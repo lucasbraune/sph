@@ -14,13 +14,21 @@ constexpr int WINDOW_SIZE = 600;
 constexpr char WINDOW_TITLE[] = "Fluid simulation";
 
 const size_t N = 1000;
+const int targetFps = 60;
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
 const double particleRadius = 0.02;
 
-const View view(region, particleRadius);
-ParticleSystem particles{randomPositions(region, N)};
+constexpr Vec2d ZERO_VECTOR{};
+const double nu = 0.001;
+PointGravity gravity{ZERO_VECTOR, nu};
+vector<Force*> forces{&gravity};
 
-int main(int argc, char** argv) {
+const View view(region, particleRadius);
+ParticleSystem particleSystem{randomPositions(region, N), vector<Vec2d>(N), forces, 1.0 / N,
+    1.0 / targetFps};
+
+int main(int argc, char** argv)
+{
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
   glutInitWindowSize(WINDOW_SIZE, WINDOW_SIZE);
@@ -36,11 +44,22 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void display() {
-  view.draw(particles.positions());
+void display()
+{
+  glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glColor3f(0.0, 0.0, 0.0);
+  view.draw(particleSystem.positions());
+
   glutSwapBuffers();
 }
 
-void idle() {}
+void idle()
+{
+  particleSystem.integrate(1.0 / targetFps);
+
+  glutPostRedisplay();
+}
 
 void keyboard(unsigned char, int, int) {}

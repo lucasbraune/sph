@@ -11,3 +11,45 @@ vector<Vec2d> randomPositions(const Rectangle region, const size_t N) {
   }
   return result;
 }
+
+Vec2d operator+(const Vec2d& a, const Vec2d& b) {
+  Vec2d res;
+  for (int i=0; i < a.size(); i++) {
+    res[i] = a[i] + b[i];
+  }
+  return res;
+}
+
+Vec2d operator-(const Vec2d& a, const Vec2d& b) {
+  Vec2d res;
+  for (int i=0; i < a.size(); i++) {
+    res[i] = a[i] - b[i];
+  }
+  return res;
+}
+
+Vec2d operator*(const double lambda, const Vec2d& a) {
+  Vec2d res;
+  for (int i=0; i< a.size(); i++) {
+    res[i] = lambda * a[i];
+  }
+  return res;
+}
+
+void operator+=(Vec2d& a, const Vec2d& b) {
+  for (int i=0; i < a.size(); i++) {
+    a[i] += b[i];
+  }
+}
+
+void operator-=(Vec2d& a, const Vec2d& b) {
+  for (int i=0; i < a.size(); i++) {
+    a[i] -= b[i];
+  }
+}
+
+void operator*=(Vec2d& a, const double lambda) {
+  for (int i=0; i < a.size(); i++) {
+    a[i] *= lambda;
+  }
+}

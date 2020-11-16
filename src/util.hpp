@@ -14,4 +14,11 @@ struct Rectangle {
 
 vector<Vec2d> randomPositions(const Rectangle region, const size_t N);
 
+Vec2d operator+(const Vec2d& a, const Vec2d& b);
+Vec2d operator-(const Vec2d& a, const Vec2d& b);
+Vec2d operator*(const double lambda, const Vec2d& a);
+void operator+=(Vec2d& a, const Vec2d& b);
+void operator-=(Vec2d& a, const Vec2d& b);
+void operator*=(Vec2d& a, const double lambda);
+
 #endif

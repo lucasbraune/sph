@@ -12,10 +12,6 @@ Rectangle View::region() const
 
 void View::draw(const vector<Vec2d>& positions) const
 {
-  glClearColor(1.0, 1.0, 1.0, 1.0); // White
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  glColor3f(0.0, 0.0, 0.0); // Black
   for (auto position : positions) {
     drawDisk(position, particleRadius_);
   }
