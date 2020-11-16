@@ -1,3 +1,5 @@
+#define GL_SILENCE_DEPRECATION
+
 #include <GL/freeglut.h>
 #include <iostream>
 
