@@ -4,6 +4,7 @@
 #include <iostream>
 #include "util.hpp"
 #include "particle_system.hpp"
+#include "view.hpp"
 
 void display();
 void idle();
@@ -12,8 +13,10 @@ void keyboard(unsigned char key, int x, int y);
 constexpr int WINDOW_SIZE = 800;
 constexpr char WINDOW_TITLE[] = "Fluid simulation";
 
-const Rectangle region {-1.0, -1.0, 1.0, 1.0};
-const ParticleSystem particles{randomPositions(region, 100)};
+const size_t N = 1000;
+const Rectangle region{-1.0, -1.0, 1.0, 1.0};
+const View view(region, 0.01);
+ParticleSystem particles{randomPositions(region, N)};
 
 int main(int argc, char** argv) {
   glutInit(&argc, argv);
@@ -21,7 +24,8 @@ int main(int argc, char** argv) {
   glutInitWindowSize(WINDOW_SIZE, WINDOW_SIZE);
   glutCreateWindow(WINDOW_TITLE);
 
-  gluOrtho2D(region.xmin, region.xmax, region.ymin, region.ymax);
+  gluOrtho2D(view.region().xmin, view.region().xmax,
+             view.region().ymin, view.region().ymax);
 
   glutDisplayFunc(display);
   glutIdleFunc(idle);
@@ -30,7 +34,10 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void display() {}
+void display() {
+  view.draw(particles.positions());
+  glutSwapBuffers();
+}
 
 void idle() {}
 
