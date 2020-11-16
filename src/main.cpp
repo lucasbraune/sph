@@ -2,18 +2,18 @@
 
 #include <GL/freeglut.h>
 #include <iostream>
+#include "util.hpp"
+#include "particle_system.hpp"
 
 void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-struct Rectangle {
-  const double xmin, ymin, xmax, ymax;
-};
-
 constexpr int WINDOW_SIZE = 800;
 constexpr char WINDOW_TITLE[] = "Fluid simulation";
-const Rectangle region {0.0, 0.0, 1.0, 1.0};
+
+const Rectangle region {-1.0, -1.0, 1.0, 1.0};
+const ParticleSystem particles{randomPositions(region, 100)};
 
 int main(int argc, char** argv) {
   glutInit(&argc, argv);
