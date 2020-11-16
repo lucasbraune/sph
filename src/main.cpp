@@ -58,6 +58,7 @@ void display()
 void idle()
 {
   particleSystem.integrate(1.0 / targetFps);
+  std::cout << particleSystem.time() << "\n";
 
   glutPostRedisplay();
 }

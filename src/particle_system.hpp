@@ -13,14 +13,14 @@ class Force {
 public:
   virtual ~Force() {}
   virtual void apply(const vector<Vec2d>& positions, const vector<Vec2d>& velocities,  
-      vector<Vec2d>& accelerations, const double t) = 0;
+      vector<Vec2d>& accelerations, const double t, const double particleMass) = 0;
 };
 
 class PointGravity : public Force {
 public:
   PointGravity(const Vec2d center, const double nu);
   void apply(const vector<Vec2d>& positions, const vector<Vec2d>& velocities,  
-      vector<Vec2d>& accelerations, const double t);
+      vector<Vec2d>& accelerations, const double t, const double particleMass);
 
 private:
   Vec2d center_;
