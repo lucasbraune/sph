@@ -10,12 +10,14 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-constexpr int WINDOW_SIZE = 800;
+constexpr int WINDOW_SIZE = 600;
 constexpr char WINDOW_TITLE[] = "Fluid simulation";
 
 const size_t N = 1000;
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
-const View view(region, 0.01);
+const double particleRadius = 0.02;
+
+const View view(region, particleRadius);
 ParticleSystem particles{randomPositions(region, N)};
 
 int main(int argc, char** argv) {
