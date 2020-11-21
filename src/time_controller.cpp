@@ -13,7 +13,7 @@ TimeController::TimeController(int targetFps) :
   TimeController(targetFps, 1.0)
 {}
 
-void TimeController::setStart()
+void TimeController::setStartOfSimulation()
 {
   sim_start_ = high_resolution_clock::now();
 }

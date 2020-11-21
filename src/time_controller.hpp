@@ -11,7 +11,7 @@ public:
   TimeController(int targetFps, double playbackSpeed);
   TimeController(int targetFps);
 
-  void setStart();
+  void setStartOfSimulation();
   void waitUntil(double simulationTime) const;
   double timeUntilNextFrame() const;
 

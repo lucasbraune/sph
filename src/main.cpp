@@ -11,7 +11,7 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-constexpr int WINDOW_SIZE = 600;
+constexpr int WINDOW_SIZE = 750;
 constexpr char WINDOW_TITLE[] = "Fluid simulation";
 
 TimeController timeController{60};
@@ -44,19 +44,14 @@ int main(int argc, char** argv)
   glutIdleFunc(idle);
   glutKeyboardFunc(keyboard);
 
-  timeController.setStart();
+  timeController.setStartOfSimulation();
   glutMainLoop();
   return 0;
 }
 
 void display()
 {
-  glClearColor(1.0, 1.0, 1.0, 1.0);
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  glColor3f(0.0, 0.0, 0.0);
-  view.draw(particleSystem.positions());
-
+  view.draw(particleSystem);  
   glutSwapBuffers();
 }
 
@@ -64,8 +59,6 @@ void idle()
 {
   particleSystem.integrate(timeController.timeUntilNextFrame());
   timeController.waitUntil(particleSystem.time());
-  std::cout << particleSystem.time() << "\n";
-
   glutPostRedisplay();
 }
 

@@ -15,9 +15,20 @@ Rectangle View::region() const
   return region_;
 }
 
-void View::draw(const vector<Vec2d>& positions) const
+void drawText(std::string line)
 {
-  for (auto position : positions) {
+  for (size_t i=0; i<line.size(); i++) {
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, line[i]);
+  }
+}
+
+void View::draw(const ParticleSystem& ps) const
+{
+  glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glColor3f(0.0, 0.0, 0.0);
+  for (auto position : ps.positions()) {
     glBegin(GL_POLYGON);
     for (auto vertex : particlePolygon_) {
       Vec2d translate = vertex + position;
@@ -25,4 +36,8 @@ void View::draw(const vector<Vec2d>& positions) const
     }
     glEnd();
   }
+
+  glColor3f(1.0, 0.0, 0.0);
+  glRasterPos2d(0.95 * region().xmin, 0.95 * region().ymin);
+  drawText("Simulation time: " + std::to_string(ps.time()));
 }
