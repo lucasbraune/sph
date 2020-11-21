@@ -5,6 +5,7 @@
 #include "util.hpp"
 #include "particle_system.hpp"
 #include "view.hpp"
+#include "synchronizer.hpp"
 
 void display();
 void idle();
@@ -13,19 +14,21 @@ void keyboard(unsigned char key, int x, int y);
 constexpr int WINDOW_SIZE = 600;
 constexpr char WINDOW_TITLE[] = "Fluid simulation";
 
-const size_t N = 1000;
-const int targetFps = 60;
-const Rectangle region{-1.0, -1.0, 1.0, 1.0};
-const double particleRadius = 0.02;
+Synchronizer synchronizer{60};
 
-constexpr Vec2d ZERO_VECTOR{};
-const double nu = 0.001;
-PointGravity gravity{ZERO_VECTOR, nu};
+const size_t numberOfParticles = 1000;
+const Rectangle region{-1.0, -1.0, 1.0, 1.0};
+
+PointGravity gravity{Vec2d{0.0, 0.0}, 1.0};
 vector<Force*> forces{&gravity};
 
-const View view(region, particleRadius, 12);
-ParticleSystem particleSystem{randomPositions(region, N), vector<Vec2d>(N), forces, 1.0 / N,
-    1.0 / targetFps};
+const View view(region, 0.02, 12);
+ParticleSystem particleSystem{
+    randomPositions(region, numberOfParticles),
+    vector<Vec2d>(numberOfParticles),
+    forces,
+    1.0 / numberOfParticles,
+    synchronizer.timeUntilNextFrame()};
 
 int main(int argc, char** argv)
 {
@@ -40,6 +43,8 @@ int main(int argc, char** argv)
   glutDisplayFunc(display);
   glutIdleFunc(idle);
   glutKeyboardFunc(keyboard);
+
+  synchronizer.setStart();
   glutMainLoop();
   return 0;
 }
@@ -57,7 +62,8 @@ void display()
 
 void idle()
 {
-  particleSystem.integrate(1.0 / targetFps);
+  particleSystem.integrate(synchronizer.timeUntilNextFrame());
+  synchronizer.waitUntil(particleSystem.time());
   std::cout << particleSystem.time() << "\n";
 
   glutPostRedisplay();
