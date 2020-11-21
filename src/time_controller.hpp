@@ -1,15 +1,15 @@
-#ifndef SYNCHRONIZER_HPP
-#define SYNCHRONIZER_HPP
+#ifndef TIME_CONTROLLER_HPP
+#define TIME_CONTROLLER_HPP
 
 #include <chrono>
 
 using std::chrono::high_resolution_clock;
 using std::chrono::time_point;
 
-class Synchronizer {
+class TimeController {
 public:
-  Synchronizer(int targetFps, double playbackSpeed);
-  Synchronizer(int targetFps);
+  TimeController(int targetFps, double playbackSpeed);
+  TimeController(int targetFps);
 
   void setStart();
   void waitUntil(double simulationTime) const;

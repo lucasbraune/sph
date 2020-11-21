@@ -5,7 +5,7 @@
 #include "util.hpp"
 #include "particle_system.hpp"
 #include "view.hpp"
-#include "synchronizer.hpp"
+#include "time_controller.hpp"
 
 void display();
 void idle();
@@ -14,7 +14,7 @@ void keyboard(unsigned char key, int x, int y);
 constexpr int WINDOW_SIZE = 600;
 constexpr char WINDOW_TITLE[] = "Fluid simulation";
 
-Synchronizer synchronizer{60};
+TimeController timeController{60};
 
 const size_t numberOfParticles = 1000;
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
@@ -28,7 +28,7 @@ ParticleSystem particleSystem{
     vector<Vec2d>(numberOfParticles),
     forces,
     1.0 / numberOfParticles,
-    synchronizer.timeUntilNextFrame()};
+    timeController.timeUntilNextFrame()};
 
 int main(int argc, char** argv)
 {
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
   glutIdleFunc(idle);
   glutKeyboardFunc(keyboard);
 
-  synchronizer.setStart();
+  timeController.setStart();
   glutMainLoop();
   return 0;
 }
@@ -62,8 +62,8 @@ void display()
 
 void idle()
 {
-  particleSystem.integrate(synchronizer.timeUntilNextFrame());
-  synchronizer.waitUntil(particleSystem.time());
+  particleSystem.integrate(timeController.timeUntilNextFrame());
+  timeController.waitUntil(particleSystem.time());
   std::cout << particleSystem.time() << "\n";
 
   glutPostRedisplay();
