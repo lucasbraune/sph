@@ -8,17 +8,15 @@
 
 class View {
 public:
-  View(const Rectangle region, const double particleRadius);
+  View(const Rectangle region, const vector<Vec2d> particlePolygon);
+  View(const Rectangle region, const double radius, const size_t sides);
   void draw(const vector<Vec2d>& positions) const;
   Rectangle region() const;
 
 private:
-  void drawDisk(const Vec2d center, const double radius) const;
-
   const Rectangle region_;
-  const double particleRadius_;
+  const vector<Vec2d> particlePolygon_;
 };
-
 
 
 #endif

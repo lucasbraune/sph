@@ -1,8 +1,13 @@
 #include "view.hpp"
+#include <cmath>
 
-View::View(const Rectangle region, const double particleRadius) : 
-    region_(region),
-    particleRadius_(particleRadius)
+View::View(const Rectangle region, const vector<Vec2d> particlePolygon) :
+  region_(region),
+  particlePolygon_(particlePolygon)
+{}
+
+View::View(const Rectangle region, const double radius, const size_t sides) :
+  View(region, RegularPolygon(radius, sides).vertices())
 {}
 
 Rectangle View::region() const
@@ -13,24 +18,11 @@ Rectangle View::region() const
 void View::draw(const vector<Vec2d>& positions) const
 {
   for (auto position : positions) {
-    drawDisk(position, particleRadius_);
+    glBegin(GL_POLYGON);
+    for (auto vertex : particlePolygon_) {
+      Vec2d translate = vertex + position;
+      glVertex2d(translate[0], translate[1]);
+    }
+    glEnd();
   }
 }
-
-void View::drawDisk(const Vec2d center, const double radius) const
-{
-  // Approximates a circle by an octagon
-  constexpr double slope = 0.70710678118; // cos(pi/4)
-  glBegin(GL_POLYGON);
-  glVertex2d(center[0] + radius         , center[1]                 );
-  glVertex2d(center[0] + slope * radius , center[1] + slope * radius);
-  glVertex2d(center[0]                  , center[1] + radius        );
-  glVertex2d(center[0] - slope * radius , center[1] + slope * radius);
-  glVertex2d(center[0] - radius         , center[1]                 );
-  glVertex2d(center[0] - slope * radius , center[1] - slope * radius);
-  glVertex2d(center[0]                  , center[1] - radius        );
-  glVertex2d(center[0] + slope * radius , center[1] - slope * radius);
-  glEnd();
-}
-
-

@@ -23,7 +23,7 @@ const double nu = 0.001;
 PointGravity gravity{ZERO_VECTOR, nu};
 vector<Force*> forces{&gravity};
 
-const View view(region, particleRadius);
+const View view(region, particleRadius, 12);
 ParticleSystem particleSystem{randomPositions(region, N), vector<Vec2d>(N), forces, 1.0 / N,
     1.0 / targetFps};
 

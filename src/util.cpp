@@ -1,5 +1,22 @@
 #include "util.hpp"
 
+RegularPolygon::RegularPolygon(Vec2d center, double radius, size_t sides)
+{
+  for (size_t i=0; i<sides; i++) {
+    double theta = 2 * M_PI * i / sides;
+    vertices_.push_back(center + radius * Vec2d{cos(theta), sin(theta)});
+  }
+}
+
+RegularPolygon::RegularPolygon(double radius, size_t sides) :
+  RegularPolygon(Vec2d{0.0, 0.0}, radius, sides)
+{}
+
+const vector<Vec2d>& RegularPolygon::vertices() const
+{
+  return vertices_;  
+}
+
 vector<Vec2d> randomPositions(const Rectangle region, const size_t N) {
   vector<Vec2d> result;
   std::uniform_real_distribution<double> xDist{region.xmin, region.xmax};
