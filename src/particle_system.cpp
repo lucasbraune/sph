@@ -1,17 +1,17 @@
 #include "particle_system.hpp"
 
 ParticleSystem::ParticleSystem(const vector<Vec2d>& positions, const vector<Vec2d>& velocities,
-    vector<Force*> forces, vector<Damping*> dampings, const double m, const double dt) :
+    vector<Force*> forces, Damping* damping, const double m, const double dt) :
   numberOfParticles_(positions.size()),
   positions_(positions),
   velocities_(velocities),
   accelerations_(positions_.size()),
   forces_(forces),
-  dampings_(dampings),
+  damping_(damping),
   particleMass_(m),
   time_(0.0),
   timeStep_(dt),
-  approxVelocities_(positions_.size())
+  forceAccelerations_(positions_.size())
 {}
 
 double ParticleSystem::time() const
@@ -22,22 +22,6 @@ double ParticleSystem::time() const
 const vector<Vec2d>& ParticleSystem::positions() const
 {
   return positions_;
-}
-
-vector<Vec2d> ParticleSystem::forceAccelerations() const {
-  vector<Vec2d> forceAccelerations(numberOfParticles_);
-  for (auto force : forces_) {
-    force->apply(time_, particleMass_, positions_, forceAccelerations);
-  }
-  return forceAccelerations;
-}
-
-vector<Vec2d> ParticleSystem::dampingAccelerations(const vector<Vec2d>& velocities) const {
-  vector<Vec2d> dampingAccelerations(numberOfParticles_);
-  for (auto damping : dampings_) {
-    damping->apply(time_, particleMass_, velocities, dampingAccelerations);
-  }
-  return dampingAccelerations;
 }
 
 /**
@@ -51,24 +35,22 @@ void ParticleSystem::step(const double dt) {
     positions_[i] += dt * velocities_[i] + (0.5 * dt * dt) * accelerations_[i];
   }
 
-  forceAccelerations_ = forceAccelerations();
-  for (size_t i=0; i<numberOfParticles_; i++) {
-    approxVelocities_[i] = velocities_[i] + dt * accelerations_[i];
+  for (Vec2d& acc : forceAccelerations_) {
+    acc = ZERO_VECTOR;
   }
-  dampingAccelerations_ = dampingAccelerations(approxVelocities_);
-  for (size_t i=0; i<numberOfParticles_; i++) {
-    approxVelocities_[i] += (0.5 * dt) *
-        (forceAccelerations_[i] + dampingAccelerations_[i] - accelerations_[i]);
+  for (auto force : forces_) {
+    force->apply(time_, particleMass_, positions_, forceAccelerations_);
   }
-  dampingAccelerations_ = dampingAccelerations(approxVelocities_);
 
   for (size_t i=0; i<numberOfParticles_; i++) {
-    velocities_[i] += (0.5 * dt) *
-        (accelerations_[i] + forceAccelerations_[i] + dampingAccelerations_[i]);
-  }
-  dampingAccelerations_ = dampingAccelerations(velocities_);
-  for (size_t i=0; i<numberOfParticles_; i++) {
-    accelerations_[i] = forceAccelerations_[i] + dampingAccelerations_[i];
+    Vec2d approxVel{velocities_[i] + dt * accelerations_[i]};
+    Vec2d dampingAcc{damping_->acceleration(time_, particleMass_, approxVel)};
+    approxVel += (0.5 * dt) * (forceAccelerations_[i] + dampingAcc - accelerations_[i]);
+    dampingAcc = damping_->acceleration(time_, particleMass_, approxVel);
+    velocities_[i] += (0.5 * dt) * (accelerations_[i] + forceAccelerations_[i] + dampingAcc);
+
+    dampingAcc = damping_->acceleration(time_, particleMass_, velocities_[i]);
+    accelerations_[i] = forceAccelerations_[i] + dampingAcc;
   }
 }
 
@@ -80,8 +62,8 @@ void ParticleSystem::updateAccelerations()
   for (auto force : forces_) {
     force->apply(time_, particleMass_, positions_, accelerations_);
   }
-  for (auto damping : dampings_) {
-    damping->apply(time_, particleMass_, velocities_, accelerations_);
+  for (size_t i=0; i<numberOfParticles_; i++) {
+    accelerations_[i] += damping_->acceleration(time_, particleMass_, velocities_[i]);
   }
 }
 
@@ -100,29 +82,5 @@ void ParticleSystem::integrate(double time)
   size_t steps = ceil(time / timeStep_);
   for (size_t i=0; i<steps; i++) {
     step(timeStep_);
-  }
-}
-
-PointGravity::PointGravity(const Vec2d center, const double nu) :
-  center_(center), intensity_(nu)
-{}
-
-void PointGravity::apply(const double, const double, const vector<Vec2d>& positions,
-                         vector<Vec2d>& accelerations) 
-{
-  for (size_t i=0; i<positions.size(); i++) {
-    accelerations[i] -= intensity_ * (positions[i] - center_);
-  }
-}
-
-LinearDamping::LinearDamping(const double intensity) :
-  intensity_(intensity)
-{}
-
-void LinearDamping::apply(const double, const double, const vector<Vec2d>& velocities,
-                          vector<Vec2d>& accelerations) 
-{
-  for (size_t i=0; i<velocities.size(); i++) {
-    accelerations[i] -= intensity_ * velocities[i];
   }
 }

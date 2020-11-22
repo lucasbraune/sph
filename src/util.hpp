@@ -35,6 +35,6 @@ void operator+=(Vec2d& a, const Vec2d& b);
 void operator-=(Vec2d& a, const Vec2d& b);
 void operator*=(Vec2d& a, const double lambda);
 
-vector<Vec2d> randomPositions(const Rectangle region, const size_t N);
+vector<Vec2d> randomVectors(const Rectangle region, const size_t numberOfVectors);
 
 #endif

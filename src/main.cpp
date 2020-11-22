@@ -4,6 +4,7 @@
 #include <iostream>
 #include "util.hpp"
 #include "particle_system.hpp"
+#include "forces.hpp"
 #include "view.hpp"
 #include "time_controller.hpp"
 
@@ -22,14 +23,12 @@ const size_t numberOfParticles = 1000;
 const double particleMass = 1.0 / numberOfParticles;
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
 PointGravity gravity{Vec2d{0.0, 0.0}, 1.0};
-LinearDamping damping{0.1};
+LinearDamping damping{0.001};
 const double timeStep = 0.01;
 
-const vector<Force*> forces{&gravity};
-const vector<Damping*> dampings{&damping};
 ParticleSystem particleSystem{
-    randomPositions(region, numberOfParticles), vector<Vec2d>(numberOfParticles),
-    forces, dampings, particleMass, timeStep};
+    randomVectors(region, numberOfParticles), vector<Vec2d>(numberOfParticles),
+    vector<Force*>{&gravity}, &damping, particleMass, timeStep};
 
 const double particleRadius = 0.02;
 const int sides = 12;

@@ -17,7 +17,7 @@ const vector<Vec2d>& RegularPolygon::vertices() const
   return vertices_;  
 }
 
-vector<Vec2d> randomPositions(const Rectangle region, const size_t N) {
+vector<Vec2d> randomVectors(const Rectangle region, const size_t N) {
   vector<Vec2d> result;
   std::uniform_real_distribution<double> xDist{region.xmin, region.xmax};
   std::uniform_real_distribution<double> yDist{region.ymin, region.ymax};
