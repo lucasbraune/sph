@@ -39,13 +39,13 @@ void drawText(std::string line)
   }
 }
 
-void View::draw(const ParticleSystem& ps) const
+void View::draw(const Simulation& sim) const
 {
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glColor3f(0.0, 0.0, 0.0);
-  for (auto position : ps.positions()) {
+  for (auto position : sim.positions()) {
     glBegin(GL_POLYGON);
     for (auto vertex : particlePolygon_) {
       Vec2d translate = vertex + position;
@@ -56,7 +56,7 @@ void View::draw(const ParticleSystem& ps) const
 
   glColor3f(1.0, 0.0, 0.0);
   glRasterPos2d(0.95 * region().xmin, 0.95 * region().ymin);
-  drawText("t = " + std::to_string(ps.time()));
+  drawText("t = " + std::to_string(sim.time()));
 }
 
 Rectangle View::region() const

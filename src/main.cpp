@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
 void display()
 {
-  view.draw(simulation.particleSystem());  
+  view.draw(simulation);  
   glutSwapBuffers();
 }
 

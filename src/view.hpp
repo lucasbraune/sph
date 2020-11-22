@@ -6,7 +6,7 @@
 #include <string>
 #include <GL/freeglut.h>
 #include "util.hpp"
-#include "particle_system.hpp"
+#include "simulation.hpp"
 
 using std::string;
 
@@ -29,7 +29,7 @@ public:
        const vector<Vec2d> particlePolygon);
   View(const Rectangle region, const int windowHeight, const string title,
        const double radius, const size_t sides);
-  void draw(const ParticleSystem& positions) const;
+  void draw(const Simulation& simulation) const;
   Rectangle region() const;
   int windowHeight() const;
   int windowWidth() const;

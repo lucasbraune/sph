@@ -15,7 +15,12 @@ void Simulation::waitForNextFrame() const
   tc_.waitUntil(ps_.time());
 }
 
-const ParticleSystem& Simulation::particleSystem() const
+const vector<Vec2d>& Simulation::positions() const
 {
-  return ps_;
+  return ps_.positions();
+}
+
+double Simulation::time() const
+{
+  return ps_.time();
 }
