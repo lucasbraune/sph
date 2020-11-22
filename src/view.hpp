@@ -7,6 +7,19 @@
 #include "util.hpp"
 #include "particle_system.hpp"
 
+/**
+ * A regular polygon inscribed in a circle.
+ */
+class RegularPolygon {
+public:
+  RegularPolygon(Vec2d center, double radius, size_t sides);
+  RegularPolygon(double radius, size_t sides);
+  const vector<Vec2d>& vertices() const;
+
+private:
+  vector<Vec2d> vertices_;
+};
+
 class View {
 public:
   View(const Rectangle region, const vector<Vec2d> particlePolygon);

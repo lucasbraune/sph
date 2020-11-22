@@ -1,6 +1,24 @@
 #include "view.hpp"
 #include <cmath>
 
+RegularPolygon::RegularPolygon(Vec2d center, double radius, size_t sides)
+{
+  for (size_t i=0; i<sides; i++) {
+    double theta = 2 * M_PI * i / sides;
+    vertices_.push_back(center + radius * Vec2d{cos(theta), sin(theta)});
+  }
+}
+
+RegularPolygon::RegularPolygon(double radius, size_t sides) :
+  RegularPolygon(Vec2d{0.0, 0.0}, radius, sides)
+{}
+
+const vector<Vec2d>& RegularPolygon::vertices() const
+{
+  return vertices_;  
+}
+
+
 View::View(const Rectangle region, const vector<Vec2d> particlePolygon) :
   region_(region),
   particlePolygon_(particlePolygon)
