@@ -7,6 +7,7 @@
 #include "forces.hpp"
 #include "view.hpp"
 #include "time_controller.hpp"
+#include "simulation.hpp"
 
 void display();
 void idle();
@@ -21,10 +22,11 @@ const double timeStep = 0.01;
 ParticleSystem particleSystem{
     randomVectors(region, numberOfParticles), vector<Vec2d>(numberOfParticles),
     vector<Force*>{&gravity}, &damping, particleMass, timeStep};
-
 const int fps = 60;
 const double playbackSpeed = 1.0;
 TimeController timeController{fps, playbackSpeed};
+
+Simulation simulation{particleSystem, timeController};
 
 const int windowHeight = 750;
 const char windowTitle[] = "Fluid simulation";
@@ -53,14 +55,14 @@ int main(int argc, char** argv)
 
 void display()
 {
-  view.draw(particleSystem);  
+  view.draw(simulation.particleSystem());  
   glutSwapBuffers();
 }
 
 void idle()
 {
-  particleSystem.integrate(timeController.timeUntilNextFrame());
-  timeController.waitUntil(particleSystem.time());
+  simulation.computeNextFrame();
+  simulation.waitForNextFrame();
   glutPostRedisplay();
 }
 
