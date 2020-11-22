@@ -53,6 +53,10 @@ Vec2d operator*(const double lambda, const Vec2d& a) {
   return res;
 }
 
+Vec2d operator*(const Vec2d& a, const double lambda) {
+  return lambda * a;
+}
+
 void operator+=(Vec2d& a, const Vec2d& b) {
   for (size_t i=0; i < a.size(); i++) {
     a[i] += b[i];

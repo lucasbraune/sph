@@ -39,5 +39,5 @@ void View::draw(const ParticleSystem& ps) const
 
   glColor3f(1.0, 0.0, 0.0);
   glRasterPos2d(0.95 * region().xmin, 0.95 * region().ymin);
-  drawText("Simulation time: " + std::to_string(ps.time()));
+  drawText("t = " + std::to_string(ps.time()));
 }
