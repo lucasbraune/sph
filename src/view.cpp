@@ -19,19 +19,18 @@ const vector<Vec2d>& RegularPolygon::vertices() const
 }
 
 
-View::View(const Rectangle region, const vector<Vec2d> particlePolygon) :
+View::View(const Rectangle region, const int windowHeight, const string title,
+           const vector<Vec2d> particlePolygon) :
   region_(region),
-  particlePolygon_(particlePolygon)
+  particlePolygon_(particlePolygon),
+  heightInPixels_(windowHeight),
+  title_(title)
 {}
 
-View::View(const Rectangle region, const double radius, const size_t sides) :
-  View(region, RegularPolygon(radius, sides).vertices())
+View::View(const Rectangle region, const int windowHeight, const string title,
+           const double radius, const size_t sides) :
+  View(region, windowHeight, title, RegularPolygon(radius, sides).vertices())
 {}
-
-Rectangle View::region() const
-{
-  return region_;
-}
 
 void drawText(std::string line)
 {
@@ -58,4 +57,26 @@ void View::draw(const ParticleSystem& ps) const
   glColor3f(1.0, 0.0, 0.0);
   glRasterPos2d(0.95 * region().xmin, 0.95 * region().ymin);
   drawText("t = " + std::to_string(ps.time()));
+}
+
+Rectangle View::region() const
+{
+  return region_;
+}
+
+int View::windowHeight() const 
+{
+  return heightInPixels_;
+}
+
+int View::windowWidth() const
+{
+  double width = region_.xmax - region_.xmin;
+  double height = region_.ymax - region_.ymin;
+  return (int) ((width / height) * heightInPixels_);
+}
+
+const char* View::title() const
+{
+  return title_.c_str();
 }

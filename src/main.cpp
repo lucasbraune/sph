@@ -12,34 +12,32 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-constexpr int WINDOW_SIZE = 750;
-constexpr char WINDOW_TITLE[] = "Fluid simulation";
-
-const int fps = 60;
-const double playbackSpeed = 1.0;
-TimeController timeController{fps, playbackSpeed};
-
 const size_t numberOfParticles = 1000;
 const double particleMass = 1.0 / numberOfParticles;
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
 PointGravity gravity{Vec2d{0.0, 0.0}, 1.0};
 LinearDamping damping{0.001};
 const double timeStep = 0.01;
-
 ParticleSystem particleSystem{
     randomVectors(region, numberOfParticles), vector<Vec2d>(numberOfParticles),
     vector<Force*>{&gravity}, &damping, particleMass, timeStep};
 
+const int fps = 60;
+const double playbackSpeed = 1.0;
+TimeController timeController{fps, playbackSpeed};
+
+const int windowHeight = 750;
+const char windowTitle[] = "Fluid simulation";
 const double particleRadius = 0.02;
 const int sides = 12;
-const View view(region, particleRadius, sides);
+const View view(region, windowHeight, windowTitle, particleRadius, sides);
 
 int main(int argc, char** argv)
 {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-  glutInitWindowSize(WINDOW_SIZE, WINDOW_SIZE);
-  glutCreateWindow(WINDOW_TITLE);
+  glutInitWindowSize(view.windowWidth(), view.windowHeight());
+  glutCreateWindow(view.title());
 
   gluOrtho2D(view.region().xmin, view.region().xmax,
              view.region().ymin, view.region().ymax);

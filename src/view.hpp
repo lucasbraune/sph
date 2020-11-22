@@ -3,9 +3,12 @@
 
 #define GL_SILENCE_DEPRECATION
 
+#include <string>
 #include <GL/freeglut.h>
 #include "util.hpp"
 #include "particle_system.hpp"
+
+using std::string;
 
 /**
  * A regular polygon inscribed in a circle.
@@ -22,14 +25,21 @@ private:
 
 class View {
 public:
-  View(const Rectangle region, const vector<Vec2d> particlePolygon);
-  View(const Rectangle region, const double radius, const size_t sides);
+  View(const Rectangle region, const int windowHeight, const string title,
+       const vector<Vec2d> particlePolygon);
+  View(const Rectangle region, const int windowHeight, const string title,
+       const double radius, const size_t sides);
   void draw(const ParticleSystem& positions) const;
   Rectangle region() const;
+  int windowHeight() const;
+  int windowWidth() const;
+  const char* title() const;
 
 private:
   const Rectangle region_;
   const vector<Vec2d> particlePolygon_;
+  const int heightInPixels_;  // window height in pixels
+  const string title_;        // window title 
 };
 
 #endif
