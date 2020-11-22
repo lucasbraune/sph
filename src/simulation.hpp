@@ -9,33 +9,38 @@ using std::vector;
 using std::chrono::high_resolution_clock;
 using std::chrono::time_point;
 
-class TimeController {
+class TimeUtil {
 public:
-  TimeController(int targetFps, double playbackSpeed);
-  TimeController(int targetFps);
-
-  void setStartOfSimulation();
-  void waitUntil(double simulationTime) const;
-  double timeUntilNextFrame() const;
+  TimeUtil();
+  void synchronize(const double simulationTime);
+  void waitUntil(const double simulationTime, const double playbackSpeed) const;
 
 private:
-  time_point<high_resolution_clock> sim_start_;
-  const int fps_;
-  const double playbackSpeed_;  
+  // Time of an event, as recorded by the system clock
+  time_point<high_resolution_clock> fixedRealTime_;
+  // Time of the same event, as recorded by the simulation clock. Measured in seconds.
+  double fixedSimTime_;
+  // Number of simulation seconds to be simulated in one real second
+  double playbackSpeed_;
 };
 
 class Simulation {
 public:
-  Simulation(const ParticleSystem& ps, const TimeController& tc);
+  Simulation(const ParticleSystem& ps, const double playbackSpeed = 1.0, const int fps = 60);
+  void synchronize();
   void computeNextFrame();
   void waitForNextFrame() const;
-
+  double playbackSpeed() const;
+  void setPlaybackSpeed(const double playbackSpeed);
   const vector<Vec2d>& positions() const;
   double time() const;
 
 private:
   ParticleSystem ps_;
-  TimeController tc_;
+  TimeUtil timeUtil_;
+  double playbackSpeed_;
+  int fps_;
 };
+
 
 #endif

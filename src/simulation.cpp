@@ -3,51 +3,57 @@
 
 using std::chrono::milliseconds;
 
-TimeController::TimeController(int targetFps, double playbackSpeed) :
-  sim_start_(high_resolution_clock::now()),
-  fps_(targetFps),
-  playbackSpeed_(playbackSpeed)
+TimeUtil::TimeUtil() :
+  fixedRealTime_(high_resolution_clock::now()),
+  fixedSimTime_(0.0)
 {}
-
-TimeController::TimeController(int targetFps) :
-  TimeController(targetFps, 1.0)
-{}
-
-void TimeController::setStartOfSimulation()
-{
-  sim_start_ = high_resolution_clock::now();
-}
 
 milliseconds toMilliseconds(double seconds)
 {
   return milliseconds((long) (seconds * 1e3));
 }
 
-void TimeController::waitUntil(double simulationTime) const 
+void TimeUtil::synchronize(const double simulationTime)
 {
-  auto realTime = sim_start_ + toMilliseconds(simulationTime / playbackSpeed_);
+  fixedRealTime_ = high_resolution_clock::now();
+  fixedSimTime_ = simulationTime;
+}
+
+void TimeUtil::waitUntil(const double simulationTime, const double playbackSpeed) const 
+{
+  double difference = simulationTime - fixedSimTime_;
+  auto realTime = fixedRealTime_ + toMilliseconds(difference / playbackSpeed);
   std::this_thread::sleep_until(realTime);
 }
 
-double TimeController::timeUntilNextFrame() const 
-{
-  return playbackSpeed_ / fps_;
-}
 
-
-Simulation::Simulation(const ParticleSystem& ps, const TimeController& tc) :
-  ps_(ps), tc_(tc)
+Simulation::Simulation(const ParticleSystem& ps, const double playbackSpeed, const int fps) :
+  ps_(ps), timeUtil_(), playbackSpeed_(playbackSpeed), fps_(fps)
 {}
+
+void Simulation::synchronize()
+{
+  timeUtil_.synchronize(ps_.time());
+}
 
 void Simulation::computeNextFrame()
 {
-  ps_.integrate(tc_.timeUntilNextFrame());
+  ps_.integrate(playbackSpeed_ / fps_);
 }
-
 
 void Simulation::waitForNextFrame() const
 {
-  tc_.waitUntil(ps_.time());
+  timeUtil_.waitUntil(ps_.time(), playbackSpeed_);
+}
+
+double Simulation::playbackSpeed() const
+{
+  return playbackSpeed_;
+}
+
+void Simulation::setPlaybackSpeed(const double playbackSpeed)
+{
+  playbackSpeed_ = playbackSpeed;
 }
 
 const vector<Vec2d>& Simulation::positions() const
