@@ -30,9 +30,6 @@ public:
   void integrate(double time);
   
 private:
-  void eulerStep(const double dt);
-  void updateAccelerations();
-
   void step(const double dt);
   
   const size_t numberOfParticles_;

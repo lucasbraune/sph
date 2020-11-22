@@ -54,29 +54,6 @@ void ParticleSystem::step(const double dt) {
   }
 }
 
-void ParticleSystem::updateAccelerations()
-{
-  for (Vec2d& acc : accelerations_) {
-    acc = ZERO_VECTOR;
-  }
-  for (auto force : forces_) {
-    force->apply(time_, particleMass_, positions_, accelerations_);
-  }
-  for (size_t i=0; i<numberOfParticles_; i++) {
-    accelerations_[i] += damping_->acceleration(time_, particleMass_, velocities_[i]);
-  }
-}
-
-void ParticleSystem::eulerStep(const double dt)
-{
-  updateAccelerations();
-  for (size_t i=0; i<numberOfParticles_; i++) {
-    positions_[i] += dt * velocities_[i];
-    velocities_[i] += dt * accelerations_[i];
-  }
-  time_ += dt;
-}
-
 void ParticleSystem::integrate(double time)
 {
   size_t steps = ceil(time / timeStep_);
