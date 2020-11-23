@@ -43,7 +43,7 @@ private:
 
   // Used in time steps
   const double timeStep_;
-  vector<Vec2d> forceAccelerations_;
+  vector<Vec2d> nextForceAcc_;
 };
 
 #endif

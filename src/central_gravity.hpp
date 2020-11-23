@@ -24,5 +24,4 @@ private:
   LinearDamping damping_;
 };
 
-
 #endif

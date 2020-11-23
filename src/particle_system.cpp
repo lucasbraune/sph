@@ -11,7 +11,7 @@ ParticleSystem::ParticleSystem(const vector<Vec2d>& positions, const vector<Vec2
   particleMass_(m),
   time_(0.0),
   timeStep_(dt),
-  forceAccelerations_(positions_.size())
+  nextForceAcc_(positions_.size())
 {}
 
 double ParticleSystem::time() const
@@ -22,6 +22,16 @@ double ParticleSystem::time() const
 const vector<Vec2d>& ParticleSystem::positions() const
 {
   return positions_;
+}
+
+inline Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc, const Damping& damping,
+                   double mass, double time, double timeStep)
+{
+  Vec2d approxVel{currVel + timeStep * currAcc};
+  Vec2d approxDampingAcc{damping.acceleration(time, mass, approxVel)};
+  approxVel += (0.5 * timeStep) * (nextForceAcc + approxDampingAcc - currAcc);
+  approxDampingAcc = damping.acceleration(time, mass, approxVel);
+  return currVel + (0.5 * timeStep) * (currAcc + nextForceAcc + approxDampingAcc);
 }
 
 /**
@@ -35,22 +45,18 @@ void ParticleSystem::step(const double dt) {
     positions_[i] += dt * velocities_[i] + (0.5 * dt * dt) * accelerations_[i];
   }
 
-  for (Vec2d& acc : forceAccelerations_) {
+  for (Vec2d& acc : nextForceAcc_) {
     acc = ZERO_VECTOR;
   }
   for (auto force : forces_) {
-    force->apply(time_, particleMass_, positions_, forceAccelerations_);
+    force->apply(time_, particleMass_, positions_, nextForceAcc_);
   }
 
   for (size_t i=0; i<numberOfParticles_; i++) {
-    Vec2d approxVel{velocities_[i] + dt * accelerations_[i]};
-    Vec2d dampingAcc{damping_->acceleration(time_, particleMass_, approxVel)};
-    approxVel += (0.5 * dt) * (forceAccelerations_[i] + dampingAcc - accelerations_[i]);
-    dampingAcc = damping_->acceleration(time_, particleMass_, approxVel);
-    velocities_[i] += (0.5 * dt) * (accelerations_[i] + forceAccelerations_[i] + dampingAcc);
-
-    dampingAcc = damping_->acceleration(time_, particleMass_, velocities_[i]);
-    accelerations_[i] = forceAccelerations_[i] + dampingAcc;
+    velocities_[i] = nextVelocity(velocities_[i], accelerations_[i], nextForceAcc_[i],
+                                  *damping_, particleMass_, time_, dt);
+    Vec2d nextDampingAcc = damping_->acceleration(time_, particleMass_, velocities_[i]);
+    accelerations_[i] = nextForceAcc_[i] + nextDampingAcc;
   }
 }
 
