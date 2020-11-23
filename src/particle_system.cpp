@@ -24,13 +24,13 @@ const vector<Vec2d>& ParticleSystem::positions() const
   return positions_;
 }
 
-inline Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc, const Damping& damping,
-                   double mass, double time, double timeStep)
+inline Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc, Damping const* damping,
+                          double mass, double time, double timeStep)
 {
   Vec2d approxVel{currVel + timeStep * currAcc};
-  Vec2d approxDampingAcc{damping.acceleration(time, mass, approxVel)};
+  Vec2d approxDampingAcc{damping->acceleration(time, mass, approxVel)};
   approxVel += (0.5 * timeStep) * (nextForceAcc + approxDampingAcc - currAcc);
-  approxDampingAcc = damping.acceleration(time, mass, approxVel);
+  approxDampingAcc = damping->acceleration(time, mass, approxVel);
   return currVel + (0.5 * timeStep) * (currAcc + nextForceAcc + approxDampingAcc);
 }
 
@@ -54,7 +54,7 @@ void ParticleSystem::step(const double dt) {
 
   for (size_t i=0; i<numberOfParticles_; i++) {
     velocities_[i] = nextVelocity(velocities_[i], accelerations_[i], nextForceAcc_[i],
-                                  *damping_, particleMass_, time_, dt);
+                                  damping_, particleMass_, time_, dt);
     Vec2d nextDampingAcc = damping_->acceleration(time_, particleMass_, velocities_[i]);
     accelerations_[i] = nextForceAcc_[i] + nextDampingAcc;
   }
