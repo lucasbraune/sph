@@ -23,11 +23,8 @@ ParticleSystem particleSystem{
     vector<Force*>{&gravity}, &damping, particleMass, timeStep};
 Simulation simulation{particleSystem};
 
-const int windowHeight = 750;
-const char windowTitle[] = "Fluid simulation";
 const double particleRadius = 0.02;
-const int sides = 12;
-const View view(region, windowHeight, windowTitle, particleRadius, sides);
+const View view(region, particleRadius);
 
 int main(int argc, char** argv)
 {

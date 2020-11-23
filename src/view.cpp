@@ -27,9 +27,9 @@ View::View(const Rectangle region, const int windowHeight, const string title,
   title_(title)
 {}
 
-View::View(const Rectangle region, const int windowHeight, const string title,
-           const double radius, const size_t sides) :
-  View(region, windowHeight, title, RegularPolygon(radius, sides).vertices())
+View::View(const Rectangle region, const double particleRadius, const size_t sides,
+           const int windowHeight, const string title) :
+  View(region, windowHeight, title, RegularPolygon(particleRadius, sides).vertices())
 {}
 
 void drawText(std::string line)
