@@ -27,11 +27,18 @@ private:
 class Simulation {
 public:
   Simulation(const ParticleSystem& ps, const double playbackSpeed = 1.0, const int fps = 60);
-  void synchronize();
+  
   void computeNextFrame();
   void waitForNextFrame() const;
+
   double playbackSpeed() const;
   void setPlaybackSpeed(const double playbackSpeed);
+
+  bool paused() const;
+  void pause();
+  void unpause();
+  void pauseSwitch();
+  
   const vector<Vec2d>& positions() const;
   double time() const;
 
@@ -40,6 +47,7 @@ private:
   TimeUtil timeUtil_;
   double playbackSpeed_;
   int fps_;
+  bool paused_;
 };
 
 

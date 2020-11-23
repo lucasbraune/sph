@@ -28,22 +28,21 @@ void TimeUtil::waitUntil(const double simulationTime, const double playbackSpeed
 
 
 Simulation::Simulation(const ParticleSystem& ps, const double playbackSpeed, const int fps) :
-  ps_(ps), timeUtil_(), playbackSpeed_(playbackSpeed), fps_(fps)
+  ps_(ps), timeUtil_(), playbackSpeed_(playbackSpeed), fps_(fps), paused_(true)
 {}
-
-void Simulation::synchronize()
-{
-  timeUtil_.synchronize(ps_.time());
-}
 
 void Simulation::computeNextFrame()
 {
-  ps_.integrate(playbackSpeed_ / fps_);
+  if (!paused()) {
+    ps_.integrate(playbackSpeed_ / fps_);
+  }
 }
 
 void Simulation::waitForNextFrame() const
 {
-  timeUtil_.waitUntil(ps_.time(), playbackSpeed_);
+  if (!paused()) {
+    timeUtil_.waitUntil(ps_.time(), playbackSpeed_);
+  }
 }
 
 double Simulation::playbackSpeed() const
@@ -54,6 +53,31 @@ double Simulation::playbackSpeed() const
 void Simulation::setPlaybackSpeed(const double playbackSpeed)
 {
   playbackSpeed_ = playbackSpeed;
+}
+
+void Simulation::unpause()
+{ 
+  timeUtil_.synchronize(ps_.time());
+  paused_ = false;
+}
+
+void Simulation::pause()
+{
+  paused_ = true;
+}
+
+bool Simulation::paused() const
+{
+  return paused_;
+}
+
+void Simulation::pauseSwitch()
+{
+  if (paused_) {
+    unpause();
+  } else {
+    pause();
+  }
 }
 
 const vector<Vec2d>& Simulation::positions() const
