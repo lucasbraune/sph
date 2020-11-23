@@ -35,8 +35,6 @@ public:
   void setPlaybackSpeed(const double playbackSpeed);
 
   bool paused() const;
-  void pause();
-  void unpause();
   void pauseSwitch();
   
   const vector<Vec2d>& positions() const;

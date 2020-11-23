@@ -43,7 +43,7 @@ int main(int argc, char** argv)
   glutIdleFunc(idle);
   glutKeyboardFunc(keyboard);
 
-  simulation.unpause();
+  simulation.pauseSwitch();
   glutMainLoop();
   return 0;
 }

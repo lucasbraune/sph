@@ -55,17 +55,6 @@ void Simulation::setPlaybackSpeed(const double playbackSpeed)
   playbackSpeed_ = playbackSpeed;
 }
 
-void Simulation::unpause()
-{ 
-  timeUtil_.synchronize(ps_.time());
-  paused_ = false;
-}
-
-void Simulation::pause()
-{
-  paused_ = true;
-}
-
 bool Simulation::paused() const
 {
   return paused_;
@@ -74,10 +63,9 @@ bool Simulation::paused() const
 void Simulation::pauseSwitch()
 {
   if (paused_) {
-    unpause();
-  } else {
-    pause();
+    timeUtil_.synchronize(time());
   }
+  paused_ = !paused_;
 }
 
 const vector<Vec2d>& Simulation::positions() const
