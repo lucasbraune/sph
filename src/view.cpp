@@ -39,6 +39,17 @@ void drawText(std::string line)
   }
 }
 
+string textInfo(const Simulation& sim)
+{
+  string text =
+      "time = " + std::to_string(sim.time()) + 
+      ", speed = " + std::to_string(sim.speed()) + "x";
+  if (sim.paused()) {
+    text.append(", PAUSED");
+  } 
+  return text;
+}
+
 void View::draw(const Simulation& sim) const
 {
   glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -56,7 +67,7 @@ void View::draw(const Simulation& sim) const
 
   glColor3f(1.0, 0.0, 0.0);
   glRasterPos2d(0.95 * region().xmin, 0.95 * region().ymin);
-  drawText("t = " + std::to_string(sim.time()));
+  drawText(textInfo(sim));
 }
 
 Rectangle View::region() const

@@ -45,6 +45,11 @@ void Simulation::waitForNextFrame() const
   }
 }
 
+double Simulation::speed() const
+{
+  return simulationSpeed_;
+}
+
 void Simulation::speedUp()
 {
   synchronize();
