@@ -22,3 +22,23 @@ CentralGravity::CentralGravity(const size_t numberOfParticles, const double tota
   addForce(&gravity_);
   replaceDamping(&damping_);
 }
+
+void CentralGravity::increaseGravity()
+{
+  gravity_.increaseIntensity();
+}
+
+void CentralGravity::decreaseGravity()
+{
+  gravity_.decreaseIntensity();
+}
+
+void CentralGravity::increaseDamping()
+{
+  damping_.increaseIntensity();
+}
+
+void CentralGravity::decreaseDamping()
+{
+  damping_.decreaseIntensity();
+}

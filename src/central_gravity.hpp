@@ -14,6 +14,11 @@ public:
       const double dampingConstant = 0.01,
       const double timeStep = 0.01);
 
+  void increaseGravity();
+  void decreaseGravity();
+  void increaseDamping();
+  void decreaseDamping();
+
 private:
   PointGravity gravity_;
   LinearDamping damping_;

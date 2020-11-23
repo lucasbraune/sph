@@ -50,6 +50,21 @@ void idle()
 void keyboard(unsigned char c, int, int)
 {
   switch (c) {
+  // Central gravity controls
+  case 'd':
+    simulation.decreaseDamping();
+    break;
+  case 'D':
+    simulation.increaseDamping();
+    break;
+  case 'g':
+    simulation.decreaseGravity();
+    break;
+  case 'G':
+    simulation.increaseGravity();
+    break;
+
+  // Simulation controls
   case 'p':
   case 'P':
     simulation.switchPauseState();
