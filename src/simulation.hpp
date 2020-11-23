@@ -29,7 +29,7 @@ public:
   void computeNextFrame();
   void waitForNextFrame() const;
 
-  double speed() const;
+  double targetSpeed() const;
   void speedUp();
   void speedDown();
 

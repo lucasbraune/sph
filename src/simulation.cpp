@@ -45,7 +45,7 @@ void Simulation::waitForNextFrame() const
   }
 }
 
-double Simulation::speed() const
+double Simulation::targetSpeed() const
 {
   return simulationSpeed_;
 }

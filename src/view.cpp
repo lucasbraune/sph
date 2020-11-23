@@ -43,7 +43,7 @@ string textInfo(const Simulation& sim)
 {
   string text =
       "time = " + std::to_string(sim.time()) + 
-      ", speed = " + std::to_string(sim.speed()) + "x";
+      ", target speed = " + std::to_string(sim.targetSpeed()) + "x";
   if (sim.paused()) {
     text.append(", PAUSED");
   } 
