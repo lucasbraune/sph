@@ -39,6 +39,10 @@ public:
   const vector<Vec2d>& positions() const;
   double time() const;
 
+protected:
+  void addForce(Force* const force); // Argument is a constant pointer to a possibly mutable object.
+  void replaceDamping(Damping* const damping);
+
 private:
   void synchronize();
 

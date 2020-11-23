@@ -61,3 +61,13 @@ void ParticleSystem::integrate(double time)
     step(timeStep_);
   }
 }
+
+void ParticleSystem::addForce(Force* const force)
+{
+  forces_.emplace_back(force);
+}
+
+void ParticleSystem::replaceDamping(Damping* const damping)  
+{
+  damping_ = damping;
+}

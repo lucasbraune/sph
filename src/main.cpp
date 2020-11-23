@@ -1,28 +1,17 @@
 #define GL_SILENCE_DEPRECATION
 
 #include <GL/freeglut.h>
-#include <iostream>
 #include "util.hpp"
-#include "particle_system.hpp"
-#include "forces.hpp"
 #include "view.hpp"
-#include "simulation.hpp"
+#include "central_gravity.hpp"
 
 void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-const size_t numberOfParticles = 1000;
-const double particleMass = 1.0 / numberOfParticles;
-const Rectangle region{-1.0, -1.0, 1.0, 1.0};
-PointGravity gravity{Vec2d{0.0, 0.0}, 1.0};
-LinearDamping damping{0.001};
-const double timeStep = 0.01;
-ParticleSystem particleSystem{
-    randomVectors(region, numberOfParticles), vector<Vec2d>(numberOfParticles),
-    vector<Force*>{&gravity}, &damping, particleMass, timeStep};
-Simulation simulation{particleSystem};
+CentralGravity simulation;
 
+const Rectangle region{-1.0, -1.0, 1.0, 1.0};
 const double particleRadius = 0.02;
 const View view(region, particleRadius);
 

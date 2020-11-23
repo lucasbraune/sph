@@ -85,6 +85,16 @@ double Simulation::time() const
   return ps_.time();
 }
 
+void Simulation::addForce(Force* const force)
+{
+  ps_.addForce(force);
+}
+
+void Simulation::replaceDamping(Damping* const damping)
+{
+  ps_.replaceDamping(damping);
+}
+
 void Simulation::synchronize()
 {
   timeUtil_.synchronize(ps_.time());
