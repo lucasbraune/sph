@@ -43,7 +43,7 @@ int main(int argc, char** argv)
   glutIdleFunc(idle);
   glutKeyboardFunc(keyboard);
 
-  simulation.pauseSwitch();
+  simulation.switchPauseState(); // Unpauses the simulation
   glutMainLoop();
   return 0;
 }
@@ -66,7 +66,13 @@ void keyboard(unsigned char c, int, int)
   switch (c) {
   case 'p':
   case 'P':
-      simulation.pauseSwitch();
-      break;
+    simulation.switchPauseState();
+    break;
+  case 's':
+    simulation.speedDown();
+    break;
+  case 'S':
+    simulation.speedUp();
+    break;
   }
 }

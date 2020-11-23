@@ -28,31 +28,33 @@ void TimeUtil::waitUntil(const double simulationTime, const double playbackSpeed
 
 
 Simulation::Simulation(const ParticleSystem& ps, const double playbackSpeed, const int fps) :
-  ps_(ps), timeUtil_(), playbackSpeed_(playbackSpeed), fps_(fps), paused_(true)
+  ps_(ps), timeUtil_(), simulationSpeed_(playbackSpeed), fps_(fps), paused_(true)
 {}
 
 void Simulation::computeNextFrame()
 {
   if (!paused()) {
-    ps_.integrate(playbackSpeed_ / fps_);
+    ps_.integrate(simulationSpeed_ / fps_);
   }
 }
 
 void Simulation::waitForNextFrame() const
 {
   if (!paused()) {
-    timeUtil_.waitUntil(ps_.time(), playbackSpeed_);
+    timeUtil_.waitUntil(ps_.time(), simulationSpeed_);
   }
 }
 
-double Simulation::playbackSpeed() const
+void Simulation::speedUp()
 {
-  return playbackSpeed_;
+  synchronize();
+  simulationSpeed_ *= 2.0;
 }
 
-void Simulation::setPlaybackSpeed(const double playbackSpeed)
+void Simulation::speedDown()
 {
-  playbackSpeed_ = playbackSpeed;
+  synchronize();
+  simulationSpeed_ *= 0.5;
 }
 
 bool Simulation::paused() const
@@ -60,10 +62,10 @@ bool Simulation::paused() const
   return paused_;
 }
 
-void Simulation::pauseSwitch()
+void Simulation::switchPauseState()
 {
   if (paused_) {
-    timeUtil_.synchronize(time());
+    synchronize();
   }
   paused_ = !paused_;
 }
@@ -76,4 +78,9 @@ const vector<Vec2d>& Simulation::positions() const
 double Simulation::time() const
 {
   return ps_.time();
+}
+
+void Simulation::synchronize()
+{
+  timeUtil_.synchronize(ps_.time());
 }

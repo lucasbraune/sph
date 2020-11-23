@@ -13,37 +13,38 @@ class TimeUtil {
 public:
   TimeUtil();
   void synchronize(const double simulationTime);
-  void waitUntil(const double simulationTime, const double playbackSpeed) const;
+  void waitUntil(const double simulationTime, const double simulationSpeed) const;
 
 private:
   // Time of an event, as recorded by the system clock
   time_point<high_resolution_clock> fixedRealTime_;
   // Time of the same event, as recorded by the simulation clock. Measured in seconds.
   double fixedSimTime_;
-  // Number of simulation seconds to be simulated in one real second
-  double playbackSpeed_;
 };
 
 class Simulation {
 public:
-  Simulation(const ParticleSystem& ps, const double playbackSpeed = 1.0, const int fps = 60);
+  Simulation(const ParticleSystem& ps, const double simulationSpeed = 1.0, const int fps = 60);
   
   void computeNextFrame();
   void waitForNextFrame() const;
 
-  double playbackSpeed() const;
-  void setPlaybackSpeed(const double playbackSpeed);
+  double speed() const;
+  void speedUp();
+  void speedDown();
 
   bool paused() const;
-  void pauseSwitch();
+  void switchPauseState();
   
   const vector<Vec2d>& positions() const;
   double time() const;
 
 private:
+  void synchronize();
+
   ParticleSystem ps_;
   TimeUtil timeUtil_;
-  double playbackSpeed_;
+  double simulationSpeed_;
   int fps_;
   bool paused_;
 };
