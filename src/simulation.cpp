@@ -41,7 +41,7 @@ void Simulation::computeNextFrame()
 void Simulation::waitForNextFrame() const
 {
   if (!paused()) {
-    timeUtil_.waitUntil(ps_.time(), simulationSpeed_);
+    timeUtil_.waitUntil(ps_.time, simulationSpeed_);
   }
 }
 
@@ -77,15 +77,15 @@ void Simulation::switchPauseState()
 
 const vector<Vec2d>& Simulation::positions() const
 {
-  return ps_.positions();
+  return ps_.positions;
 }
 
 double Simulation::time() const
 {
-  return ps_.time();
+  return ps_.time;
 }
 
 void Simulation::synchronize()
 {
-  timeUtil_.synchronize(ps_.time());
+  timeUtil_.synchronize(ps_.time);
 }
