@@ -43,6 +43,7 @@ private:
   void synchronize();
 
   ParticleSystem& ps_;
+  VerletIntegrator integrator_;
   TimeUtil timeUtil_;
   double simulationSpeed_;
   int fps_;

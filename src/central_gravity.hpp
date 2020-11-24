@@ -11,8 +11,7 @@ public:
       const double totalMass = 1.0,
       const Rectangle region = {-1.0, -1.0, 1.0, 1.0},
       const double gravityConstant = 1.0,
-      const double dampingConstant = 0.01,
-      const double timeStep = 0.01);
+      const double dampingConstant = 0.01);
 
   Simulation& simulation();
   LinearDamping& damping();

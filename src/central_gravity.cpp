@@ -1,16 +1,14 @@
 #include "central_gravity.hpp"
 
 CentralGravity::CentralGravity(const size_t numberOfParticles, const double totalMass,
-    const Rectangle region, const double gravityConstant, const double dampingConstant,
-    const double timeStep) :
+    const Rectangle region, const double gravityConstant, const double dampingConstant) :
   gravity_(ZERO_VECTOR, gravityConstant),
   damping_(dampingConstant),
   ps_(randomVectors(region, numberOfParticles),
                     vector<Vec2d>(numberOfParticles),
                     vector<Force*>{&gravity_},
                     damping_,
-                    totalMass / numberOfParticles,
-                    timeStep),
+                    totalMass / numberOfParticles),
   sim_(ps_)
 {}
 

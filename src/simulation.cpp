@@ -34,7 +34,7 @@ Simulation::Simulation(ParticleSystem& ps, const double playbackSpeed, const int
 void Simulation::computeNextFrame()
 {
   if (!paused()) {
-    ps_.integrate(simulationSpeed_ / fps_);
+    integrator_.integrate(ps_, simulationSpeed_ / fps_);
   }
 }
 

@@ -23,23 +23,43 @@ public:
 class ParticleSystem {
 public:
   ParticleSystem(const vector<Vec2d>& initialPositions, const vector<Vec2d>& initialVelocities,
-                 vector<Force*> forces, Damping& damping, const double particleMass,
-                 const double timeStep);
+                 vector<Force*> forces, Damping& damping, const double particleMass);
+
   const vector<Vec2d>& positions() const;
   double time() const;
-  void integrate(double time);
-  
-private:
-  void step(const double dt);
   
   const size_t numberOfParticles_;
+  const double particleMass_;
   vector<Vec2d> positions_, velocities_, accelerations_;
   vector<Force*> forces_; 
   Damping& damping_; 
-  const double particleMass_;
   double time_;
+};
 
-  // Used in time steps
+class TimeIntegrator {
+public:
+  virtual void step(ParticleSystem& ps) = 0;
+  void integrate(ParticleSystem& ps, double duration);
+};
+
+class EulerIntegrator : public TimeIntegrator {
+public:
+  EulerIntegrator(double timeStep = 0.01);
+  void step(ParticleSystem& ps) override;
+
+private:
+  const double timeStep_;
+};
+
+class VerletIntegrator : public TimeIntegrator {
+public:
+  VerletIntegrator(double timeStep = 0.01);
+  void step(ParticleSystem& ps) override;
+
+private:
+  static inline Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc,
+                                   const Damping& damping, double mass, double time,
+                                   double timeStep);
   const double timeStep_;
   vector<Vec2d> nextForceAcc_;
 };
