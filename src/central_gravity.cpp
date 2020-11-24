@@ -5,10 +5,10 @@ CentralGravity::CentralGravity(const size_t numberOfParticles, const double tota
   gravity_(ZERO_VECTOR, gravityConstant),
   damping_(dampingConstant),
   ps_(randomVectors(region, numberOfParticles),
-                    vector<Vec2d>(numberOfParticles),
-                    vector<Force*>{&gravity_},
-                    damping_,
-                    totalMass / numberOfParticles),
+      vector<Vec2d>(numberOfParticles),
+      vector<Force*>{&gravity_},
+      damping_,
+      totalMass / numberOfParticles),
   sim_(ps_)
 {}
 
