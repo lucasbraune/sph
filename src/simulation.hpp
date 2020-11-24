@@ -24,7 +24,7 @@ private:
 
 class Simulation {
 public:
-  Simulation(const ParticleSystem& ps, const double simulationSpeed = 1.0, const int fps = 60);
+  Simulation(ParticleSystem& ps, const double simulationSpeed = 1.0, const int fps = 60);
   
   void computeNextFrame();
   void waitForNextFrame() const;
@@ -39,14 +39,10 @@ public:
   const vector<Vec2d>& positions() const;
   double time() const;
 
-protected:
-  void addForce(Force* const force); // Argument is a constant pointer to a possibly mutable object.
-  void replaceDamping(Damping* const damping);
-
 private:
   void synchronize();
 
-  ParticleSystem ps_;
+  ParticleSystem& ps_;
   TimeUtil timeUtil_;
   double simulationSpeed_;
   int fps_;

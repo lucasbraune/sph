@@ -9,7 +9,7 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-CentralGravity simulation;
+CentralGravity centralGravity;
 
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
 const double particleRadius = 0.02;
@@ -29,21 +29,21 @@ int main(int argc, char** argv)
   glutIdleFunc(idle);
   glutKeyboardFunc(keyboard);
 
-  simulation.switchPauseState(); // Unpauses the simulation
+  centralGravity.simulation().switchPauseState(); // Unpauses the simulation
   glutMainLoop();
   return 0;
 }
 
 void display()
 {
-  view.draw(simulation);  
+  view.draw(centralGravity.simulation());  
   glutSwapBuffers();
 }
 
 void idle()
 {
-  simulation.computeNextFrame();
-  simulation.waitForNextFrame();
+  centralGravity.simulation().computeNextFrame();
+  centralGravity.simulation().waitForNextFrame();
   glutPostRedisplay();
 }
 
@@ -52,28 +52,28 @@ void keyboard(unsigned char c, int, int)
   switch (c) {
   // Central gravity controls
   case 'd':
-    simulation.decreaseDamping();
+    centralGravity.damping().decrease();
     break;
   case 'D':
-    simulation.increaseDamping();
+    centralGravity.damping().increase();
     break;
   case 'g':
-    simulation.decreaseGravity();
+    centralGravity.gravity().decrease();
     break;
   case 'G':
-    simulation.increaseGravity();
+    centralGravity.gravity().increase();
     break;
 
   // Simulation controls
   case 'p':
   case 'P':
-    simulation.switchPauseState();
+    centralGravity.simulation().switchPauseState();
     break;
   case 's':
-    simulation.speedDown();
+    centralGravity.simulation().speedDown();
     break;
   case 'S':
-    simulation.speedUp();
+    centralGravity.simulation().speedUp();
     break;
   }
 }

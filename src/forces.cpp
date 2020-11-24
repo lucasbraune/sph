@@ -12,12 +12,12 @@ void PointGravity::apply(const double, const double, const vector<Vec2d>& positi
   }
 }
 
-void PointGravity::increaseIntensity()
+void PointGravity::increase()
 {
   intensity_ *= 2.0;
 }
 
-void PointGravity::decreaseIntensity()
+void PointGravity::decrease()
 {
   intensity_ *= 0.5;
 }
@@ -31,12 +31,12 @@ Vec2d LinearDamping::acceleration(const double, const double, const Vec2d veloci
   return -intensity_ * velocity;
 }
 
-void LinearDamping::increaseIntensity()
+void LinearDamping::increase()
 {
   intensity_ *= 2.0;
 }
 
-void LinearDamping::decreaseIntensity()
+void LinearDamping::decrease()
 {
   intensity_ *= 0.5;
 }

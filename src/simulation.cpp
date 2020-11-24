@@ -27,7 +27,7 @@ void TimeUtil::waitUntil(const double simulationTime, const double playbackSpeed
 }
 
 
-Simulation::Simulation(const ParticleSystem& ps, const double playbackSpeed, const int fps) :
+Simulation::Simulation(ParticleSystem& ps, const double playbackSpeed, const int fps) :
   ps_(ps), timeUtil_(), simulationSpeed_(playbackSpeed), fps_(fps), paused_(true)
 {}
 
@@ -83,16 +83,6 @@ const vector<Vec2d>& Simulation::positions() const
 double Simulation::time() const
 {
   return ps_.time();
-}
-
-void Simulation::addForce(Force* const force)
-{
-  ps_.addForce(force);
-}
-
-void Simulation::replaceDamping(Damping* const damping)
-{
-  ps_.replaceDamping(damping);
 }
 
 void Simulation::synchronize()

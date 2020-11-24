@@ -1,44 +1,30 @@
 #include "central_gravity.hpp"
 
-ParticleSystem createParticleSystem(const size_t numberOfParticles,
-    const double totalMass, const Rectangle region, const double timeStep)
-{
-  return ParticleSystem{
-      randomVectors(region, numberOfParticles),
-      vector<Vec2d>(numberOfParticles),
-      vector<Force*>{},
-      NULL,
-      totalMass/numberOfParticles,
-      timeStep};
-}
-
 CentralGravity::CentralGravity(const size_t numberOfParticles, const double totalMass,
     const Rectangle region, const double gravityConstant, const double dampingConstant,
     const double timeStep) :
-  Simulation(createParticleSystem(numberOfParticles, totalMass, region, timeStep)),
-  gravity_{ZERO_VECTOR, gravityConstant},
-  damping_{dampingConstant}
+  gravity_(ZERO_VECTOR, gravityConstant),
+  damping_(dampingConstant),
+  ps_(randomVectors(region, numberOfParticles),
+                    vector<Vec2d>(numberOfParticles),
+                    vector<Force*>{&gravity_},
+                    damping_,
+                    totalMass / numberOfParticles,
+                    timeStep),
+  sim_(ps_)
+{}
+
+Simulation& CentralGravity::simulation()
 {
-  addForce(&gravity_);
-  replaceDamping(&damping_);
+  return sim_;
 }
 
-void CentralGravity::increaseGravity()
+LinearDamping& CentralGravity::damping()
 {
-  gravity_.increaseIntensity();
+  return damping_;
 }
 
-void CentralGravity::decreaseGravity()
+PointGravity& CentralGravity::gravity()
 {
-  gravity_.decreaseIntensity();
-}
-
-void CentralGravity::increaseDamping()
-{
-  damping_.increaseIntensity();
-}
-
-void CentralGravity::decreaseDamping()
-{
-  damping_.decreaseIntensity();
+  return gravity_;
 }
