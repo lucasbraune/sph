@@ -3,11 +3,13 @@
 
 #include <vector>
 #include <chrono>
+#include <memory>
 #include "particle_system.hpp"
 
 using std::vector;
 using std::chrono::high_resolution_clock;
 using std::chrono::time_point;
+using std::unique_ptr;
 
 class TimeUtil {
 public:
@@ -24,7 +26,8 @@ private:
 
 class Simulation {
 public:
-  Simulation(ParticleSystem& ps, const double simulationSpeed = 1.0, const int fps = 60);
+  Simulation(ParticleSystem& ps,
+             unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01), double simulationSpeed = 1.0, int fps = 60);
   
   void computeNextFrame();
   void waitForNextFrame() const;
@@ -43,7 +46,7 @@ private:
   void synchronize();
 
   ParticleSystem& ps_;
-  VerletIntegrator integrator_;
+  unique_ptr<TimeIntegrator> integrator_;
   TimeUtil timeUtil_;
   double simulationSpeed_;
   int fps_;

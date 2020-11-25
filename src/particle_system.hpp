@@ -33,6 +33,7 @@ struct ParticleSystem {
 
 class TimeIntegrator {
 public:
+  virtual ~TimeIntegrator() {};
   virtual void step(ParticleSystem& ps) = 0;
   void integrate(ParticleSystem& ps, double duration);
 };

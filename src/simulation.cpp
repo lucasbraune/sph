@@ -26,15 +26,19 @@ void TimeUtil::waitUntil(const double simulationTime, const double playbackSpeed
   std::this_thread::sleep_until(realTime);
 }
 
-
-Simulation::Simulation(ParticleSystem& ps, const double playbackSpeed, const int fps) :
-  ps_(ps), timeUtil_(), simulationSpeed_(playbackSpeed), fps_(fps), paused_(true)
+Simulation::Simulation(ParticleSystem& ps, unique_ptr<TimeIntegrator> integrator, double playbackSpeed, int fps) :
+  ps_(ps),
+  integrator_(std::move(integrator)),
+  timeUtil_(),
+  simulationSpeed_(playbackSpeed),
+  fps_(fps),
+  paused_(true)
 {}
 
 void Simulation::computeNextFrame()
 {
   if (!paused()) {
-    integrator_.integrate(ps_, simulationSpeed_ / fps_);
+    integrator_->integrate(ps_, simulationSpeed_ / fps_);
   }
 }
 
