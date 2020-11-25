@@ -51,5 +51,13 @@ private:
   bool paused_;
 };
 
+class Simulation {
+public:
+  virtual ~Simulation() {};
+  virtual SimulationRunner& runner() = 0;
+  virtual const SimulationRunner& runner() const = 0;
+  virtual const ParticleSystem& state() const = 0;
+};
+
 
 #endif

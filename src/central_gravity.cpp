@@ -1,6 +1,6 @@
 #include "central_gravity.hpp"
 
-CentralGravitySimulation::CentralGravitySimulation(const size_t numberOfParticles, const double totalMass,
+CentralPotential::CentralPotential(const size_t numberOfParticles, const double totalMass,
     const Rectangle region, const double gravityConstant, const double dampingConstant) :
   gravity_(ZERO_VECTOR, gravityConstant),
   damping_(dampingConstant),
@@ -12,22 +12,27 @@ CentralGravitySimulation::CentralGravitySimulation(const size_t numberOfParticle
   runner_(ps_)
 {}
 
-const ParticleSystem& CentralGravitySimulation::state() const
+const ParticleSystem& CentralPotential::state() const
 {
   return ps_;
 }
 
-SimulationRunner& CentralGravitySimulation::runner()
+SimulationRunner& CentralPotential::runner()
 {
   return runner_;
 }
 
-LinearDamping& CentralGravitySimulation::damping()
+const SimulationRunner& CentralPotential::runner() const
+{
+  return runner_;
+}
+
+LinearDamping& CentralPotential::damping()
 {
   return damping_;
 }
 
-PointGravity& CentralGravitySimulation::gravity()
+PointGravity& CentralPotential::gravity()
 {
   return gravity_;
 }

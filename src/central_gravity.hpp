@@ -4,17 +4,17 @@
 #include "simulation.hpp"
 #include "forces.hpp"
 
-class CentralGravitySimulation {
+class CentralPotential : public Simulation {
 public:
-  CentralGravitySimulation(
-      const size_t numberOfParticles = 1000,
-      const double totalMass = 1.0,
-      const Rectangle region = {-1.0, -1.0, 1.0, 1.0},
-      const double gravityConstant = 1.0,
-      const double dampingConstant = 0.01);
+  CentralPotential(size_t numberOfParticles = 1000,
+                   double totalMass = 1.0,
+                   Rectangle region = {-1.0, -1.0, 1.0, 1.0},
+                   double gravityConstant = 1.0,
+                   double dampingConstant = 0.01);
 
-  SimulationRunner& runner();
-  const ParticleSystem& state() const;
+  SimulationRunner& runner() override;
+  const SimulationRunner& runner() const override;
+  const ParticleSystem& state() const override;
   LinearDamping& damping();
   PointGravity& gravity();
 

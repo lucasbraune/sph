@@ -9,7 +9,7 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-CentralGravitySimulation simulation;
+CentralPotential simulation;
 
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
 const double particleRadius = 0.02;
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 
 void display()
 {
-  view.draw(simulation.state(), simulation.runner());  
+  view.draw(simulation);  
   glutSwapBuffers();
 }
 
@@ -64,7 +64,7 @@ void keyboard(unsigned char c, int, int)
     simulation.gravity().increase();
     break;
 
-  // Simulation controls
+  // Runner controls
   case 'p':
   case 'P':
     simulation.runner().switchPauseState();
