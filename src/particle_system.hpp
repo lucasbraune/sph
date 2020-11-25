@@ -3,9 +3,11 @@
 
 #include <memory>
 #include <cmath>
+#include <functional>
 #include "util.hpp"
 
 using std::vector;
+using std::reference_wrapper;
 
 class Force {
 public:
@@ -22,12 +24,13 @@ public:
 
 struct ParticleSystem {
   ParticleSystem(const vector<Vec2d>& initialPositions, const vector<Vec2d>& initialVelocities,
-                 vector<Force*> forces, Damping& damping, double particleMass);
+                 const vector<reference_wrapper<const Force>>& forces, const Damping& damping,
+                 double particleMass);
   const size_t numberOfParticles;
   const double particleMass;
+  const vector<reference_wrapper<const Force>> forces;
+  const Damping& damping; 
   vector<Vec2d> positions, velocities, accelerations;
-  vector<Force*> forces; 
-  Damping& damping; 
   double time;
 };
 

@@ -1,14 +1,17 @@
 #include "particle_system.hpp"
 
-ParticleSystem::ParticleSystem(const vector<Vec2d>& positions, const vector<Vec2d>& velocities,
-    vector<Force*> forces, Damping& damping, const double m) :
-  numberOfParticles(positions.size()),
-  particleMass(m),
-  positions(positions),
-  velocities(velocities),
-  accelerations(positions.size()),
+ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions,
+                               const vector<Vec2d>& initialVelocities,
+                               const vector<reference_wrapper<const Force>>& forces,
+                               const Damping& damping,
+                               double particleMass) :
+  numberOfParticles(initialPositions.size()),
+  particleMass(particleMass),
   forces(forces),
   damping(damping),
+  positions(initialPositions),
+  velocities(initialVelocities),
+  accelerations(positions.size()),
   time(0.0)
 {}
 
@@ -31,7 +34,7 @@ void EulerIntegrator::step(ParticleSystem& ps)
     ps.accelerations[i] = ps.damping.acceleration(ps.time, ps.particleMass, ps.velocities[i]);
   }
   for (auto force : ps.forces) {
-    force->apply(ps.time, ps.particleMass, ps.positions, ps.accelerations);
+    force.get().apply(ps.time, ps.particleMass, ps.positions, ps.accelerations);
   }
 }
 
@@ -50,7 +53,7 @@ void VerletIntegrator::step(ParticleSystem& ps)
     acc = ZERO_VECTOR;
   }
   for (auto force : ps.forces) {
-    force->apply(ps.time, ps.particleMass, ps.positions, nextForceAcc_);
+    force.get().apply(ps.time, ps.particleMass, ps.positions, nextForceAcc_);
   }
 
   for (size_t i=0; i<ps.numberOfParticles; i++) {

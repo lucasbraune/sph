@@ -1,12 +1,15 @@
 #include "central_gravity.hpp"
+#include <functional>
 
-CentralPotential::CentralPotential(const size_t numberOfParticles, const double totalMass,
-    const Rectangle region, const double gravityConstant, const double dampingConstant) :
+using std::reference_wrapper;
+
+CentralPotential::CentralPotential(size_t numberOfParticles, double totalMass, Rectangle region,
+                                   double gravityConstant, double dampingConstant) :
   gravity_(ZERO_VECTOR, gravityConstant),
   damping_(dampingConstant),
   ps_(randomVectors(region, numberOfParticles),
       vector<Vec2d>(numberOfParticles),
-      vector<Force*>{&gravity_},
+      vector<reference_wrapper<const Force>>{std::cref<Force>(gravity_)},
       damping_,
       totalMass / numberOfParticles),
   runner_(ps_)
