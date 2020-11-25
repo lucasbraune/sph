@@ -3,7 +3,7 @@
 #include <GL/freeglut.h>
 #include "util.hpp"
 #include "view.hpp"
-#include "central_gravity.hpp"
+#include "central_potential.hpp"
 
 void display();
 void idle();

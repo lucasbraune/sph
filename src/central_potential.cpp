@@ -1,4 +1,4 @@
-#include "central_gravity.hpp"
+#include "central_potential.hpp"
 #include <functional>
 
 using std::reference_wrapper;
