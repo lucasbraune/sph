@@ -3,7 +3,7 @@
 
 using std::chrono::milliseconds;
 
-TimeUtil::TimeUtil() :
+Synchronizer::Synchronizer() :
   fixedRealTime_(high_resolution_clock::now()),
   fixedSimTime_(0.0)
 {}
@@ -13,13 +13,13 @@ milliseconds toMilliseconds(double seconds)
   return milliseconds((long) (seconds * 1e3));
 }
 
-void TimeUtil::synchronize(const double simulationTime)
+void Synchronizer::synchronize(const double simulationTime)
 {
   fixedRealTime_ = high_resolution_clock::now();
   fixedSimTime_ = simulationTime;
 }
 
-void TimeUtil::waitUntil(const double simulationTime, const double playbackSpeed) const 
+void Synchronizer::waitUntil(const double simulationTime, const double playbackSpeed) const 
 {
   double difference = simulationTime - fixedSimTime_;
   auto realTime = fixedRealTime_ + toMilliseconds(difference / playbackSpeed);
@@ -29,7 +29,7 @@ void TimeUtil::waitUntil(const double simulationTime, const double playbackSpeed
 SimulationRunner::SimulationRunner(ParticleSystem& ps, unique_ptr<TimeIntegrator> integrator, double playbackSpeed, int fps) :
   ps_(ps),
   integrator_(std::move(integrator)),
-  timeUtil_(),
+  synchronizer_(),
   simulationSpeed_(playbackSpeed),
   fps_(fps),
   paused_(true)
@@ -45,7 +45,7 @@ void SimulationRunner::computeNextFrame()
 void SimulationRunner::waitForNextFrame() const
 {
   if (!paused()) {
-    timeUtil_.waitUntil(ps_.time, simulationSpeed_);
+    synchronizer_.waitUntil(ps_.time, simulationSpeed_);
   }
 }
 
@@ -81,5 +81,5 @@ void SimulationRunner::switchPauseState()
 
 void SimulationRunner::synchronize()
 {
-  timeUtil_.synchronize(ps_.time);
+  synchronizer_.synchronize(ps_.time);
 }

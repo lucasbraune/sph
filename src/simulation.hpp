@@ -11,9 +11,9 @@ using std::chrono::high_resolution_clock;
 using std::chrono::time_point;
 using std::unique_ptr;
 
-class TimeUtil {
+class Synchronizer {
 public:
-  TimeUtil();
+  Synchronizer();
   void synchronize(const double simulationTime);
   void waitUntil(const double simulationTime, const double simulationSpeed) const;
 
@@ -45,7 +45,7 @@ private:
 
   ParticleSystem& ps_;
   unique_ptr<TimeIntegrator> integrator_;
-  TimeUtil timeUtil_;
+  Synchronizer synchronizer_;
   double simulationSpeed_;
   int fps_;
   bool paused_;
