@@ -33,7 +33,7 @@ void EulerIntegrator::step(ParticleSystem& ps)
     ps.velocities[i] += timeStep_ * ps.accelerations[i];
     ps.accelerations[i] = ps.damping.acceleration(ps.time, ps.particleMass, ps.velocities[i]);
   }
-  for (auto force : ps.forces) {
+  for (auto& force : ps.forces) {
     force.get().apply(ps.time, ps.particleMass, ps.positions, ps.accelerations);
   }
 }
@@ -52,7 +52,7 @@ void VerletIntegrator::step(ParticleSystem& ps)
   for (Vec2d& acc : nextForceAcc_) {
     acc = ZERO_VECTOR;
   }
-  for (auto force : ps.forces) {
+  for (auto& force : ps.forces) {
     force.get().apply(ps.time, ps.particleMass, ps.positions, nextForceAcc_);
   }
 
