@@ -24,10 +24,11 @@ private:
   double fixedSimTime_;
 };
 
-class Simulation {
+class SimulationRunner {
 public:
-  Simulation(ParticleSystem& ps,
-             unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01), double simulationSpeed = 1.0, int fps = 60);
+  SimulationRunner(ParticleSystem& ps,
+                   unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01),
+                   double simulationSpeed = 1.0, int fps = 60);
   
   void computeNextFrame();
   void waitForNextFrame() const;
@@ -38,9 +39,6 @@ public:
 
   bool paused() const;
   void switchPauseState();
-  
-  const vector<Vec2d>& positions() const;
-  double time() const;
 
 private:
   void synchronize();

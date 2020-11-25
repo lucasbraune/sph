@@ -26,7 +26,7 @@ void TimeUtil::waitUntil(const double simulationTime, const double playbackSpeed
   std::this_thread::sleep_until(realTime);
 }
 
-Simulation::Simulation(ParticleSystem& ps, unique_ptr<TimeIntegrator> integrator, double playbackSpeed, int fps) :
+SimulationRunner::SimulationRunner(ParticleSystem& ps, unique_ptr<TimeIntegrator> integrator, double playbackSpeed, int fps) :
   ps_(ps),
   integrator_(std::move(integrator)),
   timeUtil_(),
@@ -35,43 +35,43 @@ Simulation::Simulation(ParticleSystem& ps, unique_ptr<TimeIntegrator> integrator
   paused_(true)
 {}
 
-void Simulation::computeNextFrame()
+void SimulationRunner::computeNextFrame()
 {
   if (!paused()) {
     integrator_->integrate(ps_, simulationSpeed_ / fps_);
   }
 }
 
-void Simulation::waitForNextFrame() const
+void SimulationRunner::waitForNextFrame() const
 {
   if (!paused()) {
     timeUtil_.waitUntil(ps_.time, simulationSpeed_);
   }
 }
 
-double Simulation::targetSpeed() const
+double SimulationRunner::targetSpeed() const
 {
   return simulationSpeed_;
 }
 
-void Simulation::speedUp()
+void SimulationRunner::speedUp()
 {
   synchronize();
   simulationSpeed_ *= 2.0;
 }
 
-void Simulation::speedDown()
+void SimulationRunner::speedDown()
 {
   synchronize();
   simulationSpeed_ *= 0.5;
 }
 
-bool Simulation::paused() const
+bool SimulationRunner::paused() const
 {
   return paused_;
 }
 
-void Simulation::switchPauseState()
+void SimulationRunner::switchPauseState()
 {
   if (paused_) {
     synchronize();
@@ -79,17 +79,7 @@ void Simulation::switchPauseState()
   paused_ = !paused_;
 }
 
-const vector<Vec2d>& Simulation::positions() const
-{
-  return ps_.positions;
-}
-
-double Simulation::time() const
-{
-  return ps_.time;
-}
-
-void Simulation::synchronize()
+void SimulationRunner::synchronize()
 {
   timeUtil_.synchronize(ps_.time);
 }

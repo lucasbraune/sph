@@ -39,24 +39,24 @@ void drawText(std::string line)
   }
 }
 
-string textInfo(const Simulation& sim)
+string textInfo(const ParticleSystem& state, const SimulationRunner& runner)
 {
   string text =
-      "time = " + std::to_string(sim.time()) + 
-      ", target speed = " + std::to_string(sim.targetSpeed()) + "x";
-  if (sim.paused()) {
+      "time = " + std::to_string(state.time) + 
+      ", target speed = " + std::to_string(runner.targetSpeed()) + "x";
+  if (runner.paused()) {
     text.append(", PAUSED");
   } 
   return text;
 }
 
-void View::draw(const Simulation& sim) const
+void View::draw(const ParticleSystem& state, const SimulationRunner& runner) const
 {
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glColor3f(0.0, 0.0, 0.0);
-  for (auto position : sim.positions()) {
+  for (auto position : state.positions) {
     glBegin(GL_POLYGON);
     for (auto vertex : particlePolygon_) {
       Vec2d translate = vertex + position;
@@ -67,7 +67,7 @@ void View::draw(const Simulation& sim) const
 
   glColor3f(1.0, 0.0, 0.0);
   glRasterPos2d(0.95 * region().xmin, 0.95 * region().ymin);
-  drawText(textInfo(sim));
+  drawText(textInfo(state, runner));
 }
 
 Rectangle View::region() const

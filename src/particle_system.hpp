@@ -49,7 +49,7 @@ private:
 
 class VerletIntegrator : public TimeIntegrator {
 public:
-  VerletIntegrator(double timeStep = 0.01);
+  VerletIntegrator(double timeStep);
   void step(ParticleSystem& ps) override;
 
 private:
