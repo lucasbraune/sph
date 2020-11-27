@@ -9,45 +9,45 @@ using std::vector;
 using std::pair;
 using std::make_pair;
 
-using cell_coords = pair<size_t, size_t>;
-using particle_indices = vector<size_t>;
+using CellCoords = pair<size_t, size_t>;
+using ParticleIndices = vector<size_t>;
 
-class grid {
+class Grid {
 public:
-  grid(double xmax, double ymax, double cell_size);
+  Grid(double xmax, double ymax, double cell_size);
   void fill(const vector<Vec2d>& positions);
-  cell_coords get_cell(Vec2d position) const;
-  const particle_indices& get_content(cell_coords cell) const;
-  vector<cell_coords> get_nearby_cells(cell_coords cell, double radius) const;
-  vector<const particle_indices*> get_nearby_particles(Vec2d center, double radius) const;
+  CellCoords cell(Vec2d position) const;
+  const ParticleIndices& content(CellCoords cell) const;
+  vector<CellCoords> nearbyCells(CellCoords cell, double radius) const;
+  vector<const ParticleIndices*> nearbyParticleIndices(Vec2d center, double radius) const;
 
 private:
-  vector<vector<particle_indices>> m_cell_contents;
-  const double m_cell_size;
-  const size_t m_rows, m_cols;
+  vector<vector<ParticleIndices>> cellContents_;
+  const double cellSize_;
+  const size_t rows_, cols_;
 };
 
-class grid_iterator : public neighbor_iterator {
+class GridIterator : public NeighborIterator {
 public:
-  grid_iterator(vector<const particle_indices*> nearby_particles); 
-  bool has_next() const override;
+  GridIterator(vector<const ParticleIndices*> nearbyParticles); 
+  bool hasNext() const override;
   size_t next() override;
 
 private:
-  vector<const particle_indices*> m_nearby_particles;
-  size_t m_i, m_j;
+  vector<const ParticleIndices*> nearbyParticles_;
+  size_t i_, j_;
 };
 
-class grid_loop_util : public neighbor_loop_util {
+class GridNeighborIteratorFactory : public NeighborIteratorFactory {
 public:
-  grid_loop_util(double interaction_radius, unique_ptr<grid> g);
+  GridNeighborIteratorFactory(double interactionRadius, unique_ptr<Grid> grid);
   void refresh(const vector<Vec2d>& x) override;
-  unique_ptr<neighbor_iterator> build(Vec2d position) const override;
-  unique_ptr<neighbor_loop_util> clone() const override;
+  unique_ptr<NeighborIterator> build(Vec2d position) const override;
+  unique_ptr<NeighborIteratorFactory> clone() const override;
 
 private:
-  const double m_interaction_radius;
-  grid m_grid;
+  const double interactionRadius_;
+  Grid grid_;
 };
 
 

@@ -11,85 +11,85 @@ using std::vector;
 using std::unique_ptr;
 using std::function;
 
-class neighbor_iterator {
+class NeighborIterator {
   public:
-  virtual bool has_next() const = 0;
+  virtual bool hasNext() const = 0;
   virtual size_t next() = 0;
-  virtual ~neighbor_iterator() {};
+  virtual ~NeighborIterator() {};
 };
 
-class neighbor_loop_util {
+class NeighborIteratorFactory {
   public:
-  virtual void refresh(const vector<Vec2d>& x) = 0; // when particles move
-  virtual unique_ptr<neighbor_iterator> build(Vec2d x) const = 0;
+  virtual void refresh(const vector<Vec2d>& positions) = 0; // when particles move
+  virtual unique_ptr<NeighborIterator> build(Vec2d position) const = 0;
 
-  virtual unique_ptr<neighbor_loop_util> clone() const = 0;
-  virtual ~neighbor_loop_util() {};
+  virtual unique_ptr<NeighborIteratorFactory> clone() const = 0;
+  virtual ~NeighborIteratorFactory() {};
 };
 
-class smoothing_kernel {
+class SmoothingKernel {
   public:
   virtual double operator()(double dist) const = 0;
-  virtual double differentated_at(double dist) const = 0;
-  virtual double get_interaction_radius() const = 0;
+  virtual double DifferentiatedAt(double dist) const = 0;
+  virtual double interactionRadius() const = 0;
   
-  virtual unique_ptr<smoothing_kernel> clone() const = 0;
-  virtual ~smoothing_kernel() {};
+  virtual unique_ptr<SmoothingKernel> clone() const = 0;
+  virtual ~SmoothingKernel() {};
 };
 
-class pressure_force {
+class PressureForce {
   public:
-  pressure_force( unique_ptr<neighbor_loop_util> it_factory,
-                  unique_ptr<smoothing_kernel> kernel,
-                  function<double(double)> pressure_function);
-  pressure_force(const pressure_force& sys); 
-  pressure_force(pressure_force&& sys) = default;
-  pressure_force& operator=(const pressure_force& sys);
-  pressure_force& operator=(pressure_force&& sys) = default;
-  ~pressure_force() = default;
+  PressureForce(unique_ptr<NeighborIteratorFactory> iteratorFactory,
+                unique_ptr<SmoothingKernel> kernel,
+                function<double(double)> pressure);
+  PressureForce(const PressureForce& other); 
+  PressureForce(PressureForce&& other) = default;
+  PressureForce& operator=(const PressureForce& other);
+  PressureForce& operator=(PressureForce&& other) = default;
+  ~PressureForce() = default;
   
   void apply(const double time, const double particleMass, const vector<Vec2d>& positions,
              vector<Vec2d>& accelerations) const;
 
   private:
-  vector<double> compute_densities(double particleMass, const vector<Vec2d>& x) const;
+  vector<double> computeDensities(double particleMass, const vector<Vec2d>& positions) const;
 
-  unique_ptr<smoothing_kernel> m_kernel;
-  unique_ptr<neighbor_loop_util> m_loop_util;
-  function<double(double)> m_pressure_function;
+  unique_ptr<SmoothingKernel> kernel_;
+  unique_ptr<NeighborIteratorFactory> neighborIteratorFactory_;
+  function<double(double)> pressure_;
 };
 
-class cubic_kernel : public smoothing_kernel {
+class CubicKernel : public SmoothingKernel {
   public:
-  cubic_kernel(double smoothing_length);
+  CubicKernel(double smoothingLength);
   double operator()(double dist) const override;
-  double differentated_at(double dist) const override;
-  double get_interaction_radius() const override;
+  double DifferentiatedAt(double dist) const override;
+  double interactionRadius() const override;
 
-  unique_ptr<smoothing_kernel> clone() const override;
+  unique_ptr<SmoothingKernel> clone() const override;
 
   private:
-  const double m_smoothing_length;
-  const double m_C, m_D;
+  const double smoothingLength_;
+  const double C_, D_;
 };
 
-class water_pressure {
+class WaterPressure {
   public:
-  water_pressure(double pressure_constant, double rest_density);
+  WaterPressure(double pressureConstant, double restDensity);
   double operator()(double density) const;
 
   private:
-  const double m_pressure_constant;
-  const double m_rest_density;
+  const double pressureConstant_;
+  const double restDensity_;
 };
 
-class gas_pressure {
+class GasPressure {
   public:
-  gas_pressure(double pressure_constant);
+  GasPressure(double pressureConstant);
   double operator()(double density) const;
 
   private:
-  const double m_pressure_constant;
+  const double pressureConstant_;
 };
 
 #endif
