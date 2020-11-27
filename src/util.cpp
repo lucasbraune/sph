@@ -1,4 +1,5 @@
 #include "util.hpp"
+#include <cmath>
 
 vector<Vec2d> randomVectors(const Rectangle region, const size_t N) {
   vector<Vec2d> result;
@@ -13,27 +14,15 @@ vector<Vec2d> randomVectors(const Rectangle region, const size_t N) {
 }
 
 Vec2d operator+(const Vec2d& a, const Vec2d& b) {
-  Vec2d res;
-  for (size_t i=0; i < a.size(); i++) {
-    res[i] = a[i] + b[i];
-  }
-  return res;
+  return Vec2d{a[0] + b[0], a[1] + b[1]};
 }
 
 Vec2d operator-(const Vec2d& a, const Vec2d& b) {
-  Vec2d res;
-  for (size_t i=0; i < a.size(); i++) {
-    res[i] = a[i] - b[i];
-  }
-  return res;
+  return Vec2d{a[0] - b[0], a[1] - b[1]};
 }
 
 Vec2d operator*(const double lambda, const Vec2d& a) {
-  Vec2d res;
-  for (size_t i=0; i< a.size(); i++) {
-    res[i] = lambda * a[i];
-  }
-  return res;
+  return Vec2d{lambda * a[0], lambda * a[1]};
 }
 
 Vec2d operator*(const Vec2d& a, const double lambda) {
@@ -41,19 +30,27 @@ Vec2d operator*(const Vec2d& a, const double lambda) {
 }
 
 void operator+=(Vec2d& a, const Vec2d& b) {
-  for (size_t i=0; i < a.size(); i++) {
-    a[i] += b[i];
-  }
+  a[0] += b[0];
+  a[1] += b[1];
 }
 
 void operator-=(Vec2d& a, const Vec2d& b) {
-  for (size_t i=0; i < a.size(); i++) {
-    a[i] -= b[i];
-  }
+  a[0] -= b[0];
+  a[1] -= b[1];
 }
 
 void operator*=(Vec2d& a, const double lambda) {
+  a[0] *= lambda;
+  a[1] *= lambda;
   for (size_t i=0; i < a.size(); i++) {
     a[i] *= lambda;
   }
+}
+
+double norm(Vec2d x) {
+  return hypot(x[0], x[1]);
+}
+
+double dist(Vec2d x, Vec2d y) {
+  return norm(x - y);
 }

@@ -17,6 +17,8 @@ Vec2d operator*(const Vec2d& a, const double lambda);
 void operator+=(Vec2d& a, const Vec2d& b);
 void operator-=(Vec2d& a, const Vec2d& b);
 void operator*=(Vec2d& a, const double lambda);
+double norm(Vec2d x);
+double dist(Vec2d x, Vec2d y);
 
 struct Rectangle {
   const double xmin, ymin, xmax, ymax;
