@@ -45,7 +45,7 @@ void VerletIntegrator::step(ParticleSystem& ps)
   ps.time += timeStep_;
   for (size_t i=0; i<ps.numberOfParticles; i++) {
     ps.positions[i] += timeStep_ * ps.velocities[i] +
-                        (0.5 * timeStep_ * timeStep_) * ps.accelerations[i];
+                       (0.5 * timeStep_ * timeStep_) * ps.accelerations[i];
   }
 
   nextForceAcc_.resize(ps.numberOfParticles);
@@ -58,7 +58,7 @@ void VerletIntegrator::step(ParticleSystem& ps)
 
   for (size_t i=0; i<ps.numberOfParticles; i++) {
     ps.velocities[i] = nextVelocity(ps.velocities[i], ps.accelerations[i], nextForceAcc_[i],
-                                  ps.damping, ps.particleMass, ps.time, timeStep_);
+                                    ps.damping, ps.particleMass, ps.time, timeStep_);
     Vec2d nextDampingAcc = ps.damping.acceleration(ps.time, ps.particleMass, ps.velocities[i]);
     ps.accelerations[i] = nextForceAcc_[i] + nextDampingAcc;
   }
