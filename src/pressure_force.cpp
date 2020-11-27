@@ -59,6 +59,44 @@ vector<double> PressureForce::computeDensities(double particleMass, const vector
   return densities;
 }
 
+template<typename T>
+RangeIterator<T>::RangeIterator(T begin, T end) :
+  begin_(begin),
+  end_(end),
+  next_(begin)
+{}
+
+template<typename T>
+bool RangeIterator<T>::hasNext() const 
+{
+  return next_ < end_;
+}
+
+template<typename T>
+T RangeIterator<T>::next()
+{
+  return next_++; // return pre-increment value
+}
+
+TrivialNeighborIteratorFactory::TrivialNeighborIteratorFactory(size_t numberOfParticles) :
+  numberOfParticles_(numberOfParticles)
+{}
+
+void TrivialNeighborIteratorFactory::refresh(const vector<Vec2d>& positions)
+{
+  numberOfParticles_ = positions.size();
+}
+
+unique_ptr<NeighborIterator> TrivialNeighborIteratorFactory::build(Vec2d) const
+{
+  return std::make_unique<RangeIterator<size_t>>(0, numberOfParticles_);
+}
+
+unique_ptr<NeighborIteratorFactory> TrivialNeighborIteratorFactory::clone() const
+{
+  return std::make_unique<TrivialNeighborIteratorFactory>(numberOfParticles_);
+}
+
 CubicKernel::CubicKernel(double smoothingLength) :
   smoothingLength_(smoothingLength),
   C_(15.0/ (14 * M_PI * smoothingLength * smoothingLength)),
@@ -79,7 +117,6 @@ double CubicKernel::operator()(double dist) const
   }
 }
 
-// Derivative of kernel as a function of one variable (dist)
 double CubicKernel::DifferentiatedAt(double dist) const
 {
   if (dist < 0 || dist > 2) return 0;

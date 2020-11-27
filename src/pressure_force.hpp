@@ -11,18 +11,20 @@ using std::vector;
 using std::unique_ptr;
 using std::function;
 
-class NeighborIterator {
-  public:
+template<typename T>
+class Iterator {
+public:
   virtual bool hasNext() const = 0;
-  virtual size_t next() = 0;
-  virtual ~NeighborIterator() {};
+  virtual T next() = 0;
+  virtual ~Iterator() {};
 };
 
+using NeighborIterator = Iterator<size_t>;
+
 class NeighborIteratorFactory {
-  public:
+public:
   virtual void refresh(const vector<Vec2d>& positions) = 0; // when particles move
   virtual unique_ptr<NeighborIterator> build(Vec2d position) const = 0;
-
   virtual unique_ptr<NeighborIteratorFactory> clone() const = 0;
   virtual ~NeighborIteratorFactory() {};
 };
@@ -30,6 +32,7 @@ class NeighborIteratorFactory {
 class SmoothingKernel {
   public:
   virtual double operator()(double dist) const = 0;
+  /** Derivative of kernel as a function of one variable (dist) */
   virtual double DifferentiatedAt(double dist) const = 0;
   virtual double interactionRadius() const = 0;
   
@@ -57,6 +60,29 @@ class PressureForce {
   unique_ptr<SmoothingKernel> kernel_;
   unique_ptr<NeighborIteratorFactory> neighborIteratorFactory_;
   function<double(double)> pressure_;
+};
+
+template<typename T>
+class RangeIterator : public Iterator<T> {
+public:
+  RangeIterator(T begin, T end);
+  bool hasNext() const override;
+  T next() override;
+
+private:
+  const T begin_, end_;
+  T next_;
+};
+
+class TrivialNeighborIteratorFactory : public NeighborIteratorFactory {
+public:
+  TrivialNeighborIteratorFactory(size_t numberOfParticles = 0);
+  void refresh(const vector<Vec2d>& positions);
+  unique_ptr<NeighborIterator> build(Vec2d position) const;
+  unique_ptr<NeighborIteratorFactory> clone() const;
+
+private:
+  size_t numberOfParticles_;
 };
 
 class CubicKernel : public SmoothingKernel {
