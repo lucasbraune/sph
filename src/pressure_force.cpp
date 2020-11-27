@@ -1,67 +1,67 @@
 #include "pressure_force.hpp"
 
 PressureForce::PressureForce(
-    unique_ptr<NeighborIteratorFactory> it_factory,
+    unique_ptr<NeighborIteratorFactory> iteratorFactory,
     unique_ptr<SmoothingKernel> kernel,
-    function<double(double)> pressure_function) :
+    function<double(double)> pressure) :
   kernel_(move(kernel)),
-  neighborIteratorFactory_(move(it_factory)),
-  pressure_(pressure_function)
+  neighborIteratorFactory_(move(iteratorFactory)),
+  pressure_(pressure)
 {}
 
-PressureForce::PressureForce(const PressureForce& sys) :
-  kernel_(sys.kernel_->clone()),
-  neighborIteratorFactory_(sys.neighborIteratorFactory_->clone()),
-  pressure_(sys.pressure_)
+PressureForce::PressureForce(const PressureForce& other) :
+  kernel_(other.kernel_->clone()),
+  neighborIteratorFactory_(other.neighborIteratorFactory_->clone()),
+  pressure_(other.pressure_)
 {}
 
-PressureForce& PressureForce::operator=(const PressureForce& sys)
+PressureForce& PressureForce::operator=(const PressureForce& other)
 {
-  neighborIteratorFactory_ = sys.neighborIteratorFactory_->clone();
-  kernel_ = sys.kernel_->clone();
-  pressure_ = sys.pressure_;
+  neighborIteratorFactory_ = other.neighborIteratorFactory_->clone();
+  kernel_ = other.kernel_->clone();
+  pressure_ = other.pressure_;
   return *this;
 
 }
 
 void PressureForce::apply(const double, const double particleMass,
-                           const vector<Vec2d>& x, vector<Vec2d>& a) const
+                          const vector<Vec2d>& positions, vector<Vec2d>& accelerations) const
 {
-  neighborIteratorFactory_->refresh(x);
-  vector<double> densities = computeDensities(particleMass, x);
-  for (size_t i=0; i<x.size(); i++) {
+  neighborIteratorFactory_->refresh(positions);
+  vector<double> densities = computeDensities(particleMass, positions);
+  for (size_t i=0; i<positions.size(); i++) {
     Vec2d accPerMass = ZERO_VECTOR;
     double A = pressure_(densities[i]) / (densities[i] * densities[i]);
-    auto& it = *(neighborIteratorFactory_->build(x[i]));
+    auto& it = *(neighborIteratorFactory_->build(positions[i]));
     while (it.hasNext()) {
       size_t j = it.next();
       if (j == i) continue; // OK to skip, assuming (1/r)(dW/dr) -> 0 as r->0
       double B = pressure_(densities[i]) / (densities[j] * densities[j]);
-      double distance = dist(x[i], x[j]);
+      double distance = dist(positions[i], positions[j]);
       double C = (A + B) * kernel_->DifferentiatedAt(distance) / distance;
-      accPerMass -= C * (x[i] - x[j]);
+      accPerMass -= C * (positions[i] - positions[j]);
     }
-    a[i] += particleMass * accPerMass;
+    accelerations[i] += particleMass * accPerMass;
   }
 }
 
-vector<double> PressureForce::computeDensities(double particleMass, const vector<Vec2d>& x) const
+vector<double> PressureForce::computeDensities(double particleMass, const vector<Vec2d>& positions) const
 {
-  vector<double> densities(x.size());
-  for (size_t i=0; i<x.size(); i++) {
+  vector<double> densities(positions.size());
+  for (size_t i=0; i<positions.size(); i++) {
     densities[i] = 0;
-    auto& it = *(neighborIteratorFactory_->build(x[i]));
+    auto& it = *(neighborIteratorFactory_->build(positions[i]));
     while (it.hasNext()) {
-      densities[i] += (*kernel_)(dist(x[i], x[it.next()]));
+      densities[i] += (*kernel_)(dist(positions[i], positions[it.next()]));
     }
     densities[i] *= particleMass;
   }
   return densities;
 }
 
-CubicKernel::CubicKernel(double smoothing_length) :
-  smoothingLength_(smoothing_length),
-  C_(15.0/ (14 * M_PI * smoothing_length * smoothing_length)),
+CubicKernel::CubicKernel(double smoothingLength) :
+  smoothingLength_(smoothingLength),
+  C_(15.0/ (14 * M_PI * smoothingLength * smoothingLength)),
   D_(-3 * C_ / smoothingLength_)
 {}
 
@@ -104,10 +104,9 @@ unique_ptr<SmoothingKernel> CubicKernel::clone() const
   return std::make_unique<CubicKernel>(*this);
 }
 
-WaterPressure::WaterPressure(
-    double pressure_constant, double rest_density) :
-  pressureConstant_(pressure_constant),
-  restDensity_(rest_density)
+WaterPressure::WaterPressure(double pressureConstant, double restDensity) :
+  pressureConstant_(pressureConstant),
+  restDensity_(restDensity)
 {}
 
 double WaterPressure::operator()(double density) const
@@ -115,8 +114,8 @@ double WaterPressure::operator()(double density) const
   return pressureConstant_ * (pow((density / restDensity_), 7) - 1);
 }
 
-GasPressure::GasPressure(double pressure_constant) :
-  pressureConstant_(pressure_constant)
+GasPressure::GasPressure(double pressureConstant) :
+  pressureConstant_(pressureConstant)
 {}
 
 double GasPressure::operator()(double density) const
