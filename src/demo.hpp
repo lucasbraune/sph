@@ -1,5 +1,5 @@
-#ifndef CENTRAL_GRAVITY_HPP
-#define CENTRAL_GRAVITY_HPP
+#ifndef DEMO_HPP
+#define DEMO_HPP
 
 #include "simulation.hpp"
 #include "forces.hpp"
