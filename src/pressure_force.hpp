@@ -8,7 +8,6 @@
 #include "util.hpp"
 
 using std::vector;
-using std::pair;
 using std::unique_ptr;
 using std::function;
 

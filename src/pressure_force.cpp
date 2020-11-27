@@ -1,5 +1,4 @@
 #include "pressure_force.hpp"
-#include <cassert>
 
 pressure_force::pressure_force(
     unique_ptr<neighbor_loop_util> it_factory,
