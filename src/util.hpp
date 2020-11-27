@@ -21,6 +21,9 @@ double norm(Vec2d x);
 double dist(Vec2d x, Vec2d y);
 
 struct Rectangle {
+  double width() const;
+  double height() const;
+  Vec2d bottomLeft() const;
   const double xmin, ymin, xmax, ymax;
 };
 
