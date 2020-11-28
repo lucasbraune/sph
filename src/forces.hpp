@@ -11,6 +11,7 @@ public:
   PointGravity(const Vec2d center, const double gravityConstant);
   void apply(const double time, const double particleMass, const vector<Vec2d>& positions,
              vector<Vec2d>& accelerations) const;
+  void setConstant(double intensity);
   void increase();
   void decrease();
   

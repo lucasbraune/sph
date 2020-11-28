@@ -9,7 +9,7 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-CentralPotential simulation;
+ToyStar simulation;
 
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
 const double particleRadius = 0.02;

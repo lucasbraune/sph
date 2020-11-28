@@ -6,6 +6,7 @@
 #include <functional>
 #include <cmath>
 #include "util.hpp"
+#include "particle_system.hpp"
 
 using std::vector;
 using std::unique_ptr;
@@ -40,7 +41,7 @@ class SmoothingKernel {
   virtual ~SmoothingKernel() {};
 };
 
-class PressureForce {
+class PressureForce : public Force {
   public:
   PressureForce(unique_ptr<NeighborIteratorFactory> iteratorFactory,
                 unique_ptr<SmoothingKernel> kernel,
@@ -113,6 +114,7 @@ class GasPressure {
   public:
   GasPressure(double pressureConstant);
   double operator()(double density) const;
+
 
   private:
   const double pressureConstant_;

@@ -12,6 +12,11 @@ void PointGravity::apply(const double, const double, const vector<Vec2d>& positi
   }
 }
 
+void PointGravity::setConstant(double newValue)
+{
+  intensity_ = newValue;
+}
+
 void PointGravity::increase()
 {
   intensity_ *= 2.0;

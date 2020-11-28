@@ -32,9 +32,9 @@ void PressureForce::apply(const double, const double particleMass,
   for (size_t i=0; i<positions.size(); i++) {
     Vec2d accPerMass = ZERO_VECTOR;
     double A = pressure_(densities[i]) / (densities[i] * densities[i]);
-    auto& it = *(neighborIteratorFactory_->build(positions[i]));
-    while (it.hasNext()) {
-      size_t j = it.next();
+    auto it = neighborIteratorFactory_->build(positions[i]);
+    while (it->hasNext()) {
+      size_t j = it->next();
       if (j == i) continue; // OK to skip, assuming (1/r)(dW/dr) -> 0 as r->0
       double B = pressure_(densities[i]) / (densities[j] * densities[j]);
       double distance = dist(positions[i], positions[j]);
@@ -50,9 +50,9 @@ vector<double> PressureForce::computeDensities(double particleMass, const vector
   vector<double> densities(positions.size());
   for (size_t i=0; i<positions.size(); i++) {
     densities[i] = 0;
-    auto& it = *(neighborIteratorFactory_->build(positions[i]));
-    while (it.hasNext()) {
-      densities[i] += (*kernel_)(dist(positions[i], positions[it.next()]));
+    auto it = neighborIteratorFactory_->build(positions[i]);
+    while (it->hasNext()) {
+      densities[i] += (*kernel_)(dist(positions[i], positions[it->next()]));
     }
     densities[i] *= particleMass;
   }
@@ -105,15 +105,16 @@ CubicKernel::CubicKernel(double smoothingLength) :
 
 double CubicKernel::operator()(double dist) const
 {
-  if (dist < 0 || dist > 2) return 0;
+  assert(dist >= 0);
   double q = dist/smoothingLength_;
   double A = 2 - q;
-  if (dist < 1) {
+  if (q < 1) {
     double B = 1 - q;
     return C_ * (A*A*A - 4 * B*B*B);
-  } else {
-    // 1 <= dist <= 2
+  } else if (q < 2) {
     return C_ * A*A*A;
+  } else {
+    return 0.0;
   }
 }
 
