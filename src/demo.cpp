@@ -1,5 +1,6 @@
 #include "demo.hpp"
 #include <functional>
+#include <cmath>
 
 using std::reference_wrapper;
 
@@ -40,12 +41,12 @@ PointGravity& CentralPotential::gravity()
   return gravity_;
 }
 
-ToyStar::ToyStar(size_t numberOfParticles, double totalMass, Rectangle region,
-                 double dampingConstant, double smoothingLength, double pressureConstant) :
+ToyStar::ToyStar(size_t numberOfParticles, double totalMass, double starRadius, Rectangle region,
+                 double dampingConstant, double pressureConstant) :
   gravity_(ZERO_VECTOR, 0.0),
   pressureFunction_(pressureConstant),
   pressureForce_(std::make_unique<TrivialNeighborIteratorFactory>(),
-                 std::make_unique<CubicKernel>(smoothingLength),
+                 std::make_unique<CubicKernel>(0.04 / sqrt(numberOfParticles / 1000.0)),
                  pressureFunction_),
   damping_(dampingConstant),
   ps_(randomVectors(region, numberOfParticles),
@@ -56,7 +57,7 @@ ToyStar::ToyStar(size_t numberOfParticles, double totalMass, Rectangle region,
   runner_(ps_)
 {
   constexpr double PI = 3.14159265359;
-  gravity_.setConstant(8 * totalMass * pressureConstant / PI);
+  gravity_.setConstant(8 * totalMass * pressureConstant / (PI * pow(starRadius, 4)));
 }
 
 const ParticleSystem& ToyStar::state() const

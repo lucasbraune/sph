@@ -1,4 +1,5 @@
 #include "pressure_force.hpp"
+#include <cassert>
 
 PressureForce::PressureForce(
     unique_ptr<NeighborIteratorFactory> iteratorFactory,
@@ -30,18 +31,16 @@ void PressureForce::apply(const double, const double particleMass,
   neighborIteratorFactory_->refresh(positions);
   vector<double> densities = computeDensities(particleMass, positions);
   for (size_t i=0; i<positions.size(); i++) {
-    Vec2d accPerMass = ZERO_VECTOR;
+    Vec2d sum = ZERO_VECTOR;
     double A = pressure_(densities[i]) / (densities[i] * densities[i]);
     auto it = neighborIteratorFactory_->build(positions[i]);
     while (it->hasNext()) {
       size_t j = it->next();
-      if (j == i) continue; // OK to skip, assuming (1/r)(dW/dr) -> 0 as r->0
-      double B = pressure_(densities[i]) / (densities[j] * densities[j]);
-      double distance = dist(positions[i], positions[j]);
-      double C = (A + B) * kernel_->DifferentiatedAt(distance) / distance;
-      accPerMass -= C * (positions[i] - positions[j]);
+      if (j == i) continue; // OK to skip, assuming (1/r)(dW/dr) -> 0 as r -> 0
+      double B = pressure_(densities[j]) / (densities[j] * densities[j]);
+      sum += (A + B) * kernel_->gradientAt(positions[i] - positions[j]);
     }
-    accelerations[i] += particleMass * accPerMass;
+    accelerations[i] -= particleMass * sum;
   }
 }
 
@@ -52,7 +51,7 @@ vector<double> PressureForce::computeDensities(double particleMass, const vector
     densities[i] = 0;
     auto it = neighborIteratorFactory_->build(positions[i]);
     while (it->hasNext()) {
-      densities[i] += (*kernel_)(dist(positions[i], positions[it->next()]));
+      densities[i] += (*kernel_)(positions[i] - positions[it->next()]);
     }
     densities[i] *= particleMass;
   }
@@ -103,10 +102,9 @@ CubicKernel::CubicKernel(double smoothingLength) :
   D_(-3 * C_ / smoothingLength_)
 {}
 
-double CubicKernel::operator()(double dist) const
+double CubicKernel::operator()(Vec2d x) const
 {
-  assert(dist >= 0);
-  double q = dist/smoothingLength_;
+  double q = hypot(x[0], x[1]) / smoothingLength_;
   double A = 2 - q;
   if (q < 1) {
     double B = 1 - q;
@@ -118,18 +116,22 @@ double CubicKernel::operator()(double dist) const
   }
 }
 
-double CubicKernel::DifferentiatedAt(double dist) const
+Vec2d CubicKernel::gradientAt(Vec2d x) const
 {
-  if (dist < 0 || dist > 2) return 0;
-  double q = dist/smoothingLength_;
-  double A = 2 - q;
-  if (dist < 1) {
-    double B = 1 - q;
-    return D_ * (A*A - 4 * B*B);
-  } else {
-    // 1 <= dist <= 2
-    return D_ * A*A;
+  double r = hypot(x[0], x[1]);
+  double q = r / smoothingLength_;
+  constexpr double EPSILON = 1e-3;
+  if (q < EPSILON || q >= 2) {
+    return ZERO_VECTOR;
   }
+  double A = 2 - q;
+  if (q < 1) {
+    double B = 1 - q;
+    return (D_ * (A*A - 4 * B*B) / r) * x;
+  } else {
+    // 1 <= q < 2
+    return (D_ * A*A / r) * x;
+  } 
 }
 
 double CubicKernel::interactionRadius() const 

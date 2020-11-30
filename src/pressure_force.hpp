@@ -32,9 +32,8 @@ public:
 
 class SmoothingKernel {
   public:
-  virtual double operator()(double dist) const = 0;
-  /** Derivative of kernel as a function of one variable (dist) */
-  virtual double DifferentiatedAt(double dist) const = 0;
+  virtual double operator()(Vec2d x) const = 0;
+  virtual Vec2d gradientAt(Vec2d x) const = 0;
   virtual double interactionRadius() const = 0;
   
   virtual unique_ptr<SmoothingKernel> clone() const = 0;
@@ -89,8 +88,8 @@ private:
 class CubicKernel : public SmoothingKernel {
   public:
   CubicKernel(double smoothingLength);
-  double operator()(double dist) const override;
-  double DifferentiatedAt(double dist) const override;
+  double operator()(Vec2d x) const override;
+  Vec2d gradientAt(Vec2d x) const override;
   double interactionRadius() const override;
 
   unique_ptr<SmoothingKernel> clone() const override;

@@ -28,12 +28,12 @@ private:
 
 class ToyStar : public Simulation {
 public:
-  ToyStar(size_t numberOfParticles = 250,
-          double totalMass = 1.0,
+  ToyStar(size_t numberOfParticles = 600,
+          double totalMass = 2.0,
+          double starRadius = 0.75,
           Rectangle region = {-1.0, -1.0, 1.0, 1.0},
-          double dampingConstant = 1.0,
-          double smoothingLength = 0.1,
-          double pressureConstant = 0.1);
+          double dampingConstant = 0.01,
+          double pressureConstant = 1.0);
 
   SimulationRunner& runner() override;
   const SimulationRunner& runner() const override;
