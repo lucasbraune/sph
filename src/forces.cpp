@@ -1,6 +1,6 @@
 #include "forces.hpp"
 
-PointGravity::PointGravity(const Vec2d center, const double gravityConstant) :
+PointGravity::PointGravity(const double gravityConstant, const Vec2d center) :
   center_(center), intensity_(gravityConstant)
 {}
 

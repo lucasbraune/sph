@@ -8,7 +8,7 @@ using std::vector;
 
 class PointGravity : public Force {
 public:
-  PointGravity(const Vec2d center, const double gravityConstant);
+  PointGravity(const double gravityConstant, const Vec2d center = ZERO_VECTOR);
   void apply(const double time, const double particleMass, const vector<Vec2d>& positions,
              vector<Vec2d>& accelerations) const;
   void setConstant(double intensity);

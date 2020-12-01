@@ -28,11 +28,11 @@ private:
 
 class ToyStar : public Simulation {
 public:
-  ToyStar(size_t numberOfParticles = 600,
-          double totalMass = 2.0,
+  ToyStar(size_t numberOfParticles = 250,
+          double starMass = 2.0,
           double starRadius = 0.75,
-          Rectangle region = {-1.0, -1.0, 1.0, 1.0},
-          double dampingConstant = 0.01,
+          Rectangle initialRegion = {-1.0, -1.0, 1.0, 1.0},
+          double dampingConstant = 1.0,
           double pressureConstant = 1.0);
 
   SimulationRunner& runner() override;
@@ -43,7 +43,6 @@ public:
 
 private:
   PointGravity gravity_;
-  GasPressure pressureFunction_;
   PressureForce pressureForce_;
   LinearDamping damping_;
   ParticleSystem ps_;
