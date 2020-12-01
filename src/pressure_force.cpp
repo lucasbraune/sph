@@ -10,6 +10,12 @@ PressureForce::PressureForce(
   pressure_(pressure)
 {}
 
+PressureForce::PressureForce(double interactionRadius, function<double(double)> pressure) :
+  PressureForce(std::make_unique<TrivialNeighborIteratorFactory>(),
+                std::make_unique<CubicKernel>(interactionRadius / 2),
+                pressure)
+{}
+
 PressureForce::PressureForce(const PressureForce& other) :
   kernel_(other.kernel_->clone()),
   neighborIteratorFactory_(other.neighborIteratorFactory_->clone()),

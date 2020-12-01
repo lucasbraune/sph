@@ -45,6 +45,7 @@ class PressureForce : public Force {
   PressureForce(unique_ptr<NeighborIteratorFactory> iteratorFactory,
                 unique_ptr<SmoothingKernel> kernel,
                 function<double(double)> pressure);
+  PressureForce(double interactionRadius, function<double(double)> pressure);
   PressureForce(const PressureForce& other); 
   PressureForce(PressureForce&& other) = default;
   PressureForce& operator=(const PressureForce& other);
@@ -86,7 +87,7 @@ private:
 };
 
 class CubicKernel : public SmoothingKernel {
-  public:
+public:
   CubicKernel(double smoothingLength);
   double operator()(Vec2d x) const override;
   Vec2d gradientAt(Vec2d x) const override;
@@ -94,28 +95,27 @@ class CubicKernel : public SmoothingKernel {
 
   unique_ptr<SmoothingKernel> clone() const override;
 
-  private:
+private:
   const double smoothingLength_;
   const double C_, D_;
 };
 
 class WaterPressure {
-  public:
+public:
   WaterPressure(double pressureConstant, double restDensity);
   double operator()(double density) const;
 
-  private:
+private:
   const double pressureConstant_;
   const double restDensity_;
 };
 
 class GasPressure {
-  public:
+public:
   GasPressure(double pressureConstant);
   double operator()(double density) const;
 
-
-  private:
+private:
   const double pressureConstant_;
 };
 
