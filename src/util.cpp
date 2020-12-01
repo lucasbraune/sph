@@ -37,9 +37,6 @@ void operator*=(Vec2d& a, const double lambda)
 {
   a[0] *= lambda;
   a[1] *= lambda;
-  for (size_t i=0; i < a.size(); i++) {
-    a[i] *= lambda;
-  }
 }
 
 double norm(Vec2d x)
