@@ -15,6 +15,15 @@ ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions,
   time(0.0)
 {}
 
+ParticleSystem::ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region,
+                 const vector<reference_wrapper<const Force>>& forces, const Damping& damping) :
+  ParticleSystem(randomVectors(region, numberOfParticles),
+                 vector<Vec2d>(numberOfParticles),
+                 forces,
+                 damping,
+                 totalMass / numberOfParticles)
+{}
+
 void TimeIntegrator::integrate(ParticleSystem& ps, double duration)
 {
   double target = ps.time + duration;

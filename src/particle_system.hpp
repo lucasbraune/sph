@@ -26,6 +26,8 @@ struct ParticleSystem {
   ParticleSystem(const vector<Vec2d>& initialPositions, const vector<Vec2d>& initialVelocities,
                  const vector<reference_wrapper<const Force>>& forces, const Damping& damping,
                  double particleMass);
+  ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region,
+                 const vector<reference_wrapper<const Force>>& forces, const Damping& damping);
   const size_t numberOfParticles;
   const double particleMass;
   const vector<reference_wrapper<const Force>> forces;
