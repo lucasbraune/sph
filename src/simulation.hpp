@@ -38,7 +38,7 @@ public:
   void speedDown();
 
   bool paused() const;
-  void switchPauseState();
+  void pauseOrUnpause();
 
 private:
   void synchronize();

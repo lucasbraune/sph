@@ -29,7 +29,7 @@ int main(int argc, char** argv)
   glutIdleFunc(idle);
   glutKeyboardFunc(keyboard);
 
-  simulation.runner().switchPauseState(); // Unpauses the simulation
+  simulation.runner().pauseOrUnpause(); // Unpauses the simulation
   glutMainLoop();
   return 0;
 }
@@ -67,7 +67,7 @@ void keyboard(unsigned char c, int, int)
   // Runner controls
   case 'p':
   case 'P':
-    simulation.runner().switchPauseState();
+    simulation.runner().pauseOrUnpause();
     break;
   case 's':
     simulation.runner().speedDown();

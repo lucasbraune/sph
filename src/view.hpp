@@ -29,6 +29,7 @@ public:
        const vector<Vec2d> particlePolygon);
   View(const Rectangle region, const double particleRadius, const size_t sides = 10,
        const int windowHeight = 750, const string title = "Fluid simulation");
+       
   void draw(const Simulation& sim) const;
   Rectangle region() const;
   int windowHeight() const;

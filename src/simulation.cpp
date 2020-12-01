@@ -71,7 +71,7 @@ bool SimulationRunner::paused() const
   return paused_;
 }
 
-void SimulationRunner::switchPauseState()
+void SimulationRunner::pauseOrUnpause()
 {
   if (paused_) {
     synchronize();

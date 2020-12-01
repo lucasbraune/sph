@@ -16,10 +16,35 @@ public:
                      vector<Vec2d>& accelerations) const = 0;
 };
 
+class PointGravity : public Force {
+public:
+  PointGravity(const double gravityConstant, const Vec2d center = ZERO_VECTOR);
+  void apply(const double time, const double particleMass, const vector<Vec2d>& positions,
+             vector<Vec2d>& accelerations) const;
+  void setConstant(double intensity);
+  void increase();
+  void decrease();
+  
+private:
+  Vec2d center_;
+  double intensity_;
+};
+
 class Damping {
 public:
   virtual ~Damping() {}
   virtual Vec2d acceleration(const double time, const double mass, const Vec2d velocity) const = 0;
+};
+
+class LinearDamping : public Damping {
+public:
+  LinearDamping(const double dampingConstant);
+  Vec2d acceleration(const double time, const double mass, const Vec2d velocity) const;
+  void increase();
+  void decrease();
+
+private:
+  double intensity_;
 };
 
 struct ParticleSystem {
@@ -45,7 +70,7 @@ public:
 
 class EulerIntegrator : public TimeIntegrator {
 public:
-  EulerIntegrator(double timeStep = 0.01);
+  EulerIntegrator(double timeStep);
   void step(ParticleSystem& ps) override;
 
 private:

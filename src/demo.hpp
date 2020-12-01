@@ -2,7 +2,6 @@
 #define DEMO_HPP
 
 #include "simulation.hpp"
-#include "forces.hpp"
 #include "pressure_force.hpp"
 
 class CentralPotential : public Simulation {

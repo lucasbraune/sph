@@ -104,13 +104,13 @@ unique_ptr<NeighborIteratorFactory> TrivialNeighborIteratorFactory::clone() cons
 
 CubicKernel::CubicKernel(double smoothingLength) :
   smoothingLength_(smoothingLength),
-  C_(15.0/ (14 * M_PI * smoothingLength * smoothingLength)),
+  C_(15.0 / (14 * M_PI * smoothingLength * smoothingLength)),
   D_(-3 * C_ / smoothingLength_)
 {}
 
 double CubicKernel::operator()(Vec2d x) const
 {
-  double q = hypot(x[0], x[1]) / smoothingLength_;
+  double q = norm(x) / smoothingLength_;
   double A = 2 - q;
   if (q < 1) {
     double B = 1 - q;
@@ -124,9 +124,9 @@ double CubicKernel::operator()(Vec2d x) const
 
 Vec2d CubicKernel::gradientAt(Vec2d x) const
 {
-  double r = hypot(x[0], x[1]);
+  double r = norm(x);
   double q = r / smoothingLength_;
-  constexpr double EPSILON = 1e-3;
+  constexpr double EPSILON = 1e-6;
   if (q < EPSILON || q >= 2) {
     return ZERO_VECTOR;
   }
