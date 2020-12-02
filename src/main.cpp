@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 
 void display()
 {
-  view.draw(simulation);  
+  view.draw(simulation.runner());  
   glutSwapBuffers();
 }
 

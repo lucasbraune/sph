@@ -35,6 +35,16 @@ SimulationRunner::SimulationRunner(ParticleSystem& ps, unique_ptr<TimeIntegrator
   paused_(true)
 {}
 
+const vector<Vec2d>& SimulationRunner::positions() const
+{
+  return ps_.positions;
+}
+
+double SimulationRunner::time() const
+{
+  return ps_.time;
+}
+
 void SimulationRunner::computeNextFrame()
 {
   if (!paused()) {

@@ -34,13 +34,9 @@ CentralPotential::CentralPotential(size_t numberOfParticles, double totalMass, R
   gravity_(gravityConstant),
   damping_(dampingConstant),
   ps_(numberOfParticles, totalMass, region, {std::cref<Force>(gravity_)}, damping_),
-  runner_(ps_)
+  runner_(ps_),
+  gravityConstant_(gravity_)
 {}
-
-const ParticleSystem& CentralPotential::state() const
-{
-  return ps_;
-}
 
 SimulationRunner& CentralPotential::runner()
 {
@@ -57,9 +53,14 @@ LinearDamping& CentralPotential::damping()
   return damping_;
 }
 
-PointGravity& CentralPotential::gravity()
+AdjustableParameter& CentralPotential::gravity()
 {
-  return gravity_;
+  return gravityConstant_;
+}
+
+const AdjustableParameter& CentralPotential::gravity() const
+{
+  return gravityConstant_;
 }
 
 static double gravityConstant(double totalMass, double pressureConstant, double starRadius)
@@ -82,11 +83,6 @@ ToyStar::ToyStar(size_t numberOfParticles, double totalMass, double starRadius, 
   runner_(ps_),
   gravityConstant_(gravity_)
 {}
-
-const ParticleSystem& ToyStar::state() const
-{
-  return ps_;
-}
 
 SimulationRunner& ToyStar::runner()
 {

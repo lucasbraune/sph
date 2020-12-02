@@ -31,6 +31,8 @@ public:
                    double simulationSpeed = 1.0, int fps = 60);
   
   const vector<Vec2d>& positions() const;
+  double time() const;
+  
   void computeNextFrame();
   void waitForNextFrame();
 
@@ -50,14 +52,6 @@ private:
   double simulationSpeed_;
   int fps_;
   bool paused_;
-};
-
-class Simulation {
-public:
-  virtual ~Simulation() {};
-  virtual SimulationRunner& runner() = 0;
-  virtual const SimulationRunner& runner() const = 0;
-  virtual const ParticleSystem& state() const = 0;
 };
 
 

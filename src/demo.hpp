@@ -8,6 +8,7 @@ class AdjustableParameter {
 public:
   AdjustableParameter(const function<double(void)>& getter, const function<void(double)>& setter);
   AdjustableParameter(PointGravity& gravity);
+
   double value() const;
   void increase();
   void decrease();
@@ -17,7 +18,7 @@ private:
   function<void(double)> set_;
 };
 
-class CentralPotential : public Simulation {
+class CentralPotential {
 public:
   CentralPotential(size_t numberOfParticles = 1000,
                    double totalMass = 1.0,
@@ -25,20 +26,21 @@ public:
                    double gravityConstant = 1.0,
                    double dampingConstant = 0.01);
 
-  SimulationRunner& runner() override;
-  const SimulationRunner& runner() const override;
-  const ParticleSystem& state() const override;
+  SimulationRunner& runner();
+  const SimulationRunner& runner() const;
   LinearDamping& damping();
-  PointGravity& gravity();
+  AdjustableParameter& gravity();
+  const AdjustableParameter& gravity() const;
 
 private:
   PointGravity gravity_;
   LinearDamping damping_;
   ParticleSystem ps_;
   SimulationRunner runner_;
+  AdjustableParameter gravityConstant_;
 };
 
-class ToyStar : public Simulation {
+class ToyStar {
 public:
   ToyStar(size_t numberOfParticles = 250,
           double starMass = 2.0,
@@ -47,9 +49,8 @@ public:
           double dampingConstant = 1.0,
           double pressureConstant = 1.0);
 
-  SimulationRunner& runner() override;
-  const SimulationRunner& runner() const override;
-  const ParticleSystem& state() const override;
+  SimulationRunner& runner();
+  const SimulationRunner& runner() const;
   LinearDamping& damping();
   AdjustableParameter& gravity();
   const AdjustableParameter& gravity() const;

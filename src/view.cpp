@@ -39,24 +39,24 @@ void drawText(std::string line)
   }
 }
 
-string textInfo(const Simulation& sim)
+string textInfo(const SimulationRunner& sim)
 {
   string text =
-      "time = " + std::to_string(sim.state().time) + 
-      ", target speed = " + std::to_string(sim.runner().targetSpeed()) + "x";
-  if (sim.runner().paused()) {
+      "time = " + std::to_string(sim.time()) + 
+      ", target speed = " + std::to_string(sim.targetSpeed()) + "x";
+  if (sim.paused()) {
     text.append(", PAUSED");
   } 
   return text;
 }
 
-void View::draw(const Simulation& sim) const
+void View::draw(const SimulationRunner& sim) const
 {
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glColor3f(0.0, 0.0, 0.0);
-  for (auto position : sim.state().positions) {
+  for (auto position : sim.positions()) {
     glBegin(GL_POLYGON);
     for (auto vertex : particlePolygon_) {
       Vec2d translate = vertex + position;
