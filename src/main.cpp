@@ -29,21 +29,21 @@ int main(int argc, char** argv)
   glutIdleFunc(idle);
   glutKeyboardFunc(keyboard);
 
-  simulation.runner().pauseOrUnpause(); // Unpauses the simulation
+  simulation.pauseOrUnpause(); // Unpauses the simulation
   glutMainLoop();
   return 0;
 }
 
 void display()
 {
-  view.draw(simulation.runner());  
+  view.draw(simulation);  
   glutSwapBuffers();
 }
 
 void idle()
 {
-  simulation.runner().computeNextFrame();
-  simulation.runner().waitForNextFrame();
+  simulation.computeNextFrame();
+  simulation.waitForNextFrame();
   glutPostRedisplay();
 }
 
@@ -67,7 +67,7 @@ void keyboard(unsigned char c, int, int)
   // Runner controls
   case 'p':
   case 'P':
-    simulation.runner().pauseOrUnpause();
+    simulation.pauseOrUnpause();
     break;
   case 's':
     simulation.speedAdjuster().decrease();

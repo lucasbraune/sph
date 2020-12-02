@@ -54,11 +54,12 @@ public:
   ParticleSystem(const vector<Vec2d>& initialPositions, const vector<Vec2d>& initialVelocities,
                  double particleMass, const vector<const Force*>& forces,
                  const vector<const Damping*>& dampings);
-  ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region,
-                 const vector<const Force*>& forces, const vector<const Damping*>& dampings);
+  ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region);
   
   const vector<const Force*>& forces() const;
   const vector<const Damping*>& dampings() const;
+  void addForce(Force& force);
+  void addDamping(Damping& damping);
   
   const size_t numberOfParticles;
   const double particleMass;

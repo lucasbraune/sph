@@ -39,24 +39,15 @@ ParameterAdjuster AdjusterFactory::damping(LinearDamping& damping)
 
 CentralPotential::CentralPotential(size_t numberOfParticles, double totalMass, Rectangle region,
                                    double gravityConstant, double dampingConstant) :
+  SimulationRunner(numberOfParticles, totalMass, region),
   gravity_(gravityConstant),
   damping_(dampingConstant),
-  ps_(numberOfParticles, totalMass, region, vector<const Force*>{&gravity_},
-      vector<const Damping*>{&damping_}),
-  runner_(ps_),
-  speedAdjuster_(AdjusterFactory::speed(runner_)),
+  speedAdjuster_(AdjusterFactory::speed(*this)),
   dampingAdjuster_(AdjusterFactory::damping(damping_)),
   gravityAdjuster_(AdjusterFactory::gravity(gravity_))
-{}
-
-SimulationRunner& CentralPotential::runner()
 {
-  return runner_;
-}
-
-const SimulationRunner& CentralPotential::runner() const
-{
-  return runner_;
+  addForce(gravity_);
+  addDamping(damping_);
 }
 
 const ParameterAdjuster& CentralPotential::speedAdjuster()
@@ -86,26 +77,17 @@ static double interactionRadius(double numberOfParticles)
 
 ToyStar::ToyStar(size_t numberOfParticles, double totalMass, double starRadius, Rectangle region,
                  double dampingConstant, double pressureConstant) :
+  SimulationRunner(numberOfParticles, totalMass, region),
   gravity_(gravityConstant(totalMass, pressureConstant, starRadius)),
   pressureForce_(interactionRadius(numberOfParticles), GasPressure(pressureConstant)),
   damping_(dampingConstant),
-  ps_(numberOfParticles, totalMass, region,
-      vector<const Force*>{&gravity_, &pressureForce_},
-      vector<const Damping*>{&damping_}),
-  runner_(ps_),
-  speedAdjuster_(AdjusterFactory::speed(runner_)),
+  speedAdjuster_(AdjusterFactory::speed(*this)),
   dampingAdjuster_(AdjusterFactory::damping(damping_)),
   gravityAdjuster_(AdjusterFactory::gravity(gravity_))
-{}
-
-SimulationRunner& ToyStar::runner()
 {
-  return runner_;
-}
-
-const SimulationRunner& ToyStar::runner() const
-{
-  return runner_;
+  addForce(gravity_);
+  addForce(pressureForce_);
+  addDamping(damping_);
 }
 
 const ParameterAdjuster& ToyStar::speedAdjuster()

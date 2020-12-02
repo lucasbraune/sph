@@ -28,9 +28,10 @@ private:
 
 class SimulationRunner {
 public:
-  SimulationRunner(ParticleSystem& ps,
+  SimulationRunner(const ParticleSystem& ps,
                    unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01),
                    double simulationSpeed = 1.0, int fps = 60);
+  SimulationRunner(size_t numberOfParticles, double totalMass, Rectangle region);
   
   const vector<Vec2d>& positions() const;
   double time() const;
@@ -44,10 +45,14 @@ public:
   bool paused() const;
   void pauseOrUnpause();
 
+protected:
+  void addForce(Force& force);
+  void addDamping(Damping& damping);
+
 private:
   void synchronize();
 
-  ParticleSystem& ps_;
+  ParticleSystem ps_;
   unique_ptr<TimeIntegrator> integrator_;
   Synchronizer synchronizer_;
   double simulationSpeed_;

@@ -26,13 +26,17 @@ void Synchronizer::waitUntil(const double simulationTime, const double playbackS
   std::this_thread::sleep_until(realTime);
 }
 
-SimulationRunner::SimulationRunner(ParticleSystem& ps, unique_ptr<TimeIntegrator> integrator, double playbackSpeed, int fps) :
+SimulationRunner::SimulationRunner(const ParticleSystem& ps, unique_ptr<TimeIntegrator> integrator, double playbackSpeed, int fps) :
   ps_(ps),
   integrator_(std::move(integrator)),
   synchronizer_(),
   simulationSpeed_(playbackSpeed),
   fps_(fps),
   paused_(true)
+{}
+
+SimulationRunner::SimulationRunner(size_t numberOfParticles, double totalMass, Rectangle region) :
+  SimulationRunner(ParticleSystem(numberOfParticles, totalMass, region))
 {}
 
 const vector<Vec2d>& SimulationRunner::positions() const
@@ -81,6 +85,16 @@ void SimulationRunner::pauseOrUnpause()
     synchronize();
   }
   paused_ = !paused_;
+}
+
+void SimulationRunner::addForce(Force& force)
+{
+  ps_.addForce(force);
+}
+
+void SimulationRunner::addDamping(Damping& damping)
+{
+  ps_.addDamping(damping);
 }
 
 void SimulationRunner::synchronize()

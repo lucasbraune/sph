@@ -66,14 +66,9 @@ ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions,
   dampings_(dampings)
 {}
 
-ParticleSystem::ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region,
-                               const vector<const Force*>& forces,
-                               const vector<const Damping*>& dampings) :
+ParticleSystem::ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region) :
   ParticleSystem(randomVectors(region, numberOfParticles),
-                 vector<Vec2d>(numberOfParticles),
-                 totalMass / numberOfParticles,
-                 forces,
-                 dampings)
+                 vector<Vec2d>(numberOfParticles), totalMass / numberOfParticles, {}, {})
 {}
 
 const vector<const Force*>& ParticleSystem::forces() const
@@ -84,6 +79,16 @@ const vector<const Force*>& ParticleSystem::forces() const
 const vector<const Damping*>& ParticleSystem::dampings() const
 {
   return dampings_;
+}
+
+void ParticleSystem::addForce(Force& force)
+{
+  forces_.emplace_back(&force);
+}
+
+void ParticleSystem::addDamping(Damping& damping)
+{
+  dampings_.emplace_back(&damping);
 }
 
 void TimeIntegrator::integrate(ParticleSystem& ps, double duration)

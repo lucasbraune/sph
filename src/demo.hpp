@@ -21,7 +21,7 @@ namespace AdjusterFactory {
   ParameterAdjuster gravity(PointGravity& gravity);
 };
 
-class CentralPotential {
+class CentralPotential : public SimulationRunner {
 public:
   CentralPotential(size_t numberOfParticles = 1000,
                    double totalMass = 1.0,
@@ -29,8 +29,6 @@ public:
                    double gravityConstant = 1.0,
                    double dampingConstant = 0.01);
 
-  const SimulationRunner& runner() const;
-  SimulationRunner& runner();
   const ParameterAdjuster& speedAdjuster();
   const ParameterAdjuster& dampingAdjuster();
   const ParameterAdjuster& gravityAdjuster();
@@ -38,12 +36,10 @@ public:
 private:
   PointGravity gravity_;
   LinearDamping damping_;
-  ParticleSystem ps_;
-  SimulationRunner runner_;
   ParameterAdjuster speedAdjuster_, dampingAdjuster_, gravityAdjuster_;
 };
 
-class ToyStar {
+class ToyStar : public SimulationRunner {
 public:
   ToyStar(size_t numberOfParticles = 250,
           double starMass = 2.0,
@@ -52,8 +48,6 @@ public:
           double dampingConstant = 1.0,
           double pressureConstant = 1.0);
 
-  SimulationRunner& runner();
-  const SimulationRunner& runner() const;
   const ParameterAdjuster& speedAdjuster();
   const ParameterAdjuster& dampingAdjuster();
   const ParameterAdjuster& gravityAdjuster();
@@ -62,8 +56,6 @@ private:
   PointGravity gravity_;
   PressureForce pressureForce_;
   LinearDamping damping_;
-  ParticleSystem ps_;
-  SimulationRunner runner_;
   ParameterAdjuster speedAdjuster_, dampingAdjuster_, gravityAdjuster_;
 };
 
