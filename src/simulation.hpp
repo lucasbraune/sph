@@ -4,12 +4,14 @@
 #include <vector>
 #include <chrono>
 #include <memory>
+#include <functional>
 #include "particle_system.hpp"
 
 using std::vector;
 using std::chrono::high_resolution_clock;
 using std::chrono::time_point;
 using std::unique_ptr;
+using std::function;
 
 class Synchronizer {
 public:
@@ -37,8 +39,7 @@ public:
   void waitForNextFrame();
 
   double targetSpeed() const;
-  void speedUp();
-  void speedDown();
+  void setTargetSpeed(double newSpeed);
 
   bool paused() const;
   void pauseOrUnpause();

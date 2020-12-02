@@ -64,16 +64,10 @@ double SimulationRunner::targetSpeed() const
   return simulationSpeed_;
 }
 
-void SimulationRunner::speedUp()
+void SimulationRunner::setTargetSpeed(double newSpeed)
 {
   synchronize();
-  simulationSpeed_ *= 2.0;
-}
-
-void SimulationRunner::speedDown()
-{
-  synchronize();
-  simulationSpeed_ *= 0.5;
+  simulationSpeed_ = newSpeed;
 }
 
 bool SimulationRunner::paused() const

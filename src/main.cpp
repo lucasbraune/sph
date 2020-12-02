@@ -9,7 +9,7 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-ToyStar simulation;
+CentralPotential simulation;
 
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
 const double particleRadius = 0.02;
@@ -58,10 +58,10 @@ void keyboard(unsigned char c, int, int)
     simulation.damping().increase();
     break;
   case 'g':
-    simulation.gravity().decrease();
+    simulation.gravityAdjuster().decrease();
     break;
   case 'G':
-    simulation.gravity().increase();
+    simulation.gravityAdjuster().increase();
     break;
 
   // Runner controls
@@ -70,10 +70,10 @@ void keyboard(unsigned char c, int, int)
     simulation.runner().pauseOrUnpause();
     break;
   case 's':
-    simulation.runner().speedDown();
+    simulation.speedAdjuster().decrease();
     break;
   case 'S':
-    simulation.runner().speedUp();
+    simulation.speedAdjuster().increase();
     break;
   }
 }

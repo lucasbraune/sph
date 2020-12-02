@@ -1,30 +1,32 @@
 #include "demo.hpp"
-#include <functional>
 #include <cmath>
 
 using std::reference_wrapper;
 
-AdjustableParameter::AdjustableParameter(const function<double(void)>& getter, const function<void(double)>& setter) :
+
+ParameterAdjuster::ParameterAdjuster(const function<double(void)>& getter, const function<void(double)>& setter) :
   get_(getter),
   set_(setter)
 {}
 
-AdjustableParameter::AdjustableParameter(PointGravity& gravity) :
-  get_([&gravity](){ return gravity.constant(); }),
-  set_([&gravity](double x){ gravity.setConstant(x); })
-{}
-
-double AdjustableParameter::value() const
+ParameterAdjuster AdjusterFactory::gravity(PointGravity& gravity)
 {
-  return get_();
+  return ParameterAdjuster([&gravity](){ return gravity.constant(); },
+                           [&gravity](double x){ gravity.setConstant(x); });
 }
 
-void AdjustableParameter::increase()
+ParameterAdjuster AdjusterFactory::speed(SimulationRunner& runner)
+{
+  return ParameterAdjuster([&runner](){ return runner.targetSpeed(); },
+                           [&runner](double x){ runner.setTargetSpeed(x); });
+}
+
+void ParameterAdjuster::increase() const
 {
   set_(2.0 * get_());
 }
 
-void AdjustableParameter::decrease()
+void ParameterAdjuster::decrease() const
 {
   set_(0.5 * get_());
 }
@@ -35,7 +37,8 @@ CentralPotential::CentralPotential(size_t numberOfParticles, double totalMass, R
   damping_(dampingConstant),
   ps_(numberOfParticles, totalMass, region, {std::cref<Force>(gravity_)}, damping_),
   runner_(ps_),
-  gravityConstant_(gravity_)
+  speedAdjuster_(AdjusterFactory::speed(runner_)),
+  gravityAdjuster_(AdjusterFactory::gravity(gravity_))
 {}
 
 SimulationRunner& CentralPotential::runner()
@@ -53,14 +56,14 @@ LinearDamping& CentralPotential::damping()
   return damping_;
 }
 
-AdjustableParameter& CentralPotential::gravity()
+const ParameterAdjuster& CentralPotential::speedAdjuster()
 {
-  return gravityConstant_;
+  return speedAdjuster_;
 }
 
-const AdjustableParameter& CentralPotential::gravity() const
+const ParameterAdjuster& CentralPotential::gravityAdjuster()
 {
-  return gravityConstant_;
+  return gravityAdjuster_;
 }
 
 static double gravityConstant(double totalMass, double pressureConstant, double starRadius)
@@ -81,7 +84,8 @@ ToyStar::ToyStar(size_t numberOfParticles, double totalMass, double starRadius, 
   ps_(numberOfParticles, totalMass, region,
       {std::cref<Force>(gravity_), std::cref<Force>(pressureForce_)}, damping_),
   runner_(ps_),
-  gravityConstant_(gravity_)
+  speedAdjuster_(AdjusterFactory::speed(runner_)),
+  gravityAdjuster_(AdjusterFactory::gravity(gravity_))
 {}
 
 SimulationRunner& ToyStar::runner()
@@ -99,12 +103,12 @@ LinearDamping& ToyStar::damping()
   return damping_;
 }
 
-AdjustableParameter& ToyStar::gravity()
+const ParameterAdjuster& ToyStar::speedAdjuster()
 {
-  return gravityConstant_;
+  return speedAdjuster_;
 }
 
-const AdjustableParameter& ToyStar::gravity() const
+const ParameterAdjuster& ToyStar::gravityAdjuster()
 {
-  return gravityConstant_;
+  return gravityAdjuster_;
 }

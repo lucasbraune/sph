@@ -4,18 +4,20 @@
 #include "simulation.hpp"
 #include "pressure_force.hpp"
 
-class AdjustableParameter {
+class ParameterAdjuster {
 public:
-  AdjustableParameter(const function<double(void)>& getter, const function<void(double)>& setter);
-  AdjustableParameter(PointGravity& gravity);
-
-  double value() const;
-  void increase();
-  void decrease();
+  ParameterAdjuster(const function<double(void)>& getter, const function<void(double)>& setter);
+  void increase() const;
+  void decrease() const;
 
 private:
   function<double(void)> get_;
   function<void(double)> set_;
+};
+
+namespace AdjusterFactory {
+  ParameterAdjuster speed(SimulationRunner& runner);
+  ParameterAdjuster gravity(PointGravity& gravity);
 };
 
 class CentralPotential {
@@ -26,18 +28,18 @@ public:
                    double gravityConstant = 1.0,
                    double dampingConstant = 0.01);
 
-  SimulationRunner& runner();
   const SimulationRunner& runner() const;
+  SimulationRunner& runner();
   LinearDamping& damping();
-  AdjustableParameter& gravity();
-  const AdjustableParameter& gravity() const;
+  const ParameterAdjuster& speedAdjuster();
+  const ParameterAdjuster& gravityAdjuster();
 
 private:
   PointGravity gravity_;
   LinearDamping damping_;
   ParticleSystem ps_;
   SimulationRunner runner_;
-  AdjustableParameter gravityConstant_;
+  ParameterAdjuster speedAdjuster_, gravityAdjuster_;
 };
 
 class ToyStar {
@@ -52,8 +54,8 @@ public:
   SimulationRunner& runner();
   const SimulationRunner& runner() const;
   LinearDamping& damping();
-  AdjustableParameter& gravity();
-  const AdjustableParameter& gravity() const;
+  const ParameterAdjuster& speedAdjuster();
+  const ParameterAdjuster& gravityAdjuster();
 
 private:
   PointGravity gravity_;
@@ -61,7 +63,7 @@ private:
   LinearDamping damping_;
   ParticleSystem ps_;
   SimulationRunner runner_;
-  AdjustableParameter gravityConstant_;
+  ParameterAdjuster speedAdjuster_, gravityAdjuster_;
 };
 
 #endif
