@@ -4,9 +4,15 @@
 using std::reference_wrapper;
 
 
-ParameterAdjuster::ParameterAdjuster(const function<double(void)>& getter, const function<void(double)>& setter) :
+ParameterAdjuster::ParameterAdjuster(const function<double(void)>& getter,
+                                     const function<void(double)>& setter) :
   get_(getter),
   set_(setter)
+{}
+
+ParameterAdjuster::ParameterAdjuster() :
+  get_([](){ return 0.0; }),
+  set_([](double){})
 {}
 
 void ParameterAdjuster::increase() const

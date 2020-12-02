@@ -1,17 +1,17 @@
 #define GL_SILENCE_DEPRECATION
 
 #include <GL/freeglut.h>
-#include "util.hpp"
-#include "view.hpp"
 #include "demo.hpp"
+#include "view.hpp"
+#include "controller.hpp"
 
 void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-ToyStar simulation;
+CentralPotential simulation;
 const View view;
-
+const Controller controller(simulation);
 
 int main(int argc, char** argv)
 {
@@ -47,31 +47,5 @@ void idle()
 
 void keyboard(unsigned char c, int, int)
 {
-  switch (c) {
-  // Central gravity controls
-  case 'd':
-    simulation.dampingAdjuster().decrease();
-    break;
-  case 'D':
-    simulation.dampingAdjuster().increase();
-    break;
-  case 'g':
-    simulation.gravityAdjuster().decrease();
-    break;
-  case 'G':
-    simulation.gravityAdjuster().increase();
-    break;
-
-  // Runner controls
-  case 'p':
-  case 'P':
-    simulation.pauseOrUnpause();
-    break;
-  case 's':
-    simulation.speedAdjuster().decrease();
-    break;
-  case 'S':
-    simulation.speedAdjuster().increase();
-    break;
-  }
+  controller.handleKeyboardInput(c);
 }

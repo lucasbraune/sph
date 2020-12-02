@@ -7,6 +7,7 @@
 class ParameterAdjuster {
 public:
   ParameterAdjuster(const function<double(void)>& getter, const function<void(double)>& setter);
+  ParameterAdjuster();
   void increase() const;
   void decrease() const;
 
