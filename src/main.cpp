@@ -10,10 +10,8 @@ void idle();
 void keyboard(unsigned char key, int x, int y);
 
 ToyStar simulation;
+const View view;
 
-const Rectangle region{-1.0, -1.0, 1.0, 1.0};
-const double particleRadius = 0.02;
-const View view(region, particleRadius);
 
 int main(int argc, char** argv)
 {
