@@ -31,14 +31,14 @@ Vec2d LinearDamping::acceleration(const double, const double, const Vec2d veloci
   return -intensity_ * velocity;
 }
 
-void LinearDamping::increase()
+double LinearDamping::constant() const
 {
-  intensity_ *= 2.0;
+  return intensity_;
 }
 
-void LinearDamping::decrease()
+void LinearDamping::setConstant(double newValue)
 {
-  intensity_ *= 0.5;
+  intensity_ = newValue;
 }
 
 ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions,

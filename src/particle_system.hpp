@@ -39,8 +39,8 @@ class LinearDamping : public Damping {
 public:
   LinearDamping(const double dampingConstant);
   Vec2d acceleration(const double time, const double mass, const Vec2d velocity) const;
-  void increase();
-  void decrease();
+  double constant() const;
+  void setConstant(double newValue);
 
 private:
   double intensity_;

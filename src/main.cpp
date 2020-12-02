@@ -9,7 +9,7 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-CentralPotential simulation;
+ToyStar simulation;
 
 const Rectangle region{-1.0, -1.0, 1.0, 1.0};
 const double particleRadius = 0.02;
@@ -52,10 +52,10 @@ void keyboard(unsigned char c, int, int)
   switch (c) {
   // Central gravity controls
   case 'd':
-    simulation.damping().decrease();
+    simulation.dampingAdjuster().decrease();
     break;
   case 'D':
-    simulation.damping().increase();
+    simulation.dampingAdjuster().increase();
     break;
   case 'g':
     simulation.gravityAdjuster().decrease();

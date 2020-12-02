@@ -17,6 +17,7 @@ private:
 
 namespace AdjusterFactory {
   ParameterAdjuster speed(SimulationRunner& runner);
+  ParameterAdjuster damping(LinearDamping& damping);
   ParameterAdjuster gravity(PointGravity& gravity);
 };
 
@@ -30,8 +31,8 @@ public:
 
   const SimulationRunner& runner() const;
   SimulationRunner& runner();
-  LinearDamping& damping();
   const ParameterAdjuster& speedAdjuster();
+  const ParameterAdjuster& dampingAdjuster();
   const ParameterAdjuster& gravityAdjuster();
 
 private:
@@ -39,7 +40,7 @@ private:
   LinearDamping damping_;
   ParticleSystem ps_;
   SimulationRunner runner_;
-  ParameterAdjuster speedAdjuster_, gravityAdjuster_;
+  ParameterAdjuster speedAdjuster_, dampingAdjuster_, gravityAdjuster_;
 };
 
 class ToyStar {
@@ -53,8 +54,8 @@ public:
 
   SimulationRunner& runner();
   const SimulationRunner& runner() const;
-  LinearDamping& damping();
   const ParameterAdjuster& speedAdjuster();
+  const ParameterAdjuster& dampingAdjuster();
   const ParameterAdjuster& gravityAdjuster();
 
 private:
@@ -63,7 +64,7 @@ private:
   LinearDamping damping_;
   ParticleSystem ps_;
   SimulationRunner runner_;
-  ParameterAdjuster speedAdjuster_, gravityAdjuster_;
+  ParameterAdjuster speedAdjuster_, dampingAdjuster_, gravityAdjuster_;
 };
 
 #endif
