@@ -41,7 +41,7 @@ class SmoothingKernel {
 };
 
 class PressureForce : public Force {
-  public:
+public:
   PressureForce(unique_ptr<NeighborIteratorFactory> iteratorFactory,
                 unique_ptr<SmoothingKernel> kernel,
                 function<double(double)> pressure);
@@ -55,7 +55,7 @@ class PressureForce : public Force {
   void apply(const double time, const double particleMass, const vector<Vec2d>& positions,
              vector<Vec2d>& accelerations) const;
 
-  private:
+private:
   vector<double> computeDensities(double particleMass, const vector<Vec2d>& positions) const;
 
   unique_ptr<SmoothingKernel> kernel_;

@@ -33,6 +33,9 @@ class Damping {
 public:
   virtual ~Damping() {}
   virtual Vec2d acceleration(const double time, const double mass, const Vec2d velocity) const = 0;
+
+  static Vec2d acceleration(const vector<const Damping*>& dampings, double time, double mass,
+                            Vec2d velocity);
 };
 
 class LinearDamping : public Damping {
@@ -46,18 +49,25 @@ private:
   double intensity_;
 };
 
-struct ParticleSystem {
+class ParticleSystem {
+public:
   ParticleSystem(const vector<Vec2d>& initialPositions, const vector<Vec2d>& initialVelocities,
-                 const vector<reference_wrapper<const Force>>& forces, const Damping& damping,
-                 double particleMass);
+                 double particleMass, const vector<const Force*>& forces,
+                 const vector<const Damping*>& dampings);
   ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region,
-                 const vector<reference_wrapper<const Force>>& forces, const Damping& damping);
+                 const vector<const Force*>& forces, const vector<const Damping*>& dampings);
+  
+  const vector<const Force*>& forces() const;
+  const vector<const Damping*>& dampings() const;
+  
   const size_t numberOfParticles;
   const double particleMass;
-  const vector<reference_wrapper<const Force>> forces;
-  const Damping& damping; 
   vector<Vec2d> positions, velocities, accelerations;
   double time;
+
+private:
+  vector<const Force*> forces_;
+  vector<const Damping*> dampings_;
 };
 
 class TimeIntegrator {
@@ -83,7 +93,7 @@ public:
 
 private:
   static inline Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc,
-                                   const Damping& damping, double mass, double time,
+                                   const vector<const Damping*>& dampings, double mass, double time,
                                    double timeStep);
   const double timeStep_;
   vector<Vec2d> nextForceAcc_;

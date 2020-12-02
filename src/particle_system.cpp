@@ -22,6 +22,16 @@ void PointGravity::setConstant(double newValue)
   intensity_ = newValue;
 }
 
+Vec2d Damping::acceleration(const vector<const Damping*>& dampings, double time, double mass,
+                            Vec2d velocity)
+{
+  Vec2d result = ZERO_VECTOR;
+  for (auto damping : dampings) {
+    result += damping->acceleration(time, mass, velocity);
+  }
+  return result;
+}
+
 LinearDamping::LinearDamping(const double dampingConstant) :
   intensity_(dampingConstant)
 {}
@@ -43,27 +53,38 @@ void LinearDamping::setConstant(double newValue)
 
 ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions,
                                const vector<Vec2d>& initialVelocities,
-                               const vector<reference_wrapper<const Force>>& forces,
-                               const Damping& damping,
-                               double particleMass) :
+                               double particleMass,
+                               const vector<const Force*>& forces,
+                               const vector<const Damping*>& dampings) :
   numberOfParticles(initialPositions.size()),
   particleMass(particleMass),
-  forces(forces),
-  damping(damping),
   positions(initialPositions),
   velocities(initialVelocities),
   accelerations(positions.size()),
-  time(0.0)
+  time(0.0),
+  forces_(forces),
+  dampings_(dampings)
 {}
 
 ParticleSystem::ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region,
-                 const vector<reference_wrapper<const Force>>& forces, const Damping& damping) :
+                               const vector<const Force*>& forces,
+                               const vector<const Damping*>& dampings) :
   ParticleSystem(randomVectors(region, numberOfParticles),
                  vector<Vec2d>(numberOfParticles),
+                 totalMass / numberOfParticles,
                  forces,
-                 damping,
-                 totalMass / numberOfParticles)
+                 dampings)
 {}
+
+const vector<const Force*>& ParticleSystem::forces() const
+{
+  return forces_;
+}
+
+const vector<const Damping*>& ParticleSystem::dampings() const
+{
+  return dampings_;
+}
 
 void TimeIntegrator::integrate(ParticleSystem& ps, double duration)
 {
@@ -81,10 +102,11 @@ void EulerIntegrator::step(ParticleSystem& ps)
   for (size_t i=0; i<ps.numberOfParticles; i++) {
     ps.positions[i] += timeStep_ * ps.velocities[i];
     ps.velocities[i] += timeStep_ * ps.accelerations[i];
-    ps.accelerations[i] = ps.damping.acceleration(ps.time, ps.particleMass, ps.velocities[i]);
+    ps.accelerations[i] =
+        Damping::acceleration(ps.dampings(), ps.time, ps.particleMass, ps.velocities[i]);
   }
-  for (auto& force : ps.forces) {
-    force.get().apply(ps.time, ps.particleMass, ps.positions, ps.accelerations);
+  for (auto force : ps.forces()) {
+    force->apply(ps.time, ps.particleMass, ps.positions, ps.accelerations);
   }
 }
 
@@ -102,25 +124,26 @@ void VerletIntegrator::step(ParticleSystem& ps)
   for (Vec2d& acc : nextForceAcc_) {
     acc = ZERO_VECTOR;
   }
-  for (auto& force : ps.forces) {
-    force.get().apply(ps.time, ps.particleMass, ps.positions, nextForceAcc_);
+  for (auto& force : ps.forces()) {
+    force->apply(ps.time, ps.particleMass, ps.positions, nextForceAcc_);
   }
 
   for (size_t i=0; i<ps.numberOfParticles; i++) {
     ps.velocities[i] = nextVelocity(ps.velocities[i], ps.accelerations[i], nextForceAcc_[i],
-                                    ps.damping, ps.particleMass, ps.time, timeStep_);
-    Vec2d nextDampingAcc = ps.damping.acceleration(ps.time, ps.particleMass, ps.velocities[i]);
+                                    ps.dampings(), ps.particleMass, ps.time, timeStep_);
+    Vec2d nextDampingAcc =
+        Damping::acceleration(ps.dampings(), ps.time, ps.particleMass, ps.velocities[i]);
     ps.accelerations[i] = nextForceAcc_[i] + nextDampingAcc;
   }
 }
 
 inline Vec2d VerletIntegrator::nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc,
-                                            const Damping& damping, double mass, double time,
-                                            double timeStep)
+                                            const vector<const Damping*>& dampings,
+                                            double mass, double time, double timeStep)
 {
-  Vec2d approxVel{currVel + timeStep * currAcc};
-  Vec2d approxDampingAcc{damping.acceleration(time, mass, approxVel)};
+  Vec2d approxVel = currVel + timeStep * currAcc;
+  Vec2d approxDampingAcc = Damping::acceleration(dampings, time, mass, approxVel);
   approxVel += (0.5 * timeStep) * (nextForceAcc + approxDampingAcc - currAcc);
-  approxDampingAcc = damping.acceleration(time, mass, approxVel);
+  approxDampingAcc = Damping::acceleration(dampings, time, mass, approxVel);
   return currVel + (0.5 * timeStep) * (currAcc + nextForceAcc + approxDampingAcc);
 }
