@@ -32,7 +32,7 @@ void Controller::handleKeyboardInput(char c) const
     break;
   case 'p':
   case 'P':
-    simulation_.pauseOrUnpause();
+    simulation_.togglePause();
     break;
   case 's':
     speed_.decrease();

@@ -27,7 +27,7 @@ int main(int argc, char** argv)
   glutIdleFunc(idle);
   glutKeyboardFunc(keyboard);
 
-  simulation.pauseOrUnpause(); // Unpauses the simulation
+  simulation.togglePause(); // Unpauses the simulation
   glutMainLoop();
   return 0;
 }

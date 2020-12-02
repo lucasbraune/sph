@@ -80,7 +80,7 @@ bool Simulation::paused() const
   return paused_;
 }
 
-void Simulation::pauseOrUnpause()
+void Simulation::togglePause()
 {
   if (paused_) {
     synchronize();

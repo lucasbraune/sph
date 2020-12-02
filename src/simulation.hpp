@@ -43,7 +43,7 @@ public:
   void setTargetSpeed(double newSpeed);
 
   bool paused() const;
-  void pauseOrUnpause();
+  void togglePause();
 
 protected:
   void addForce(Force& force);
