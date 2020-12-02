@@ -8,7 +8,6 @@ public:
   Controller(Simulation& simulation, const ParameterAdjuster& speed,
              const ParameterAdjuster& damping, const ParameterAdjuster& gravity);
   Controller(CentralPotential& simulation);
-  Controller(ToyStar& simulation);
   void handleKeyboardInput(char c) const;
 
 private:

@@ -15,13 +15,6 @@ Controller::Controller(CentralPotential& simulation) :
              simulation.gravityAdjuster())
 {}
 
-Controller::Controller(ToyStar& simulation) :
-  Controller(simulation,
-             simulation.speedAdjuster(),
-             simulation.dampingAdjuster(),
-             simulation.gravityAdjuster())
-{}
-
 void Controller::handleKeyboardInput(char c) const
 {
   switch (c) {

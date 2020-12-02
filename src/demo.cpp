@@ -83,30 +83,10 @@ static double interactionRadius(double numberOfParticles)
 
 ToyStar::ToyStar(size_t numberOfParticles, double totalMass, double starRadius, Rectangle region,
                  double dampingConstant, double pressureConstant) :
-  Simulation(numberOfParticles, totalMass, region),
-  gravity_(gravityConstant(totalMass, pressureConstant, starRadius)),
-  pressureForce_(interactionRadius(numberOfParticles), GasPressure(pressureConstant)),
-  damping_(dampingConstant),
-  speedAdjuster_(AdjusterFactory::speed(*this)),
-  dampingAdjuster_(AdjusterFactory::damping(damping_)),
-  gravityAdjuster_(AdjusterFactory::gravity(gravity_))
+  CentralPotential(numberOfParticles, totalMass, region,
+                   gravityConstant(totalMass, pressureConstant, starRadius),
+                   dampingConstant),
+  pressureForce_(interactionRadius(numberOfParticles), GasPressure(pressureConstant))
 {
-  addForce(gravity_);
   addForce(pressureForce_);
-  addDamping(damping_);
-}
-
-const ParameterAdjuster& ToyStar::speedAdjuster()
-{
-  return speedAdjuster_;
-}
-
-const ParameterAdjuster& ToyStar::dampingAdjuster()
-{
-  return dampingAdjuster_;
-}
-
-const ParameterAdjuster& ToyStar::gravityAdjuster()
-{
-  return gravityAdjuster_;
 }

@@ -9,7 +9,7 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-CentralPotential simulation;
+ToyStar simulation;
 const View view;
 const Controller controller(simulation);
 

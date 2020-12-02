@@ -40,7 +40,7 @@ private:
   ParameterAdjuster speedAdjuster_, dampingAdjuster_, gravityAdjuster_;
 };
 
-class ToyStar : public Simulation {
+class ToyStar : public CentralPotential {
 public:
   ToyStar(size_t numberOfParticles = 250,
           double starMass = 2.0,
@@ -49,15 +49,8 @@ public:
           double dampingConstant = 1.0,
           double pressureConstant = 1.0);
 
-  const ParameterAdjuster& speedAdjuster();
-  const ParameterAdjuster& dampingAdjuster();
-  const ParameterAdjuster& gravityAdjuster();
-
 private:
-  PointGravity gravity_;
   PressureForce pressureForce_;
-  LinearDamping damping_;
-  ParameterAdjuster speedAdjuster_, dampingAdjuster_, gravityAdjuster_;
 };
 
 #endif
