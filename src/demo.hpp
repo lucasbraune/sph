@@ -4,6 +4,19 @@
 #include "simulation.hpp"
 #include "pressure_force.hpp"
 
+class AdjustableParameter {
+public:
+  AdjustableParameter(const function<double(void)>& getter, const function<void(double)>& setter);
+  AdjustableParameter(PointGravity& gravity);
+  double value() const;
+  void increase();
+  void decrease();
+
+private:
+  function<double(void)> get_;
+  function<void(double)> set_;
+};
+
 class CentralPotential : public Simulation {
 public:
   CentralPotential(size_t numberOfParticles = 1000,
@@ -38,7 +51,8 @@ public:
   const SimulationRunner& runner() const override;
   const ParticleSystem& state() const override;
   LinearDamping& damping();
-  PointGravity& gravity();
+  AdjustableParameter& gravity();
+  const AdjustableParameter& gravity() const;
 
 private:
   PointGravity gravity_;
@@ -46,6 +60,7 @@ private:
   LinearDamping damping_;
   ParticleSystem ps_;
   SimulationRunner runner_;
+  AdjustableParameter gravityConstant_;
 };
 
 #endif

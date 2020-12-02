@@ -8,7 +8,7 @@ Synchronizer::Synchronizer() :
   fixedSimTime_(0.0)
 {}
 
-milliseconds toMilliseconds(double seconds)
+static milliseconds toMilliseconds(double seconds)
 {
   return milliseconds((long) (seconds * 1e3));
 }
@@ -42,7 +42,7 @@ void SimulationRunner::computeNextFrame()
   }
 }
 
-void SimulationRunner::waitForNextFrame() const
+void SimulationRunner::waitForNextFrame()
 {
   if (!paused()) {
     synchronizer_.waitUntil(ps_.time, simulationSpeed_);

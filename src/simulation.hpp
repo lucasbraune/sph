@@ -30,8 +30,9 @@ public:
                    unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01),
                    double simulationSpeed = 1.0, int fps = 60);
   
+  const vector<Vec2d>& positions() const;
   void computeNextFrame();
-  void waitForNextFrame() const;
+  void waitForNextFrame();
 
   double targetSpeed() const;
   void speedUp();

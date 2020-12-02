@@ -12,19 +12,14 @@ void PointGravity::apply(const double, const double, const vector<Vec2d>& positi
   }
 }
 
+double PointGravity::constant() const
+{
+  return intensity_;
+}
+
 void PointGravity::setConstant(double newValue)
 {
   intensity_ = newValue;
-}
-
-void PointGravity::increase()
-{
-  intensity_ *= 2.0;
-}
-
-void PointGravity::decrease()
-{
-  intensity_ *= 0.5;
 }
 
 LinearDamping::LinearDamping(const double dampingConstant) :
