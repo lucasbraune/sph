@@ -10,7 +10,7 @@ void idle();
 void keyboard(unsigned char key, int x, int y);
 
 ToyStar simulation;
-const View view;
+const View view(simulation);
 const Controller controller(simulation);
 
 int main(int argc, char** argv)
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 
 void display()
 {
-  view.draw(simulation);  
+  view.draw();  
   glutSwapBuffers();
 }
 
