@@ -25,7 +25,7 @@ ParameterAdjuster AdjusterFactory::gravity(PointGravity& gravity)
                            [&gravity](double x){ gravity.setConstant(x); });
 }
 
-ParameterAdjuster AdjusterFactory::speed(SimulationRunner& runner)
+ParameterAdjuster AdjusterFactory::speed(Simulation& runner)
 {
   return ParameterAdjuster([&runner](){ return runner.targetSpeed(); },
                            [&runner](double x){ runner.setTargetSpeed(x); });
@@ -39,7 +39,7 @@ ParameterAdjuster AdjusterFactory::damping(LinearDamping& damping)
 
 CentralPotential::CentralPotential(size_t numberOfParticles, double totalMass, Rectangle region,
                                    double gravityConstant, double dampingConstant) :
-  SimulationRunner(numberOfParticles, totalMass, region),
+  Simulation(numberOfParticles, totalMass, region),
   gravity_(gravityConstant),
   damping_(dampingConstant),
   speedAdjuster_(AdjusterFactory::speed(*this)),
@@ -77,7 +77,7 @@ static double interactionRadius(double numberOfParticles)
 
 ToyStar::ToyStar(size_t numberOfParticles, double totalMass, double starRadius, Rectangle region,
                  double dampingConstant, double pressureConstant) :
-  SimulationRunner(numberOfParticles, totalMass, region),
+  Simulation(numberOfParticles, totalMass, region),
   gravity_(gravityConstant(totalMass, pressureConstant, starRadius)),
   pressureForce_(interactionRadius(numberOfParticles), GasPressure(pressureConstant)),
   damping_(dampingConstant),

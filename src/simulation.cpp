@@ -26,7 +26,8 @@ void Synchronizer::waitUntil(const double simulationTime, const double playbackS
   std::this_thread::sleep_until(realTime);
 }
 
-SimulationRunner::SimulationRunner(const ParticleSystem& ps, unique_ptr<TimeIntegrator> integrator, double playbackSpeed, int fps) :
+Simulation::Simulation(const ParticleSystem& ps, unique_ptr<TimeIntegrator> integrator,
+                       double playbackSpeed, int fps) :
   ps_(ps),
   integrator_(std::move(integrator)),
   synchronizer_(),
@@ -35,51 +36,51 @@ SimulationRunner::SimulationRunner(const ParticleSystem& ps, unique_ptr<TimeInte
   paused_(true)
 {}
 
-SimulationRunner::SimulationRunner(size_t numberOfParticles, double totalMass, Rectangle region) :
-  SimulationRunner(ParticleSystem(numberOfParticles, totalMass, region))
+Simulation::Simulation(size_t numberOfParticles, double totalMass, Rectangle region) :
+  Simulation(ParticleSystem(numberOfParticles, totalMass, region))
 {}
 
-const vector<Vec2d>& SimulationRunner::positions() const
+const vector<Vec2d>& Simulation::positions() const
 {
   return ps_.positions;
 }
 
-double SimulationRunner::time() const
+double Simulation::time() const
 {
   return ps_.time;
 }
 
-void SimulationRunner::computeNextFrame()
+void Simulation::computeNextFrame()
 {
   if (!paused()) {
     integrator_->integrate(ps_, simulationSpeed_ / fps_);
   }
 }
 
-void SimulationRunner::waitForNextFrame()
+void Simulation::waitForNextFrame()
 {
   if (!paused()) {
     synchronizer_.waitUntil(ps_.time, simulationSpeed_);
   }
 }
 
-double SimulationRunner::targetSpeed() const
+double Simulation::targetSpeed() const
 {
   return simulationSpeed_;
 }
 
-void SimulationRunner::setTargetSpeed(double newSpeed)
+void Simulation::setTargetSpeed(double newSpeed)
 {
   synchronize();
   simulationSpeed_ = newSpeed;
 }
 
-bool SimulationRunner::paused() const
+bool Simulation::paused() const
 {
   return paused_;
 }
 
-void SimulationRunner::pauseOrUnpause()
+void Simulation::pauseOrUnpause()
 {
   if (paused_) {
     synchronize();
@@ -87,17 +88,17 @@ void SimulationRunner::pauseOrUnpause()
   paused_ = !paused_;
 }
 
-void SimulationRunner::addForce(Force& force)
+void Simulation::addForce(Force& force)
 {
   ps_.addForce(force);
 }
 
-void SimulationRunner::addDamping(Damping& damping)
+void Simulation::addDamping(Damping& damping)
 {
   ps_.addDamping(damping);
 }
 
-void SimulationRunner::synchronize()
+void Simulation::synchronize()
 {
   synchronizer_.synchronize(ps_.time);
 }

@@ -39,7 +39,7 @@ void drawText(std::string line)
   }
 }
 
-string textInfo(const SimulationRunner& sim)
+string textInfo(const Simulation& sim)
 {
   string text =
       "time = " + std::to_string(sim.time()) + 
@@ -50,7 +50,7 @@ string textInfo(const SimulationRunner& sim)
   return text;
 }
 
-void View::draw(const SimulationRunner& sim) const
+void View::draw(const Simulation& sim) const
 {
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);

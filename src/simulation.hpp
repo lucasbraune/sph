@@ -26,12 +26,12 @@ private:
   double fixedSimTime_;
 };
 
-class SimulationRunner {
+class Simulation {
 public:
-  SimulationRunner(const ParticleSystem& ps,
-                   unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01),
-                   double simulationSpeed = 1.0, int fps = 60);
-  SimulationRunner(size_t numberOfParticles, double totalMass, Rectangle region);
+  Simulation(const ParticleSystem& ps,
+             unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01),
+             double simulationSpeed = 1.0, int fps = 60);
+  Simulation(size_t numberOfParticles, double totalMass, Rectangle region);
   
   const vector<Vec2d>& positions() const;
   double time() const;
