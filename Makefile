@@ -1,40 +1,41 @@
 # Makefile basics: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 
-SRC	:= src
-BIN	:= bin
-EXEC := $(BIN)/main
+APP_SRC:=src/app
+APP_BIN:=bin/app
+APP_EXEC:=$(APP_BIN)/main
 
-SRC_FILES := $(wildcard $(SRC)/*.cpp)
-OBJ_FILES := $(patsubst $(SRC)/%.cpp, $(BIN)/%.o, $(SRC_FILES))
+LIB_SRC:=src/lib
+LIB_BIN:=bin/lib
+LIB_OBJS:=$(patsubst $(LIB_SRC)/%.cpp, $(LIB_BIN)/%.o, $(wildcard $(LIB_SRC)/*.cpp))
 
-TEST_SRC := test
-TEST_BIN := bin
-TEST_EXEC := $(TEST_BIN)/test
+TEST_SRC:=src/test
+TEST_BIN:=bin/test
+TEST_EXEC:=$(TEST_BIN)/main
 
-CXX := g++ -std=c++17 -g -Wall -Wextra -pedantic -framework OpenGL -framework GLUT -I $(SRC)
+CXX:=g++ -std=c++17 -g -Wall -Wextra -pedantic -I $(LIB_SRC)
+GLUT_FLAGS:=-framework OpenGL -framework GLUT
 
-all: $(EXEC)
+# Compile app executable
+$(APP_EXEC): $(APP_SRC)/*.cpp $(LIB_OBJS)
+	@$(CXX) $(GLUT_FLAGS) -I $(APP_SRC) -o $@ $^
 
-# Compile an source file into an object file
-$(BIN)/%.o: $(SRC)/%.cpp
-	@$(CXX) -c -o $@ $^
-
-# Create app executable by linking object files
-$(EXEC): $(OBJ_FILES)
-	@$(CXX) -o $@ $^
-
-# Create test executable from test sources and app object files, except for $(EXEC).o
-$(TEST_EXEC): $(TEST_SRC)/*.cpp $(filter-out $(EXEC).o, $(OBJ_FILES))
+# Create test executable
+$(TEST_EXEC): $(TEST_SRC)/*.cpp $(LIB_OBJS)
 	@$(CXX) -I $(TEST_SRC) -o $@ $^
 
-run: clean $(EXEC)
-	@./$(EXEC)
+# Seperately compile a library source file
+$(LIB_BIN)/%.o: $(LIB_SRC)/%.cpp
+	@$(CXX) -c -o $@ $^
+
+run: clean $(APP_EXEC)
+	@./$(APP_EXEC)
 
 test: clean $(TEST_EXEC)
 	@./$(TEST_EXEC)
 
-.PHONY: clean
+.PHONY: clean 
 
 clean:
-	@rm -rf $(BIN)/*
+	@rm -rf $(APP_BIN)/*
+	@rm -rf $(LIB_BIN)/*
 	@rm -rf $(TEST_BIN)/*
