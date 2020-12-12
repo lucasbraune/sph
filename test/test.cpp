@@ -1,7 +1,8 @@
-#include <iostream> 
+#define CATCH_CONFIG_MAIN
 
-int main()
+#include <catch2/catch.hpp>
+
+TEST_CASE("Addition")
 {
-  std::cout << "Hello, tests.\n";
-  return 0;
+  REQUIRE(1+1 == 2);
 }
