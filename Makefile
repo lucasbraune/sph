@@ -1,19 +1,40 @@
-COMPILER := g++
-FLAGS := -std=c++17 -g -Wall -Wextra -pedantic -framework OpenGL -framework GLUT 
+# Makefile basics: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 
-BIN	:= bin
 SRC	:= src
-EXEC := main
+BIN	:= bin
+EXEC := $(BIN)/main
 
-INCL := -I $(SRC)
+SRC_FILES := $(wildcard $(SRC)/*.cpp)
+OBJ_FILES := $(patsubst $(SRC)/%.cpp, $(BIN)/%.o, $(SRC_FILES))
 
-all: $(BIN)/$(EXEC)
+TEST_SRC := test
+TEST_BIN := bin
+TEST_EXEC := $(TEST_BIN)/test
 
-$(BIN)/$(EXEC): $(SRC)/*.cpp
-	@$(COMPILER) $(FLAGS) $(INCL) $^ -o $@
+CXX := g++ -std=c++17 -g -Wall -Wextra -pedantic -framework OpenGL -framework GLUT -I $(SRC)
 
-run: clean all
-	@./$(BIN)/$(EXEC)
+all: $(EXEC)
+
+# Compile an source file into an object file
+$(BIN)/%.o: $(SRC)/%.cpp
+	@$(CXX) -c -o $@ $^
+
+# Create app executable by linking object files
+$(EXEC): $(OBJ_FILES)
+	@$(CXX) -o $@ $^
+
+# Create test executable from test sources and app object files, except for $(EXEC).o
+$(TEST_EXEC): $(TEST_SRC)/*.cpp $(filter-out $(EXEC).o, $(OBJ_FILES))
+	@$(CXX) -I $(TEST_SRC) -o $@ $^
+
+run: clean $(EXEC)
+	@./$(EXEC)
+
+test: clean $(TEST_EXEC)
+	@./$(TEST_EXEC)
+
+.PHONY: clean
 
 clean:
 	@rm -rf $(BIN)/*
+	@rm -rf $(TEST_BIN)/*
