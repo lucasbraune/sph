@@ -19,7 +19,7 @@ GLUT_FLAGS:=-framework OpenGL -framework GLUT
 $(APP_EXEC): $(APP_SRC)/*.cpp $(LIB_OBJS)
 	@$(CXX) $(GLUT_FLAGS) -I $(APP_SRC) -o $@ $^
 
-# Create test executable
+# Compile test executable
 $(TEST_EXEC): $(TEST_SRC)/*.cpp $(LIB_OBJS)
 	@$(CXX) -I $(TEST_SRC) -o $@ $^
 
@@ -27,13 +27,16 @@ $(TEST_EXEC): $(TEST_SRC)/*.cpp $(LIB_OBJS)
 $(LIB_BIN)/%.o: $(LIB_SRC)/%.cpp
 	@$(CXX) -c -o $@ $^
 
-run: clean $(APP_EXEC)
+run: clean directories $(APP_EXEC)
 	@./$(APP_EXEC)
 
-test: clean $(TEST_EXEC)
+test: clean directories $(TEST_EXEC)
 	@./$(TEST_EXEC)
 
-.PHONY: clean 
+.PHONY: clean directories
+
+directories:
+	@mkdir -p $(APP_BIN) $(LIB_BIN) $(TEST_BIN)
 
 clean:
 	@rm -rf $(APP_BIN)/* $(LIB_BIN)/* $(TEST_BIN)/*
