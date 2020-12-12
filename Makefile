@@ -36,6 +36,4 @@ test: clean $(TEST_EXEC)
 .PHONY: clean 
 
 clean:
-	@rm -rf $(APP_BIN)/*
-	@rm -rf $(LIB_BIN)/*
-	@rm -rf $(TEST_BIN)/*
+	@rm -rf $(APP_BIN)/* $(LIB_BIN)/* $(TEST_BIN)/*
