@@ -4,6 +4,43 @@
 #include "simulation.hpp"
 #include "pressure_force.hpp"
 
+class Physics {
+public:
+  ~Physics() {}
+  const vector<const Force*>& forces() const { return forces_; }
+  const vector<const Damping*>& dampings() const { return dampings_; }
+
+protected:
+  Physics() {}
+  vector<const Force*> forces_;
+  vector<const Damping*> dampings_;
+};
+
+class NoPhysics : public Physics {
+  NoPhysics() {}
+};
+
+class CentralGravityPhysics : public Physics {
+public:
+  CentralGravityPhysics(double gravityConstant,
+                        double dampingConstant);
+private:
+  PointGravity gravity_;
+  LinearDamping damping_;
+};
+
+class ToyStarPhysics : public Physics {
+public:
+  ToyStarPhysics(double gravityConstant,
+                 double dampingConstant,
+                 double pressureConstant,
+                 double interactionRadius);
+private:
+  PointGravity gravity_;
+  LinearDamping damping_;
+  PressureForce pressure_;
+};
+
 class CentralPotential : public Simulation {
 public:
   CentralPotential(size_t numberOfParticles = 1000,

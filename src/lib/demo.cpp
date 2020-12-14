@@ -3,6 +3,27 @@
 
 using std::reference_wrapper;
 
+CentralGravityPhysics::CentralGravityPhysics(double gravityConstant, double dampingConstant) :
+  gravity_{gravityConstant},
+  damping_{dampingConstant}
+{
+  forces_.emplace_back(&gravity_);
+  dampings_.emplace_back(&damping_);
+}
+
+ToyStarPhysics::ToyStarPhysics(double gravityConstant,
+                               double dampingConstant,
+                               double pressureConstant,
+                               double interactionRadius) :
+  gravity_{gravityConstant},
+  damping_{dampingConstant},
+  pressure_{interactionRadius, GasPressure{pressureConstant}}
+{
+  forces_.emplace_back(&gravity_);
+  forces_.emplace_back(&pressure_);
+  dampings_.emplace_back(&damping_);
+}
+
 CentralPotential::CentralPotential(size_t numberOfParticles, double totalMass, Rectangle region,
                                    double gravityConstant, double dampingConstant) :
   Simulation(numberOfParticles, totalMass, region),
