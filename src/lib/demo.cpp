@@ -24,8 +24,9 @@ ToyStarPhysics::ToyStarPhysics(double gravityConstant,
   dampings_.emplace_back(&damping_);
 }
 
-CentralPotential::CentralPotential(size_t numberOfParticles, double totalMass, Rectangle region,
-                                   double gravityConstant, double dampingConstant) :
+CentralPotentialSimulation::CentralPotentialSimulation(size_t numberOfParticles, double totalMass,
+                                                       Rectangle region, double gravityConstant,
+                                                       double dampingConstant) :
   Simulation(numberOfParticles, totalMass, region),
   gravity_(gravityConstant),
   damping_(dampingConstant)
@@ -44,12 +45,14 @@ static double interactionRadius(double numberOfParticles)
   return sqrt(10.0 / numberOfParticles);
 }
 
-ToyStar::ToyStar(size_t numberOfParticles, double totalMass, double starRadius, Rectangle region,
-                 double dampingConstant, double pressureConstant) :
-  CentralPotential(numberOfParticles, totalMass, region,
-                   gravityConstant(totalMass, pressureConstant, starRadius),
-                   dampingConstant),
-  pressureForce_(interactionRadius(numberOfParticles), GasPressure(pressureConstant))
+ToyStarSimulation::ToyStarSimulation(size_t numberOfParticles, double totalMass,
+                                     double starRadius, Rectangle region,
+                                     double dampingConstant, double pressureConstant) :
+  CentralPotentialSimulation(numberOfParticles, totalMass, region,
+                             gravityConstant(totalMass, pressureConstant, starRadius),
+                                             dampingConstant),
+                             pressureForce_(interactionRadius(numberOfParticles),
+                                            GasPressure(pressureConstant))
 {
   addForce(pressureForce_);
 }

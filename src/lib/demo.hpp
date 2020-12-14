@@ -41,9 +41,9 @@ private:
   PressureForce pressure_;
 };
 
-class CentralPotential : public Simulation {
+class CentralPotentialSimulation : public Simulation {
 public:
-  CentralPotential(size_t numberOfParticles = 1000,
+  CentralPotentialSimulation(size_t numberOfParticles = 1000,
                    double totalMass = 1.0,
                    Rectangle region = {-1.0, -1.0, 1.0, 1.0},
                    double gravityConstant = 1.0,
@@ -53,9 +53,9 @@ private:
   LinearDamping damping_;
 };
 
-class ToyStar : public CentralPotential {
+class ToyStarSimulation : public CentralPotentialSimulation {
 public:
-  ToyStar(size_t numberOfParticles = 250,
+  ToyStarSimulation(size_t numberOfParticles = 250,
           double starMass = 2.0,
           double starRadius = 0.75,
           Rectangle initialRegion = {-1.0, -1.0, 1.0, 1.0},
