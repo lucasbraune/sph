@@ -1,6 +1,6 @@
 #include "controller.hpp"
 
-Controller::Controller(Simulation& simulation) :
+Controller::Controller(SimulationInterface& simulation) :
   simulation_(simulation)
 {}
 

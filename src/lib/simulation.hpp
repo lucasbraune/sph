@@ -43,14 +43,13 @@ private:
   double fixedSimTime_;
 };
 
+template<class PhysicsType>
 class Simulation : public SimulationInterface {
 public:
   Simulation(const ParticleSystem& ps,
-             const vector<const Force*>& forces,
-             const vector<const Damping*>& dampings,
+             const PhysicsType& physics,
              unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01),
              double simulationSpeed = 1.0, int fps = 60);
-  Simulation(size_t numberOfParticles, double totalMass, Rectangle region);
   
   const vector<Vec2d>& positions() const;
   double time() const;
@@ -65,17 +64,12 @@ public:
   bool paused() const;
   void togglePause();
 
-protected:
-  void addForce(const Force& force);
-  void addDamping(const Damping& damping);
-
 private:
   void synchronize();
   void setTargetSpeed(double newSpeed);
 
   ParticleSystem ps_;
-  vector<const Force*> forces_;
-  vector<const Damping*> dampings_;
+  PhysicsType physics_;
   unique_ptr<TimeIntegrator> integrator_;
   Synchronizer synchronizer_;
   double simulationSpeed_;
@@ -83,5 +77,71 @@ private:
   bool paused_;
 };
 
+template<class PhysicsType>
+Simulation<PhysicsType>::Simulation(const ParticleSystem& ps, const PhysicsType& physics,
+                       unique_ptr<TimeIntegrator> integrator,
+                       double playbackSpeed, int fps)
+    : ps_(ps),
+      physics_(physics),
+      integrator_(std::move(integrator)),
+      synchronizer_(),
+      simulationSpeed_(playbackSpeed),
+      fps_(fps),
+      paused_(true) {}
+
+template<class PhysicsType>
+const vector<Vec2d>& Simulation<PhysicsType>::positions() const { return ps_.positions; }
+
+template<class PhysicsType>
+double Simulation<PhysicsType>::time() const { return ps_.time; }
+
+template<class PhysicsType>
+void Simulation<PhysicsType>::computeNextFrame() {
+  if (!paused()) {
+    integrator_->integrate(ps_, physics_.forces(), physics_.dampings(), simulationSpeed_ / fps_);
+  }
+}
+
+template<class PhysicsType>
+void Simulation<PhysicsType>::waitForNextFrame() {
+  if (!paused()) {
+    synchronizer_.waitUntil(ps_.time, simulationSpeed_);
+  }
+}
+
+template<class PhysicsType>
+double Simulation<PhysicsType>::targetSpeed() const { return simulationSpeed_; }
+
+template<class PhysicsType>
+void Simulation<PhysicsType>::setTargetSpeed(double newSpeed) {
+  synchronize();
+  simulationSpeed_ = newSpeed;
+}
+
+template<class PhysicsType>
+void Simulation<PhysicsType>::increaseTargetSpeed()
+{
+  setTargetSpeed(2.0 * targetSpeed());
+}
+
+template<class PhysicsType>
+void Simulation<PhysicsType>::decreaseTargetSpeed()
+{
+  setTargetSpeed(0.5 * targetSpeed());
+}
+
+template<class PhysicsType>
+bool Simulation<PhysicsType>::paused() const { return paused_; }
+
+template<class PhysicsType>
+void Simulation<PhysicsType>::togglePause() {
+  if (paused_) {
+    synchronize();
+  }
+  paused_ = !paused_;
+}
+
+template<class PhysicsType>
+void Simulation<PhysicsType>::synchronize() { synchronizer_.synchronize(ps_.time); }
 
 #endif

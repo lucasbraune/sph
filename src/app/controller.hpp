@@ -5,11 +5,11 @@
 
 class Controller {
 public:
-  Controller(Simulation& simulation);
+  Controller(SimulationInterface& simulation);
   void handleKeyboardInput(char c) const;
 
 private:
-  Simulation& simulation_;
+  SimulationInterface& simulation_;
 };
 
 

@@ -15,6 +15,8 @@ TEST_EXEC:=$(TEST_BIN)/main
 CXX:=g++ -std=c++17 -g -Wall -Wextra -pedantic -I $(LIB_SRC)
 GLUT_FLAGS:=-framework OpenGL -framework GLUT
 
+all: clean directories $(APP_EXEC)
+
 # Compile app executable
 $(APP_EXEC): $(APP_SRC)/*.cpp $(LIB_OBJS)
 	@$(CXX) $(GLUT_FLAGS) -I $(APP_SRC) -o $@ $^

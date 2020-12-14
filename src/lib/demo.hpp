@@ -4,66 +4,64 @@
 #include "simulation.hpp"
 #include "pressure_force.hpp"
 
-class Physics {
+class PhysicsInterface {
 public:
-  ~Physics() {}
-  const vector<const Force*>& forces() const { return forces_; }
-  const vector<const Damping*>& dampings() const { return dampings_; }
+  virtual ~PhysicsInterface() {}
+  // TODO: Make the following two methods return references.
+  virtual const vector<const Force*> forces() const = 0;
+  virtual const vector<const Damping*> dampings() const = 0;
+};
 
-protected:
-  Physics() {}
+class NoPhysics : public PhysicsInterface {
+  NoPhysics() {}
+  const vector<const Force*> forces() const { return {}; }
+  const vector<const Damping*> dampings() const { return {}; }
+private:
   vector<const Force*> forces_;
   vector<const Damping*> dampings_;
 };
 
-class NoPhysics : public Physics {
-  NoPhysics() {}
-};
-
-class CentralGravityPhysics : public Physics {
+class CentralGravityPhysics : public PhysicsInterface {
 public:
   CentralGravityPhysics(double gravityConstant,
                         double dampingConstant);
+
+  const vector<const Force*> forces() const { return {&gravity_}; }
+  const vector<const Damping*> dampings() const { return {&damping_}; }
+
 private:
   PointGravity gravity_;
   LinearDamping damping_;
 };
 
-class ToyStarPhysics : public Physics {
+class ToyStarPhysics : public PhysicsInterface {
 public:
   ToyStarPhysics(double gravityConstant,
                  double dampingConstant,
                  double pressureConstant,
                  double interactionRadius);
+  const vector<const Force*> forces() const { return {&gravity_, &pressure_}; }
+  const vector<const Damping*> dampings() const { return {&damping_}; }
+
 private:
   PointGravity gravity_;
   LinearDamping damping_;
   PressureForce pressure_;
 };
 
-class CentralPotentialSimulation : public Simulation {
-public:
-  CentralPotentialSimulation(size_t numberOfParticles = 1000,
-                   double totalMass = 1.0,
-                   Rectangle region = {-1.0, -1.0, 1.0, 1.0},
-                   double gravityConstant = 1.0,
-                   double dampingConstant = 0.01);
-private:
-  PointGravity gravity_;
-  LinearDamping damping_;
-};
+Simulation<CentralGravityPhysics> createCentralGravitySimulation(
+    size_t numberOfParticles = 1000,
+    double totalMass = 1.0,
+    Rectangle region = {-1.0, -1.0, 1.0, 1.0},
+    double gravityConstant = 1.0,
+    double dampingConstant = 0.01);
 
-class ToyStarSimulation : public CentralPotentialSimulation {
-public:
-  ToyStarSimulation(size_t numberOfParticles = 250,
-          double starMass = 2.0,
-          double starRadius = 0.75,
-          Rectangle initialRegion = {-1.0, -1.0, 1.0, 1.0},
-          double dampingConstant = 1.0,
-          double pressureConstant = 1.0);
-
-private:
-  PressureForce pressureForce_;
-};
+Simulation<ToyStarPhysics> createToyStarSimulation(
+    size_t numberOfParticles = 250,
+    double starMass = 2.0,
+    double starRadius = 0.75,
+    Rectangle initialRegion = {-1.0, -1.0, 1.0, 1.0},
+    double dampingConstant = 1.0,
+    double pressureConstant = 1.0);
 
 #endif
