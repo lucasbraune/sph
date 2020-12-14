@@ -53,6 +53,7 @@ protected:
 
 private:
   void synchronize();
+  
   ParticleSystem ps_;
   vector<const Force*> forces_;
   vector<const Damping*> dampings_;

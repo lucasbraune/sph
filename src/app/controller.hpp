@@ -5,14 +5,11 @@
 
 class Controller {
 public:
-  Controller(Simulation& simulation, const ParameterAdjuster& speed,
-             const ParameterAdjuster& damping, const ParameterAdjuster& gravity);
-  Controller(CentralPotential& simulation);
+  Controller(Simulation& simulation);
   void handleKeyboardInput(char c) const;
 
 private:
   Simulation& simulation_;
-  const ParameterAdjuster& speed_, damping_, gravity_;
 };
 
 
