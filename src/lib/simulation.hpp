@@ -35,8 +35,8 @@ private:
 class Synchronizer {
 public:
   Synchronizer();
-  void synchronize(const double simulationTime);
-  void waitUntil(const double simulationTime, const double simulationSpeed) const;
+  void synchronize(double simulationTime);
+  void waitUntil(double simulationTime, double simulationSpeed) const;
 
 private:
   // Time of an event, as recorded by the system clock
@@ -52,13 +52,13 @@ public:
              const PhysicsType& physics,
              unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01),
              double simulationSpeed = 1.0, int fps = 60) :
-      ps_(ps),
-      physics_(physics),
-      integrator_(std::move(integrator)),
-      synchronizer_(),
-      simulationSpeed_(simulationSpeed),
-      fps_(fps),
-      paused_(true) {}
+    ps_{ps},
+    physics_{physics},
+    integrator_{std::move(integrator)},
+    synchronizer_{},
+    simulationSpeed_{simulationSpeed},
+    fps_{fps},
+    paused_{true} {}
   
   const vector<Vec2d>& positions() const { return ps_.positions; }
   double time() const { return ps_.time; }
@@ -101,7 +101,7 @@ private:
   unique_ptr<TimeIntegrator> integrator_;
   Synchronizer synchronizer_;
   double simulationSpeed_;
-  int fps_;
+  const int fps_;
   bool paused_;
 };
 
