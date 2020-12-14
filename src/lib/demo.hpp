@@ -4,44 +4,44 @@
 #include "simulation.hpp"
 #include "pressure_force.hpp"
 
-class PhysicsInterface {
+class Physics {
 public:
-  virtual ~PhysicsInterface() {}
-  // TODO: Make the following two methods return references.
-  virtual const vector<const Force*> forces() const = 0;
-  virtual const vector<const Damping*> dampings() const = 0;
-};
+  virtual ~Physics() {}
+  const vector<const Force*>& forces() const { return forces_; }
+  const vector<const Damping*>& dampings() const { return dampings_; }
 
-class NoPhysics : public PhysicsInterface {
-  NoPhysics() {}
-  const vector<const Force*> forces() const { return {}; }
-  const vector<const Damping*> dampings() const { return {}; }
-private:
+protected:
+  Physics() {}
   vector<const Force*> forces_;
   vector<const Damping*> dampings_;
 };
 
-class CentralGravityPhysics : public PhysicsInterface {
+class CentralGravityPhysics : public Physics {
 public:
   CentralGravityPhysics(double gravityConstant,
                         double dampingConstant);
-
-  const vector<const Force*> forces() const { return {&gravity_}; }
-  const vector<const Damping*> dampings() const { return {&damping_}; }
+  CentralGravityPhysics(const CentralGravityPhysics& other);
+  CentralGravityPhysics(CentralGravityPhysics&& other);
+  CentralGravityPhysics& operator=(const CentralGravityPhysics& other);
+  CentralGravityPhysics& operator=(CentralGravityPhysics&& other);
+  ~CentralGravityPhysics() = default;
 
 private:
   PointGravity gravity_;
   LinearDamping damping_;
 };
 
-class ToyStarPhysics : public PhysicsInterface {
+class ToyStarPhysics : public Physics {
 public:
   ToyStarPhysics(double gravityConstant,
                  double dampingConstant,
                  double pressureConstant,
                  double interactionRadius);
-  const vector<const Force*> forces() const { return {&gravity_, &pressure_}; }
-  const vector<const Damping*> dampings() const { return {&damping_}; }
+  ToyStarPhysics(const ToyStarPhysics& other);
+  ToyStarPhysics(ToyStarPhysics&& other);
+  ToyStarPhysics& operator=(const ToyStarPhysics& other);
+  ToyStarPhysics& operator=(ToyStarPhysics&& other);
+  ~ToyStarPhysics() = default;
 
 private:
   PointGravity gravity_;
