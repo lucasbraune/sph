@@ -53,71 +53,55 @@ void LinearDamping::setConstant(double newValue)
 
 ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions,
                                const vector<Vec2d>& initialVelocities,
-                               double particleMass,
-                               const vector<const Force*>& forces,
-                               const vector<const Damping*>& dampings) :
+                               double particleMass) :
   numberOfParticles(initialPositions.size()),
   particleMass(particleMass),
   positions(initialPositions),
   velocities(initialVelocities),
   accelerations(positions.size()),
-  time(0.0),
-  forces_(forces),
-  dampings_(dampings)
+  time(0.0)
 {}
 
 ParticleSystem::ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region) :
   ParticleSystem(randomVectors(region, numberOfParticles),
-                 vector<Vec2d>(numberOfParticles), totalMass / numberOfParticles, {}, {})
+                 vector<Vec2d>(numberOfParticles),
+                 totalMass / numberOfParticles)
 {}
 
-const vector<const Force*>& ParticleSystem::forces() const
-{
-  return forces_;
-}
-
-const vector<const Damping*>& ParticleSystem::dampings() const
-{
-  return dampings_;
-}
-
-void ParticleSystem::addForce(Force& force)
-{
-  forces_.emplace_back(&force);
-}
-
-void ParticleSystem::addDamping(Damping& damping)
-{
-  dampings_.emplace_back(&damping);
-}
-
-void TimeIntegrator::integrate(ParticleSystem& ps, double duration)
+void TimeIntegrator::integrate(ParticleSystem& ps,
+                    const vector<const Force*>& forces,
+                    const vector<const Damping*>& dampings,
+                    double duration)
 {
   double target = ps.time + duration;
   while (ps.time < target) {
-    step(ps);
+    step(ps, forces, dampings);
   }
 }
 
 EulerIntegrator::EulerIntegrator(double timeStep) : timeStep_(timeStep) {}
 
-void EulerIntegrator::step(ParticleSystem& ps)
+void EulerIntegrator::step(ParticleSystem& ps, 
+                           const vector<const Force*>& forces,
+                           const vector<const Damping*>& dampings)
 {
   ps.time += timeStep_;
   for (size_t i=0; i<ps.numberOfParticles; i++) {
     ps.positions[i] += timeStep_ * ps.velocities[i];
     ps.velocities[i] += timeStep_ * ps.accelerations[i];
     ps.accelerations[i] =
-        Damping::acceleration(ps.dampings(), ps.time, ps.particleMass, ps.velocities[i]);
+        Damping::acceleration(dampings, ps.time, ps.particleMass, ps.velocities[i]);
   }
-  for (auto force : ps.forces()) {
+  for (auto force : forces) {
     force->apply(ps.time, ps.particleMass, ps.positions, ps.accelerations);
   }
 }
 
 VerletIntegrator::VerletIntegrator(double timeStep) : timeStep_(timeStep) {}
 
-void VerletIntegrator::step(ParticleSystem& ps)
+void VerletIntegrator::step(ParticleSystem& ps,
+                            const vector<const Force*>& forces,
+                            const vector<const Damping*>& dampings)
 {
   ps.time += timeStep_;
   for (size_t i=0; i<ps.numberOfParticles; i++) {
@@ -129,15 +113,15 @@ void VerletIntegrator::step(ParticleSystem& ps)
   for (Vec2d& acc : nextForceAcc_) {
     acc = ZERO_VECTOR;
   }
-  for (auto& force : ps.forces()) {
+  for (auto& force : forces) {
     force->apply(ps.time, ps.particleMass, ps.positions, nextForceAcc_);
   }
 
   for (size_t i=0; i<ps.numberOfParticles; i++) {
     ps.velocities[i] = nextVelocity(ps.velocities[i], ps.accelerations[i], nextForceAcc_[i],
-                                    ps.dampings(), ps.particleMass, ps.time, timeStep_);
+                                    dampings, ps.particleMass, ps.time, timeStep_);
     Vec2d nextDampingAcc =
-        Damping::acceleration(ps.dampings(), ps.time, ps.particleMass, ps.velocities[i]);
+        Damping::acceleration(dampings, ps.time, ps.particleMass, ps.velocities[i]);
     ps.accelerations[i] = nextForceAcc_[i] + nextDampingAcc;
   }
 }

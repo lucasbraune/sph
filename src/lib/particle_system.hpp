@@ -49,39 +49,36 @@ private:
   double intensity_;
 };
 
-class ParticleSystem {
-public:
-  ParticleSystem(const vector<Vec2d>& initialPositions, const vector<Vec2d>& initialVelocities,
-                 double particleMass, const vector<const Force*>& forces,
-                 const vector<const Damping*>& dampings);
+struct ParticleSystem {
+  ParticleSystem(const vector<Vec2d>& initialPositions,
+                 const vector<Vec2d>& initialVelocities,
+                 double particleMass);
   ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region);
-  
-  const vector<const Force*>& forces() const;
-  const vector<const Damping*>& dampings() const;
-  void addForce(Force& force);
-  void addDamping(Damping& damping);
   
   const size_t numberOfParticles;
   const double particleMass;
   vector<Vec2d> positions, velocities, accelerations;
   double time;
-
-private:
-  vector<const Force*> forces_;
-  vector<const Damping*> dampings_;
 };
 
 class TimeIntegrator {
 public:
   virtual ~TimeIntegrator() {};
-  virtual void step(ParticleSystem& ps) = 0;
-  void integrate(ParticleSystem& ps, double duration);
+  virtual void step(ParticleSystem& ps,
+                    const vector<const Force*>& forces,
+                    const vector<const Damping*>& dampings) = 0;
+  void integrate(ParticleSystem& ps,
+                 const vector<const Force*>& forces,
+                 const vector<const Damping*>& dampings,
+                 double duration);
 };
 
 class EulerIntegrator : public TimeIntegrator {
 public:
   EulerIntegrator(double timeStep);
-  void step(ParticleSystem& ps) override;
+  void step(ParticleSystem& ps,
+            const vector<const Force*>& forces,
+            const vector<const Damping*>& dampings) override;
 
 private:
   const double timeStep_;
@@ -90,7 +87,9 @@ private:
 class VerletIntegrator : public TimeIntegrator {
 public:
   VerletIntegrator(double timeStep);
-  void step(ParticleSystem& ps) override;
+  void step(ParticleSystem& ps,
+            const vector<const Force*>& forces,
+            const vector<const Damping*>& dampings) override;
 
 private:
   static inline Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc,

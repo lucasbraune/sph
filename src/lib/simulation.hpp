@@ -29,6 +29,8 @@ private:
 class Simulation {
 public:
   Simulation(const ParticleSystem& ps,
+             const vector<const Force*>& forces,
+             const vector<const Damping*>& dampings,
              unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01),
              double simulationSpeed = 1.0, int fps = 60);
   Simulation(size_t numberOfParticles, double totalMass, Rectangle region);
@@ -46,13 +48,14 @@ public:
   void togglePause();
 
 protected:
-  void addForce(Force& force);
-  void addDamping(Damping& damping);
+  void addForce(const Force& force);
+  void addDamping(const Damping& damping);
 
 private:
   void synchronize();
-
   ParticleSystem ps_;
+  vector<const Force*> forces_;
+  vector<const Damping*> dampings_;
   unique_ptr<TimeIntegrator> integrator_;
   Synchronizer synchronizer_;
   double simulationSpeed_;
