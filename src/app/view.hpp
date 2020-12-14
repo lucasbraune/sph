@@ -25,9 +25,9 @@ private:
 
 class View {
 public:
-  View(const Simulation& simulation, const Rectangle region, const int windowHeight,
+  View(const SimulationInterface& simulation, const Rectangle region, const int windowHeight,
        const string title, const vector<Vec2d> particlePolygon);
-  View(const Simulation& simulation,
+  View(const SimulationInterface& simulation,
        const Rectangle region = {-1.0, -1.0, 1.0, 1.0},
        const double particleRadius = 0.02,
        const size_t sides = 10,
@@ -40,7 +40,7 @@ public:
   const char* title() const;
 
 private:
-  const Simulation& simulation_;
+  const SimulationInterface& simulation_;
   const Rectangle region_;
   const vector<Vec2d> particlePolygon_;
   const int heightInPixels_;  // window height in pixels

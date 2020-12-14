@@ -13,6 +13,23 @@ using std::chrono::time_point;
 using std::unique_ptr;
 using std::function;
 
+struct SimulationInterface {
+  virtual ~SimulationInterface() {}
+
+  virtual const vector<Vec2d>& positions() const = 0;
+  virtual double time() const = 0;
+  
+  virtual void computeNextFrame() = 0;
+  virtual void waitForNextFrame() = 0;
+
+  virtual double targetSpeed() const = 0;
+  virtual void increaseTargetSpeed() = 0;
+  virtual void decreaseTargetSpeed() = 0;
+
+  virtual bool paused() const = 0;
+  virtual void togglePause() = 0;
+};
+
 class Synchronizer {
 public:
   Synchronizer();
@@ -26,7 +43,7 @@ private:
   double fixedSimTime_;
 };
 
-class Simulation {
+class Simulation : public SimulationInterface {
 public:
   Simulation(const ParticleSystem& ps,
              const vector<const Force*>& forces,

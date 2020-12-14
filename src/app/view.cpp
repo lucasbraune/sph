@@ -18,7 +18,7 @@ const vector<Vec2d>& RegularPolygon::vertices() const
   return vertices_;  
 }
 
-View::View(const Simulation& simulation, const Rectangle region, const int windowHeight, 
+View::View(const SimulationInterface& simulation, const Rectangle region, const int windowHeight, 
            const string title, const vector<Vec2d> particlePolygon) :
   simulation_(simulation),
   region_(region),
@@ -27,8 +27,9 @@ View::View(const Simulation& simulation, const Rectangle region, const int windo
   title_(title)
 {}
 
-View::View(const Simulation& simulation, const Rectangle region, const double particleRadius,
-           const size_t sides, const int windowHeight, const string title) :
+View::View(const SimulationInterface& simulation, const Rectangle region,
+           const double particleRadius, const size_t sides, const int windowHeight,
+           const string title) :
   View(simulation, region, windowHeight, title, RegularPolygon(particleRadius, sides).vertices())
 {}
 
@@ -39,7 +40,7 @@ void drawText(std::string line)
   }
 }
 
-string textInfo(const Simulation& sim)
+string textInfo(const SimulationInterface& sim)
 {
   string text =
       "time = " + std::to_string(sim.time()) + 
