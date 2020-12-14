@@ -42,7 +42,8 @@ public:
   void waitForNextFrame();
 
   double targetSpeed() const;
-  void setTargetSpeed(double newSpeed);
+  void increaseTargetSpeed();
+  void decreaseTargetSpeed();
 
   bool paused() const;
   void togglePause();
@@ -53,7 +54,8 @@ protected:
 
 private:
   void synchronize();
-  
+  void setTargetSpeed(double newSpeed);
+
   ParticleSystem ps_;
   vector<const Force*> forces_;
   vector<const Damping*> dampings_;

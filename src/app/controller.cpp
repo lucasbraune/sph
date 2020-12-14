@@ -8,14 +8,15 @@ void Controller::handleKeyboardInput(char c) const
 {
   switch (c) {
   case 'p':
+    // Fall through
   case 'P':
     simulation_.togglePause();
     break;
   case 's':
-    simulation_.setTargetSpeed(0.5 * simulation_.targetSpeed());
+    simulation_.decreaseTargetSpeed();
     break;
   case 'S':
-    simulation_.setTargetSpeed(2.0 * simulation_.targetSpeed());
+    simulation_.increaseTargetSpeed();
     break;
   }
 }

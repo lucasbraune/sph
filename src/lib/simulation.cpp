@@ -64,6 +64,16 @@ void Simulation::setTargetSpeed(double newSpeed) {
   simulationSpeed_ = newSpeed;
 }
 
+void Simulation::increaseTargetSpeed()
+{
+  setTargetSpeed(2.0 * targetSpeed());
+}
+
+void Simulation::decreaseTargetSpeed()
+{
+  setTargetSpeed(0.5 * targetSpeed());
+}
+
 bool Simulation::paused() const { return paused_; }
 
 void Simulation::togglePause() {
