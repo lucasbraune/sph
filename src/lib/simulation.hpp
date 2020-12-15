@@ -21,13 +21,11 @@ public:
   virtual bool paused() const = 0;
   virtual void computeNextFrame() = 0;
   virtual void waitForNextFrame() = 0;
+  virtual void setTargetSpeed(double newSpeed) = 0;
   virtual void togglePause() = 0;
 
   void increaseTargetSpeed() { setTargetSpeed(2.0 * targetSpeed()); }
   void decreaseTargetSpeed() { setTargetSpeed(0.5 * targetSpeed()); }
-
-private:
-  virtual void setTargetSpeed(double newSpeed) = 0;
 };
 
 class Synchronizer {
@@ -43,16 +41,17 @@ private:
   double fixedSimTime_;
 };
 
-template<class PhysicsType /* models implementation of Physics */>
+template<class PhysicsType,                       // models implementation of Physics
+         class IntegratorType = VerletIntegrator> // models implementation of TimeIntegrator
 class Simulation : public SimulationInterface {
 public:
   Simulation(const ParticleSystem& ps,
              const PhysicsType& physics,
-             unique_ptr<TimeIntegrator> integrator = std::make_unique<VerletIntegrator>(0.01),
+             const IntegratorType& integrator,
              double simulationSpeed = 1.0, int fps = 60) :
     ps_{ps},
     physics_{physics},
-    integrator_{std::move(integrator)},
+    integrator_{integrator},
     synchronizer_{},
     simulationSpeed_{simulationSpeed},
     fps_{fps},
@@ -66,7 +65,7 @@ public:
   void computeNextFrame()
   {
     if (!paused()) {
-      integrator_->integrate(ps_, physics_.forcePtrs(), physics_.dampingPtrs(),
+      integrator_.integrate(ps_, physics_.forcePtrs(), physics_.dampingPtrs(),
                              simulationSpeed_ / fps_);
     }
   }
@@ -78,6 +77,12 @@ public:
     }
   }
 
+  void setTargetSpeed(double newSpeed)
+  {
+    synchronize();
+    simulationSpeed_ = newSpeed;
+  }
+
   void togglePause()
   {
     if (paused()) {
@@ -87,17 +92,11 @@ public:
   }
 
 private:
-  void setTargetSpeed(double newSpeed)
-  {
-    synchronize();
-    simulationSpeed_ = newSpeed;
-  }
-
   void synchronize() { synchronizer_.synchronize(ps_.time); }
 
   ParticleSystem ps_;
   PhysicsType physics_;
-  unique_ptr<TimeIntegrator> integrator_;
+  IntegratorType integrator_;
   Synchronizer synchronizer_;
   double simulationSpeed_;
   const int fps_;

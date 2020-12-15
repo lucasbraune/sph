@@ -21,11 +21,13 @@ Simulation<PhysicsAdapter<CentralGravity>> createCentralGravitySimulation(
     double totalMass,
     Rectangle region,
     double gravityConstant,
-    double dampingConstant)
+    double dampingConstant,
+    double timeStep)
 {
   return {ParticleSystem{numberOfParticles, totalMass, region},
           PhysicsAdapter<CentralGravity>{
-              CentralGravity{gravityConstant, dampingConstant}}};
+              CentralGravity{gravityConstant, dampingConstant}},
+          VerletIntegrator{timeStep}};
 }
 
 static double gravityConstant(double totalMass, double pressureConstant, double starRadius)
@@ -44,12 +46,14 @@ Simulation<PhysicsAdapter<ToyStar>> createToyStarSimulation(
     double starRadius,
     Rectangle initialRegion,
     double dampingConstant,
-    double pressureConstant)
+    double pressureConstant,
+    double timeStep)
 {
   return {ParticleSystem{numberOfParticles, starMass, initialRegion},
           PhysicsAdapter<ToyStar>{
               ToyStar{gravityConstant(starMass, pressureConstant, starRadius),
                       dampingConstant,
                       pressureConstant,
-                      interactionRadius(numberOfParticles)}}};
+                      interactionRadius(numberOfParticles)}},
+          VerletIntegrator{timeStep}};
 }

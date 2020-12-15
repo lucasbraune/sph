@@ -34,7 +34,8 @@ Simulation<PhysicsAdapter<CentralGravity>> createCentralGravitySimulation(
     double totalMass = 1.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
     double gravityConstant = 1.0,
-    double dampingConstant = 0.01);
+    double dampingConstant = 0.01,
+    double timeStep = 0.01);
 
 Simulation<PhysicsAdapter<ToyStar>> createToyStarSimulation(
     size_t numberOfParticles = 250,
@@ -42,6 +43,7 @@ Simulation<PhysicsAdapter<ToyStar>> createToyStarSimulation(
     double starRadius = 0.75,
     Rectangle initialRegion = {-1.0, -1.0, 1.0, 1.0},
     double dampingConstant = 1.0,
-    double pressureConstant = 1.0);
+    double pressureConstant = 1.0,
+    double timeStep = 0.01);
 
 #endif
