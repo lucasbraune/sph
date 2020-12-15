@@ -3,11 +3,9 @@
 
 #include <memory>
 #include <cmath>
-#include <functional>
 #include "util.hpp"
 
 using std::vector;
-using std::reference_wrapper;
 
 struct Force {
 public:
@@ -28,14 +26,23 @@ struct Collidable {
   virtual void resolveCollision(Vec2d& pos, Vec2d& vel, double time) const = 0;
 };
 
+struct Physics {
+  virtual ~Physics() {}
+  virtual const vector<const Force*>& forcePtrs() const = 0;
+  virtual const vector<const Damping*>& dampingPtrs() const = 0;
+};
+
 struct ParticleSystem {
   ParticleSystem(const vector<Vec2d>& initialPositions,
                  const vector<Vec2d>& initialVelocities,
                  double particleMass);
   ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region);
   
+  // Properties
   const size_t numberOfParticles;
   const double particleMass;
+
+  // State
   vector<Vec2d> positions, velocities, accelerations;
   double time;
 };

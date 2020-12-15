@@ -3,11 +3,11 @@
 
 using std::reference_wrapper;
 
-CentralGravityPhysics::CentralGravityPhysics(double gravityConstant, double dampingConstant) :
+CentralGravity::CentralGravity(double gravityConstant, double dampingConstant) :
   gravity_{gravityConstant},
   damping_{dampingConstant} {}
 
-ToyStarPhysics::ToyStarPhysics(double gravityConstant,
+ToyStar::ToyStar(double gravityConstant,
                  double dampingConstant,
                  double pressureConstant,
                  double interactionRadius) :
@@ -16,7 +16,7 @@ ToyStarPhysics::ToyStarPhysics(double gravityConstant,
   pressure_{interactionRadius, GasPressure{pressureConstant}}
 {}
 
-Simulation<CentralGravityPhysics> createCentralGravitySimulation(
+Simulation<PhysicsAdapter<CentralGravity>> createCentralGravitySimulation(
     size_t numberOfParticles,
     double totalMass,
     Rectangle region,
@@ -24,7 +24,8 @@ Simulation<CentralGravityPhysics> createCentralGravitySimulation(
     double dampingConstant)
 {
   return {ParticleSystem{numberOfParticles, totalMass, region},
-          CentralGravityPhysics{gravityConstant, dampingConstant}};
+          PhysicsAdapter<CentralGravity>{
+              CentralGravity{gravityConstant, dampingConstant}}};
 }
 
 static double gravityConstant(double totalMass, double pressureConstant, double starRadius)
@@ -37,7 +38,7 @@ static double interactionRadius(double numberOfParticles)
   return sqrt(10.0 / numberOfParticles);
 }
 
-Simulation<ToyStarPhysics> createToyStarSimulation(
+Simulation<PhysicsAdapter<ToyStar>> createToyStarSimulation(
     size_t numberOfParticles,
     double starMass,
     double starRadius,
@@ -46,8 +47,9 @@ Simulation<ToyStarPhysics> createToyStarSimulation(
     double pressureConstant)
 {
   return {ParticleSystem{numberOfParticles, starMass, initialRegion},
-          ToyStarPhysics{gravityConstant(starMass, pressureConstant, starRadius),
-                         dampingConstant,
-                         pressureConstant,
-                         interactionRadius(numberOfParticles)}};
+          PhysicsAdapter<ToyStar>{
+              ToyStar{gravityConstant(starMass, pressureConstant, starRadius),
+                      dampingConstant,
+                      pressureConstant,
+                      interactionRadius(numberOfParticles)}}};
 }

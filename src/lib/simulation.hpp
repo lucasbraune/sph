@@ -43,13 +43,7 @@ private:
   double fixedSimTime_;
 };
 
-struct PhysicsInterface {
-  virtual ~PhysicsInterface() {}
-  virtual const vector<const Force*> createForceVector() const = 0;
-  virtual const vector<const Damping*> createDampingVector() const = 0;
-};
-
-template<class PhysicsType /* models implementation of PhysicsInterface */>
+template<class PhysicsType /* models implementation of Physics */>
 class Simulation : public SimulationInterface {
 public:
   Simulation(const ParticleSystem& ps,
@@ -72,7 +66,7 @@ public:
   void computeNextFrame()
   {
     if (!paused()) {
-      integrator_->integrate(ps_, physics_.createForceVector(), physics_.createDampingVector(),
+      integrator_->integrate(ps_, physics_.forcePtrs(), physics_.dampingPtrs(),
                              simulationSpeed_ / fps_);
     }
   }
