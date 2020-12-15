@@ -23,6 +23,14 @@ void PointGravity::setConstant(double newValue)
   intensity_ = newValue;
 }
 
+void SurfaceGravity::apply(double, double, const vector<Vec2d>&,
+                           vector<Vec2d>& accelerations) const
+{
+  for (auto& acc : accelerations) {
+    acc += acceleration_;
+  }
+}
+
 LinearDamping::LinearDamping(double dampingConstant) :
   intensity_(dampingConstant)
 {}
@@ -42,8 +50,9 @@ void LinearDamping::setConstant(double newValue)
   intensity_ = newValue;
 }
 
-Wall::Wall(const Vec2d& unitNormal, const Vec2d& ptOnWall) :
-  unitNormal_{unitNormal}, ptOnWall_{ptOnWall} {}
+Wall::Wall(const Vec2d& normal, double distanceFromTheOrigin) :
+  unitNormal_{unit(normal)},
+  ptOnWall_{-distanceFromTheOrigin * unitNormal_} {}
 
 void Wall::resolveCollisions(vector<Vec2d>& positions, vector<Vec2d>& velocities, double) const
 {
@@ -55,7 +64,7 @@ void Wall::resolveCollisions(vector<Vec2d>& positions, vector<Vec2d>& velocities
 void Wall::resolveCollision(Vec2d& pos, Vec2d& vel) const
 {
   auto w = pos - ptOnWall_;
-  if (w * unitNormal_ < 0) return;
+  if (w * unitNormal_ > 0) return;
   pos -= 2 * project(w, unitNormal_);
   vel -= 2 * project(vel, unitNormal_);
 }
@@ -63,6 +72,24 @@ void Wall::resolveCollision(Vec2d& pos, Vec2d& vel) const
 CentralGravityPhysics::CentralGravityPhysics(double gravityConstant, double dampingConstant) :
   gravity_{gravityConstant},
   damping_{dampingConstant} {}
+
+WallBouncingPhysics::WallBouncingPhysics(double gravityConstant, double dampingConstant) :
+  gravity_{gravityConstant},
+  damping_{dampingConstant},
+  walls_{
+    {Vec2d{0.0, 1.0},  0.7},
+    {Vec2d{1.0, 1.0},  0.8},
+    {Vec2d{-1.0, 1.0},  0.8},
+  } {}
+
+const vector<const Collidable*> WallBouncingPhysics::createCollidableVector() const
+{
+  vector<const Collidable*> result;
+  for (const auto& wall : walls_) {
+    result.emplace_back(&wall);
+  }
+  return result;
+}
 
 ToyStarPhysics::ToyStarPhysics(double gravityConstant,
                                double dampingConstant,
@@ -87,6 +114,20 @@ Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation
           VerletIntegrator{timeStep}};
 }
 
+Simulation<PhysicsAdapter<WallBouncingPhysics>, EulerIntegrator> createWallBouncingSimulation(
+    size_t numberOfParticles,
+    double totalMass,
+    Rectangle region,
+    double gravityConstant,
+    double dampingConstant,
+    double timeStep)
+{
+  return {ParticleSystem{numberOfParticles, totalMass, region},
+          PhysicsAdapter<WallBouncingPhysics>{
+              WallBouncingPhysics{gravityConstant, dampingConstant}},
+          EulerIntegrator{timeStep}};
+}
+
 static double gravityConstant(double totalMass, double pressureConstant, double starRadius)
 {
   return 8 * totalMass * pressureConstant / (M_PI * pow(starRadius, 4));
@@ -109,8 +150,8 @@ Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
   return {ParticleSystem{numberOfParticles, starMass, initialRegion},
           PhysicsAdapter<ToyStarPhysics>{
               ToyStarPhysics{gravityConstant(starMass, pressureConstant, starRadius),
-                      dampingConstant,
-                      pressureConstant,
-                      interactionRadius(numberOfParticles)}},
+                             dampingConstant,
+                             pressureConstant,
+                             interactionRadius(numberOfParticles)}},
           VerletIntegrator{timeStep}};
 }

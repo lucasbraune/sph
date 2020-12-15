@@ -9,7 +9,7 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-auto simulation = createToyStarSimulation();
+auto simulation = createWallBouncingSimulation();
 const View view(simulation);
 const Controller controller(simulation);
 

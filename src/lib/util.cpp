@@ -22,6 +22,11 @@ Vec2d& operator*=(Vec2d& a, const double lambda)
   return a;
 }
 
+Vec2d& operator/=(Vec2d& a, const double lambda)
+{
+  return a *= 1.0 / lambda;
+}
+
 Vec2d operator+(Vec2d a, const Vec2d& b)
 {
   return a += b;
@@ -42,6 +47,11 @@ Vec2d operator*(Vec2d a, const double lambda)
   return a *= lambda;
 }
 
+Vec2d operator/(Vec2d a, const double lambda)
+{
+  return a /= lambda;
+}
+
 double operator*(const Vec2d& a, const Vec2d& b)
 {
   return a[0] * b[0] + a[1] * b[1];
@@ -59,7 +69,7 @@ double dist(const Vec2d& x, const Vec2d& y)
 
 Vec2d unit(const Vec2d& x)
 {
-  return (1.0 / norm(x)) * x;
+  return x / norm(x);
 }
 
 Vec2d project(const Vec2d& x, const Vec2d& unitNormal)

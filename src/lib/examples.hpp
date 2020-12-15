@@ -18,6 +18,18 @@ private:
   double intensity_;
 };
 
+class SurfaceGravity : public Force {
+public:
+  SurfaceGravity(double magnitude) : acceleration_{0.0, -magnitude} {}
+  void apply(double time, double particleMass, const vector<Vec2d>& positions,
+             vector<Vec2d>& accelerations) const override;
+  double magnitude() const { return -acceleration_[1]; }
+  void setMagnitude(double newValue) { acceleration_[1] = -newValue; }
+  
+private:
+  Vec2d acceleration_;
+};
+
 class LinearDamping : public Damping {
 public:
   LinearDamping(double dampingConstant);
@@ -31,13 +43,15 @@ private:
 
 class Wall : public Collidable {
 public:
-  Wall(const Vec2d& unitNormal, const Vec2d& ptOnWall);
+  Wall(const Vec2d& normal, // must be nonzero
+       double distanceFromTheOrigin);
   void resolveCollisions(vector<Vec2d>& positions, vector<Vec2d>& velocities,
                          double time) const override;
 
 private:
   void resolveCollision(Vec2d& pos, Vec2d& vel) const;
-  Vec2d unitNormal_, ptOnWall_; 
+  Vec2d unitNormal_; // outward unit normal
+  Vec2d ptOnWall_; 
 };
 
 struct CentralGravityPhysics : public PrePhysics {
@@ -49,6 +63,18 @@ struct CentralGravityPhysics : public PrePhysics {
 
   PointGravity gravity_;
   LinearDamping damping_;
+};
+
+struct WallBouncingPhysics : public PrePhysics {
+  WallBouncingPhysics(double gravityConstant, double dampingConstant);
+
+  const vector<const Force*> createForceVector() const override {return {&gravity_}; }
+  const vector<const Damping*> createDampingVector() const override {return {&damping_}; }
+  const vector<const Collidable*> createCollidableVector() const override; 
+
+  SurfaceGravity gravity_;
+  LinearDamping damping_;
+  vector<Wall> walls_;
 };
 
 struct ToyStarPhysics : public PrePhysics {
@@ -67,6 +93,14 @@ struct ToyStarPhysics : public PrePhysics {
 };
 
 Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation(
+    size_t numberOfParticles = 1000,
+    double totalMass = 1.0,
+    Rectangle region = {-1.0, -1.0, 1.0, 1.0},
+    double gravityConstant = 1.0,
+    double dampingConstant = 0.01,
+    double timeStep = 0.01);
+
+  Simulation<PhysicsAdapter<WallBouncingPhysics>, EulerIntegrator> createWallBouncingSimulation(
     size_t numberOfParticles = 1000,
     double totalMass = 1.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
