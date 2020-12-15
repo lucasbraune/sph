@@ -4,12 +4,6 @@
 #include "simulation.hpp"
 #include "pressure_force.hpp"
 
-struct PhysicsInterface {
-  virtual ~PhysicsInterface() {}
-  virtual const vector<const Force*> createForceVector() const = 0;
-  virtual const vector<const Damping*> createDampingVector() const = 0;
-};
-
 struct CentralGravityPhysics : public PhysicsInterface {
   CentralGravityPhysics(double gravityConstant,
                  double dampingConstant);

@@ -45,7 +45,13 @@ private:
   double fixedSimTime_;
 };
 
-template<class PhysicsType>
+struct PhysicsInterface {
+  virtual ~PhysicsInterface() {}
+  virtual const vector<const Force*> createForceVector() const = 0;
+  virtual const vector<const Damping*> createDampingVector() const = 0;
+};
+
+template<class PhysicsType /* models implementation of PhysicsInterface */>
 class Simulation : public SimulationInterface {
 public:
   Simulation(const ParticleSystem& ps,
@@ -82,7 +88,7 @@ public:
 
   void togglePause()
   {
-    if (paused_) {
+    if (paused()) {
       synchronize();
     }
     paused_ = !paused_;
