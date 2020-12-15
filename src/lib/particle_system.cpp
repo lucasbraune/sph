@@ -1,6 +1,6 @@
 #include "particle_system.hpp"
 
-PointGravity::PointGravity(const double gravityConstant, const Vec2d center) :
+PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :
   center_(center), intensity_(gravityConstant)
 {}
 
@@ -23,7 +23,7 @@ void PointGravity::setConstant(double newValue)
 }
 
 Vec2d Damping::acceleration(const vector<const Damping*>& dampings, double time, double mass,
-                            Vec2d velocity)
+                            const Vec2d& velocity)
 {
   Vec2d result = ZERO_VECTOR;
   for (auto damping : dampings) {
@@ -32,11 +32,11 @@ Vec2d Damping::acceleration(const vector<const Damping*>& dampings, double time,
   return result;
 }
 
-LinearDamping::LinearDamping(const double dampingConstant) :
+LinearDamping::LinearDamping(double dampingConstant) :
   intensity_(dampingConstant)
 {}
 
-Vec2d LinearDamping::acceleration(const double, const double, const Vec2d velocity) const
+Vec2d LinearDamping::acceleration(double, double, const Vec2d& velocity) const
 {
   return -intensity_ * velocity;
 }
@@ -77,6 +77,17 @@ void TimeIntegrator::integrate(ParticleSystem& ps,
   while (ps.time < target) {
     step(ps, forces, dampings);
   }
+}
+
+Wall::Wall(const Vec2d& unitNormal, const Vec2d& ptOnWall) :
+  unitNormal_{unitNormal}, ptOnWall_{ptOnWall} {}
+
+void Wall::resolveCollision(Vec2d& pos, Vec2d& vel, double) const
+{
+  auto w = pos - ptOnWall_;
+  if (w * unitNormal_ < 0) return;
+  pos -= 2 * project(w, unitNormal_);
+  vel -= 2 * project(vel, unitNormal_);
 }
 
 EulerIntegrator::EulerIntegrator(double timeStep) : timeStep_(timeStep) {}

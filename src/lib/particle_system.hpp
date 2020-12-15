@@ -9,44 +9,23 @@
 using std::vector;
 using std::reference_wrapper;
 
-class Force {
+struct Force {
 public:
   virtual ~Force() {}
-  virtual void apply(const double time, const double particleMass, const vector<Vec2d>& positions,
+  virtual void apply(double time, double particleMass, const vector<Vec2d>& positions,
                      vector<Vec2d>& accelerations) const = 0;
 };
 
-class PointGravity : public Force {
-public:
-  PointGravity(const double gravityConstant, const Vec2d center = ZERO_VECTOR);
-  void apply(const double time, const double particleMass, const vector<Vec2d>& positions,
-             vector<Vec2d>& accelerations) const;
-  double constant() const;
-  void setConstant(double intensity);
-  
-private:
-  Vec2d center_;
-  double intensity_;
-};
-
-class Damping {
-public:
+struct Damping {
   virtual ~Damping() {}
-  virtual Vec2d acceleration(const double time, const double mass, const Vec2d velocity) const = 0;
-
+  virtual Vec2d acceleration(double time, double mass, const Vec2d& velocity) const = 0;
   static Vec2d acceleration(const vector<const Damping*>& dampings, double time, double mass,
-                            Vec2d velocity);
+                            const Vec2d& velocity);
 };
 
-class LinearDamping : public Damping {
-public:
-  LinearDamping(const double dampingConstant);
-  Vec2d acceleration(const double time, const double mass, const Vec2d velocity) const;
-  double constant() const;
-  void setConstant(double newValue);
-
-private:
-  double intensity_;
+struct Collidable {
+  virtual ~Collidable() {}
+  virtual void resolveCollision(Vec2d& pos, Vec2d& vel, double time) const = 0;
 };
 
 struct ParticleSystem {
@@ -61,8 +40,7 @@ struct ParticleSystem {
   double time;
 };
 
-class TimeIntegrator {
-public:
+struct TimeIntegrator {
   virtual ~TimeIntegrator() {};
   virtual void step(ParticleSystem& ps,
                     const vector<const Force*>& forces,
@@ -71,6 +49,39 @@ public:
                  const vector<const Force*>& forces,
                  const vector<const Damping*>& dampings,
                  double duration);
+};
+
+class PointGravity : public Force {
+public:
+  PointGravity(double gravityConstant, const Vec2d& center = ZERO_VECTOR);
+  void apply(double time, double particleMass, const vector<Vec2d>& positions,
+             vector<Vec2d>& accelerations) const;
+  double constant() const;
+  void setConstant(double intensity);
+  
+private:
+  Vec2d center_;
+  double intensity_;
+};
+
+class LinearDamping : public Damping {
+public:
+  LinearDamping(double dampingConstant);
+  Vec2d acceleration(double time, double mass, const Vec2d& velocity) const;
+  double constant() const;
+  void setConstant(double newValue);
+
+private:
+  double intensity_;
+};
+
+class Wall : public Collidable {
+public:
+  Wall(const Vec2d& unitNormal, const Vec2d& ptOnWall);
+  void resolveCollision(Vec2d& pos, Vec2d& vel, double) const;
+
+private:
+  Vec2d unitNormal_, ptOnWall_; 
 };
 
 class EulerIntegrator : public TimeIntegrator {
