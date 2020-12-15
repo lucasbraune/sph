@@ -68,7 +68,8 @@ public:
   void computeNextFrame()
   {
     if (!paused()) {
-      integrator_->integrate(ps_, physics_.forces(), physics_.dampings(), simulationSpeed_ / fps_);
+      integrator_->integrate(ps_, physics_.createForceVector(), physics_.createDampingVector(),
+                             simulationSpeed_ / fps_);
     }
   }
 
