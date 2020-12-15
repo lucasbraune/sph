@@ -4,14 +4,12 @@
 #include <vector>
 #include <chrono>
 #include <memory>
-#include <functional>
 #include "particle_system.hpp"
 
 using std::vector;
 using std::chrono::high_resolution_clock;
 using std::chrono::time_point;
 using std::unique_ptr;
-using std::function;
 
 class SimulationInterface {
 public:
