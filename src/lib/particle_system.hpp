@@ -38,13 +38,15 @@ struct Damping {
 
 struct Collidable {
   virtual ~Collidable() {}
-  virtual void resolveCollision(Vec2d& pos, Vec2d& vel, double time) const = 0;
+  virtual void resolveCollisions(vector<Vec2d>& positions, vector<Vec2d>& velocities,
+                                 double time) const = 0;
 };
 
 struct Physics {
   virtual ~Physics() {}
   virtual const vector<const Force*>& forcePtrs() const = 0;
   virtual const vector<const Damping*>& dampingPtrs() const = 0;
+  virtual const vector<const Collidable*>& collidablePtrs() const = 0;
 };
 
 struct TimeIntegrator {

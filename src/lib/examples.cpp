@@ -45,7 +45,14 @@ void LinearDamping::setConstant(double newValue)
 Wall::Wall(const Vec2d& unitNormal, const Vec2d& ptOnWall) :
   unitNormal_{unitNormal}, ptOnWall_{ptOnWall} {}
 
-void Wall::resolveCollision(Vec2d& pos, Vec2d& vel, double) const
+void Wall::resolveCollisions(vector<Vec2d>& positions, vector<Vec2d>& velocities, double) const
+{
+  for (size_t i=0; i<positions.size(); i++) {
+    resolveCollision(positions[i], velocities[i]);
+  }
+}
+
+void Wall::resolveCollision(Vec2d& pos, Vec2d& vel) const
 {
   auto w = pos - ptOnWall_;
   if (w * unitNormal_ < 0) return;
@@ -53,20 +60,20 @@ void Wall::resolveCollision(Vec2d& pos, Vec2d& vel, double) const
   vel -= 2 * project(vel, unitNormal_);
 }
 
-CentralGravity::CentralGravity(double gravityConstant, double dampingConstant) :
+CentralGravityPhysics::CentralGravityPhysics(double gravityConstant, double dampingConstant) :
   gravity_{gravityConstant},
   damping_{dampingConstant} {}
 
-ToyStar::ToyStar(double gravityConstant,
-                 double dampingConstant,
-                 double pressureConstant,
-                 double interactionRadius) :
+ToyStarPhysics::ToyStarPhysics(double gravityConstant,
+                               double dampingConstant,
+                               double pressureConstant,
+                               double interactionRadius) :
   gravity_{gravityConstant},
   damping_{dampingConstant},
   pressure_{interactionRadius, GasPressure{pressureConstant}}
 {}
 
-Simulation<PhysicsAdapter<CentralGravity>> createCentralGravitySimulation(
+Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation(
     size_t numberOfParticles,
     double totalMass,
     Rectangle region,
@@ -75,8 +82,8 @@ Simulation<PhysicsAdapter<CentralGravity>> createCentralGravitySimulation(
     double timeStep)
 {
   return {ParticleSystem{numberOfParticles, totalMass, region},
-          PhysicsAdapter<CentralGravity>{
-              CentralGravity{gravityConstant, dampingConstant}},
+          PhysicsAdapter<CentralGravityPhysics>{
+              CentralGravityPhysics{gravityConstant, dampingConstant}},
           VerletIntegrator{timeStep}};
 }
 
@@ -90,7 +97,7 @@ static double interactionRadius(double numberOfParticles)
   return sqrt(10.0 / numberOfParticles);
 }
 
-Simulation<PhysicsAdapter<ToyStar>> createToyStarSimulation(
+Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
     size_t numberOfParticles,
     double starMass,
     double starRadius,
@@ -100,8 +107,8 @@ Simulation<PhysicsAdapter<ToyStar>> createToyStarSimulation(
     double timeStep)
 {
   return {ParticleSystem{numberOfParticles, starMass, initialRegion},
-          PhysicsAdapter<ToyStar>{
-              ToyStar{gravityConstant(starMass, pressureConstant, starRadius),
+          PhysicsAdapter<ToyStarPhysics>{
+              ToyStarPhysics{gravityConstant(starMass, pressureConstant, starRadius),
                       dampingConstant,
                       pressureConstant,
                       interactionRadius(numberOfParticles)}},

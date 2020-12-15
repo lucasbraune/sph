@@ -9,7 +9,7 @@ class PointGravity : public Force {
 public:
   PointGravity(double gravityConstant, const Vec2d& center = ZERO_VECTOR);
   void apply(double time, double particleMass, const vector<Vec2d>& positions,
-             vector<Vec2d>& accelerations) const;
+             vector<Vec2d>& accelerations) const override;
   double constant() const;
   void setConstant(double intensity);
   
@@ -21,7 +21,7 @@ private:
 class LinearDamping : public Damping {
 public:
   LinearDamping(double dampingConstant);
-  Vec2d acceleration(double time, double mass, const Vec2d& velocity) const;
+  Vec2d acceleration(double time, double mass, const Vec2d& velocity) const override;
   double constant() const;
   void setConstant(double newValue);
 
@@ -32,37 +32,41 @@ private:
 class Wall : public Collidable {
 public:
   Wall(const Vec2d& unitNormal, const Vec2d& ptOnWall);
-  void resolveCollision(Vec2d& pos, Vec2d& vel, double) const;
+  void resolveCollisions(vector<Vec2d>& positions, vector<Vec2d>& velocities,
+                         double time) const override;
 
 private:
+  void resolveCollision(Vec2d& pos, Vec2d& vel) const;
   Vec2d unitNormal_, ptOnWall_; 
 };
 
-struct CentralGravity : public PrePhysics {
-  CentralGravity(double gravityConstant, double dampingConstant);
+struct CentralGravityPhysics : public PrePhysics {
+  CentralGravityPhysics(double gravityConstant, double dampingConstant);
 
-  const vector<const Force*> createForceVector() const {return {&gravity_}; }
-  const vector<const Damping*> createDampingVector() const {return {&damping_}; }
+  const vector<const Force*> createForceVector() const override {return {&gravity_}; }
+  const vector<const Damping*> createDampingVector() const override {return {&damping_}; }
+  const vector<const Collidable*> createCollidableVector() const override { return {}; }
 
   PointGravity gravity_;
   LinearDamping damping_;
 };
 
-struct ToyStar : public PrePhysics {
-  ToyStar(double gravityConstant,
-          double dampingConstant,
-          double pressureConstant,
-          double interactionRadius);
+struct ToyStarPhysics : public PrePhysics {
+  ToyStarPhysics(double gravityConstant,
+                 double dampingConstant,
+                 double pressureConstant,
+                 double interactionRadius);
 
-  const vector<const Force*> createForceVector() const {return {&gravity_, &pressure_}; }
-  const vector<const Damping*> createDampingVector() const {return {&damping_}; }
+  const vector<const Force*> createForceVector() const override {return {&gravity_, &pressure_}; }
+  const vector<const Damping*> createDampingVector() const override {return {&damping_}; }
+  const vector<const Collidable*> createCollidableVector() const override { return {}; }
 
   PointGravity gravity_;
   LinearDamping damping_;
   PressureForce pressure_;
 };
 
-Simulation<PhysicsAdapter<CentralGravity>> createCentralGravitySimulation(
+Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation(
     size_t numberOfParticles = 1000,
     double totalMass = 1.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
@@ -70,7 +74,7 @@ Simulation<PhysicsAdapter<CentralGravity>> createCentralGravitySimulation(
     double dampingConstant = 0.01,
     double timeStep = 0.01);
 
-Simulation<PhysicsAdapter<ToyStar>> createToyStarSimulation(
+Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
     size_t numberOfParticles = 250,
     double starMass = 2.0,
     double starRadius = 0.75,

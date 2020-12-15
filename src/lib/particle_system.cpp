@@ -40,6 +40,11 @@ void EulerIntegrator::step(ParticleSystem& ps, Physics& physics)
   ps.time += timeStep_;
   for (size_t i=0; i<ps.numberOfParticles; i++) {
     ps.positions[i] += timeStep_ * ps.velocities[i];
+  }
+  for (auto collidablePtr : physics.collidablePtrs()) {
+    collidablePtr->resolveCollisions(ps.positions, ps.velocities, ps.time);
+  }
+  for (size_t i=0; i<ps.numberOfParticles; i++) {
     ps.velocities[i] += timeStep_ * ps.accelerations[i];
     ps.accelerations[i] =
         Damping::acceleration(physics.dampingPtrs(), ps.time, ps.particleMass, ps.velocities[i]);
