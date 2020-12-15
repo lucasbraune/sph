@@ -41,7 +41,7 @@ private:
   double fixedSimTime_;
 };
 
-template<class PhysicsType,                       // models implementation of Physics
+template<class PhysicsType,                       // must be convertible to Physics&
          class IntegratorType = VerletIntegrator> // models implementation of TimeIntegrator
 class Simulation : public SimulationInterface {
 public:
@@ -64,17 +64,12 @@ public:
   
   void computeNextFrame()
   {
-    if (!paused()) {
-      integrator_.integrate(ps_, physics_.forcePtrs(), physics_.dampingPtrs(),
-                             simulationSpeed_ / fps_);
-    }
+    if (!paused()) integrator_.integrate(ps_, physics_, simulationSpeed_ / fps_);
   }
 
   void waitForNextFrame()
   {
-    if (!paused()) {
-      synchronizer_.waitUntil(ps_.time, simulationSpeed_);
-    }
+    if (!paused()) synchronizer_.waitUntil(ps_.time, simulationSpeed_);
   }
 
   void setTargetSpeed(double newSpeed)
@@ -85,9 +80,7 @@ public:
 
   void togglePause()
   {
-    if (paused()) {
-      synchronize();
-    }
+    if (paused()) synchronize();
     paused_ = !paused_;
   }
 

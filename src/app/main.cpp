@@ -1,7 +1,7 @@
 #define GL_SILENCE_DEPRECATION
 
 #include <GL/freeglut.h>
-#include "demo.hpp"
+#include "examples.hpp"
 #include "view.hpp"
 #include "controller.hpp"
 

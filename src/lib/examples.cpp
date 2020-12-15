@@ -1,7 +1,57 @@
-#include "demo.hpp"
+#include "examples.hpp"
 #include <cmath>
 
-using std::reference_wrapper;
+PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :
+  center_(center), intensity_(gravityConstant)
+{}
+
+void PointGravity::apply(const double, const double, const vector<Vec2d>& positions,
+                         vector<Vec2d>& accelerations) const
+{
+  for (size_t i=0; i<positions.size(); i++) {
+    accelerations[i] -= intensity_ * (positions[i] - center_);
+  }
+}
+
+double PointGravity::constant() const
+{
+  return intensity_;
+}
+
+void PointGravity::setConstant(double newValue)
+{
+  intensity_ = newValue;
+}
+
+LinearDamping::LinearDamping(double dampingConstant) :
+  intensity_(dampingConstant)
+{}
+
+Vec2d LinearDamping::acceleration(double, double, const Vec2d& velocity) const
+{
+  return -intensity_ * velocity;
+}
+
+double LinearDamping::constant() const
+{
+  return intensity_;
+}
+
+void LinearDamping::setConstant(double newValue)
+{
+  intensity_ = newValue;
+}
+
+Wall::Wall(const Vec2d& unitNormal, const Vec2d& ptOnWall) :
+  unitNormal_{unitNormal}, ptOnWall_{ptOnWall} {}
+
+void Wall::resolveCollision(Vec2d& pos, Vec2d& vel, double) const
+{
+  auto w = pos - ptOnWall_;
+  if (w * unitNormal_ < 0) return;
+  pos -= 2 * project(w, unitNormal_);
+  vel -= 2 * project(vel, unitNormal_);
+}
 
 CentralGravity::CentralGravity(double gravityConstant, double dampingConstant) :
   gravity_{gravityConstant},
