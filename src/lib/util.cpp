@@ -1,50 +1,53 @@
 #include "util.hpp"
 #include <cmath>
 
-Vec2d operator+(const Vec2d& a, const Vec2d& b)
-{
-  return Vec2d{a[0] + b[0], a[1] + b[1]};
-}
-
-Vec2d operator-(const Vec2d& a, const Vec2d& b)
-{
-  return Vec2d{a[0] - b[0], a[1] - b[1]};
-}
-
-Vec2d operator*(const double lambda, const Vec2d& a)
-{
-  return Vec2d{lambda * a[0], lambda * a[1]};
-}
-
-Vec2d operator*(const Vec2d& a, const double lambda)
-{
-  return lambda * a;
-}
-
-void operator+=(Vec2d& a, const Vec2d& b)
+Vec2d& operator+=(Vec2d& a, const Vec2d& b)
 {
   a[0] += b[0];
   a[1] += b[1];
+  return a;
 }
 
-void operator-=(Vec2d& a, const Vec2d& b)
+Vec2d& operator-=(Vec2d& a, const Vec2d& b)
 {
   a[0] -= b[0];
   a[1] -= b[1];
+  return a;
 }
 
-void operator*=(Vec2d& a, const double lambda)
+Vec2d& operator*=(Vec2d& a, const double lambda)
 {
   a[0] *= lambda;
   a[1] *= lambda;
+  return a;
 }
 
-double norm(Vec2d x)
+Vec2d operator+(Vec2d a, const Vec2d& b)
+{
+  return a += b;
+}
+
+Vec2d operator-(Vec2d a, const Vec2d& b)
+{
+  return a -= b;
+}
+
+Vec2d operator*(const double lambda, Vec2d a)
+{
+  return a *= lambda;
+}
+
+Vec2d operator*(Vec2d a, const double lambda)
+{
+  return a *= lambda;
+}
+
+double norm(const Vec2d& x)
 {
   return hypot(x[0], x[1]);
 }
 
-double dist(Vec2d x, Vec2d y)
+double dist(const Vec2d& x, const Vec2d& y)
 {
   return norm(x - y);
 }
