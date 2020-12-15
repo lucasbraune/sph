@@ -61,7 +61,9 @@ void VerletIntegrator::step(ParticleSystem& ps, Physics& physics)
     ps.positions[i] += timeStep_ * ps.velocities[i] +
                        (0.5 * timeStep_ * timeStep_) * ps.accelerations[i];
   }
-
+  for (auto collidablePtr : physics.collidablePtrs()) {
+    collidablePtr->resolveCollisions(ps.positions, ps.velocities, ps.time);
+  }
   nextForceAcc_.resize(ps.numberOfParticles);
   for (Vec2d& acc : nextForceAcc_) {
     acc = ZERO_VECTOR;
