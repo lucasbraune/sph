@@ -47,7 +47,7 @@ public:
   PressureForce& operator=(PressureForce&& other) = default;
   ~PressureForce() = default;
   
-  void apply(const double time, const double particleMass, const std::vector<Vec2d>& positions,
+  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
              std::vector<Vec2d>& accelerations) const;
 
 private:

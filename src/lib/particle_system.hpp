@@ -11,6 +11,7 @@ struct ParticleSystem {
                  const std::vector<Vec2d>& initialAccelerations,
                  double particleMass);
   ParticleSystem(const std::vector<Vec2d>& initialPositions, double particleMass);
+  
   // Properties
   const size_t numberOfParticles;
   const double particleMass;
@@ -20,31 +21,48 @@ struct ParticleSystem {
   double time;
 };
 
-struct Force {
+class Force {
 public:
   virtual ~Force() {}
-  virtual void apply(double time, double particleMass, const std::vector<Vec2d>& positions,
+  // Adds this force's contribution to the acceleration of the ith particle to the ith entry
+  // of the input vector.
+  void apply(const ParticleSystem& ps, std::vector<Vec2d>& accelerations) const;
+  void apply(ParticleSystem& ps) const;
+
+private:
+  virtual void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
                      std::vector<Vec2d>& accelerations) const = 0;
 };
 
 struct Damping {
   virtual ~Damping() {}
-  virtual Vec2d acceleration(double time, double mass, const Vec2d& velocity) const = 0;
-  static Vec2d acceleration(const std::vector<const Damping*>& dampings, double time, double mass,
-                            const Vec2d& velocity);
+  void apply(const ParticleSystem& ps, std::vector<Vec2d>& accelerations) const;
+  void apply(ParticleSystem& ps) const;
+  virtual Vec2d acceleration(const Vec2d& velocity, double mass) const = 0;
 };
 
-struct Collidable {
+class Collidable {
+public:
   virtual ~Collidable() {}
+  void resolveCollisions(ParticleSystem& ps) const;
+
+private:
   virtual void resolveCollisions(std::vector<Vec2d>& positions, std::vector<Vec2d>& velocities,
                                  double time) const = 0;
 };
 
 struct Physics {
   virtual ~Physics() {}
+  // The pointers returned by the next two functions are guaranteed to be not null
   virtual const std::vector<const Force*>& forcePtrs() const = 0;
-  virtual const std::vector<const Damping*>& dampingPtrs() const = 0;
   virtual const std::vector<const Collidable*>& collidablePtrs() const = 0;
+  virtual const std::vector<const Damping*>& dampingPtrs() const = 0;
+
+  // Warning: may return nullptr
+  const Damping* dampingPtr() const
+  {
+    return dampingPtrs().size() > 0 ? dampingPtrs()[0] : nullptr;
+  }
 };
 
 struct TimeIntegrator {
@@ -69,7 +87,6 @@ public:
 
 private:
   const double timeStep_;
-  std::vector<Vec2d> nextForceAcc_;
 };
 
 } // end namespace sph

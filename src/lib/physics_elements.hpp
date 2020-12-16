@@ -17,7 +17,7 @@ namespace sph {
 class PointGravity : public Force {
 public:
   PointGravity(double gravityConstant, const Vec2d& center = ZERO_VECTOR);
-  void apply(double time, double particleMass, const std::vector<Vec2d>& positions,
+  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
              std::vector<Vec2d>& accelerations) const override;
   double constant() const;
   void setConstant(double intensity);
@@ -30,7 +30,7 @@ private:
 class SurfaceGravity : public Force {
 public:
   SurfaceGravity(double magnitude) : acceleration_{0.0, -magnitude} {}
-  void apply(double time, double particleMass, const std::vector<Vec2d>& positions,
+  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
              std::vector<Vec2d>& accelerations) const override;
   double magnitude() const { return -acceleration_[1]; }
   void setMagnitude(double newValue) { acceleration_[1] = -newValue; }
@@ -42,7 +42,7 @@ private:
 class LinearDamping : public Damping {
 public:
   LinearDamping(double dampingConstant);
-  Vec2d acceleration(double time, double mass, const Vec2d& velocity) const override;
+  Vec2d acceleration(const Vec2d& velocity, double mass) const override;
   double constant() const;
   void setConstant(double newValue);
 

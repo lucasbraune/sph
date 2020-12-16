@@ -37,8 +37,8 @@ PressureForce& PressureForce::operator=(const PressureForce& other)
 
 }
 
-void PressureForce::apply(const double, const double particleMass,
-                          const vector<Vec2d>& positions, vector<Vec2d>& accelerations) const
+void PressureForce::apply(const vector<Vec2d>& positions, double particleMass, double,
+                          vector<Vec2d>& accelerations) const
 {
   neighborIteratorFactory_->refresh(positions);
   vector<double> densities = computeDensities(particleMass, positions);
