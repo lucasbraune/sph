@@ -63,6 +63,17 @@ void EulerIntegrator::step(ParticleSystem& ps, Physics& physics)
   }
 }
 
+static Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc,
+                          const vector<const Damping*>& dampings,
+                          double mass, double time, double timeStep)
+{
+  Vec2d approxVel = currVel + timeStep * currAcc;
+  Vec2d approxDampingAcc = Damping::acceleration(dampings, time, mass, approxVel);
+  approxVel += (0.5 * timeStep) * (nextForceAcc + approxDampingAcc - currAcc);
+  approxDampingAcc = Damping::acceleration(dampings, time, mass, approxVel);
+  return currVel + (0.5 * timeStep) * (currAcc + nextForceAcc + approxDampingAcc);
+}
+
 void VerletIntegrator::step(ParticleSystem& ps, Physics& physics)
 {
   ps.time += timeStep_;
@@ -88,17 +99,6 @@ void VerletIntegrator::step(ParticleSystem& ps, Physics& physics)
         Damping::acceleration(physics.dampingPtrs(), ps.time, ps.particleMass, ps.velocities[i]);
     ps.accelerations[i] = nextForceAcc_[i] + nextDampingAcc;
   }
-}
-
-inline Vec2d VerletIntegrator::nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc,
-                                            const vector<const Damping*>& dampings,
-                                            double mass, double time, double timeStep)
-{
-  Vec2d approxVel = currVel + timeStep * currAcc;
-  Vec2d approxDampingAcc = Damping::acceleration(dampings, time, mass, approxVel);
-  approxVel += (0.5 * timeStep) * (nextForceAcc + approxDampingAcc - currAcc);
-  approxDampingAcc = Damping::acceleration(dampings, time, mass, approxVel);
-  return currVel + (0.5 * timeStep) * (currAcc + nextForceAcc + approxDampingAcc);
 }
 
 } // end namespace sph

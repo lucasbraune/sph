@@ -68,9 +68,6 @@ public:
   void step(ParticleSystem& ps, Physics& physics) override;
 
 private:
-  static inline Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc,
-                                   const std::vector<const Damping*>& dampings, double mass, 
-                                   double time, double timeStep);
   const double timeStep_;
   std::vector<Vec2d> nextForceAcc_;
 };
