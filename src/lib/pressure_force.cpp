@@ -1,5 +1,9 @@
 #include "pressure_force.hpp"
-#include <cassert>
+#include <cmath>
+
+using std::vector;
+using std::unique_ptr;
+using std::function;
 
 namespace sph {
 

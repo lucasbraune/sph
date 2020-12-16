@@ -1,5 +1,7 @@
 #include "particle_system.hpp"
 
+using std::vector;
+
 namespace sph {
 
 Vec2d Damping::acceleration(const vector<const Damping*>& dampings, double time, double mass,

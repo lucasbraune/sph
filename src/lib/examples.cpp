@@ -1,6 +1,8 @@
 #include "examples.hpp"
 #include <cmath>
 
+using std::vector;
+
 namespace sph {
 
 CentralGravityPhysics::CentralGravityPhysics(double gravityConstant, double dampingConstant) :

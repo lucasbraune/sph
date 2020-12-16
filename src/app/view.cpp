@@ -1,6 +1,11 @@
+#define GL_SILENCE_DEPRECATION
+
 #include "view.hpp"
 #include <cmath>
+#include <GL/freeglut.h>
 
+using std::vector;
+using std::string;
 using namespace sph;
 
 RegularPolygon::RegularPolygon(Vec2d center, double radius, size_t sides)

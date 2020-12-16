@@ -1,5 +1,8 @@
 #include "util.hpp"
+#include <random>
 #include <cmath>
+
+using std::vector;
 
 namespace sph {
 

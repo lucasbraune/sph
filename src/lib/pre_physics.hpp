@@ -16,9 +16,9 @@ namespace sph {
 
 struct PrePhysics {
   virtual ~PrePhysics() {}
-  virtual const vector<const Force*> createForceVector() const = 0;
-  virtual const vector<const Damping*> createDampingVector() const = 0;
-  virtual const vector<const Collidable*> createCollidableVector() const = 0;
+  virtual const std::vector<const Force*> createForceVector() const = 0;
+  virtual const std::vector<const Damping*> createDampingVector() const = 0;
+  virtual const std::vector<const Collidable*> createCollidableVector() const = 0;
 };
 
 template<class PrePhysicsType /* models implementation of PrePhysics */> 
@@ -62,15 +62,15 @@ public:
   
   ~PhysicsAdapter() {};
 
-  const vector<const Force*>& forcePtrs() const { return forcePtrs_; }
-  const vector<const Damping*>& dampingPtrs() const { return dampingPtrs_; }
-  const vector<const Collidable*>& collidablePtrs() const { return collidablePtrs_; }
+  const std::vector<const Force*>& forcePtrs() const { return forcePtrs_; }
+  const std::vector<const Damping*>& dampingPtrs() const { return dampingPtrs_; }
+  const std::vector<const Collidable*>& collidablePtrs() const { return collidablePtrs_; }
 
 protected:
   PrePhysicsType prePhysics_;
-  vector<const Force*> forcePtrs_;
-  vector<const Damping*> dampingPtrs_;
-  vector<const Collidable*> collidablePtrs_;
+  std::vector<const Force*> forcePtrs_;
+  std::vector<const Damping*> dampingPtrs_;
+  std::vector<const Collidable*> collidablePtrs_;
 
 private:
   static void updatePtrs(PhysicsAdapter& adapter)

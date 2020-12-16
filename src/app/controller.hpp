@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_HPP
 #define CONTROLLER_HPP
 
-#include "examples.hpp"
+#include "simulation.hpp"
 
 class Controller {
 public:

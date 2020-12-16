@@ -1,5 +1,7 @@
 #include "ps_elements.hpp"
 
+using std::vector;
+
 namespace sph {
 
 PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :

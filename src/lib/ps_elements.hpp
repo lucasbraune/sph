@@ -16,8 +16,8 @@ namespace sph {
 class PointGravity : public Force {
 public:
   PointGravity(double gravityConstant, const Vec2d& center = ZERO_VECTOR);
-  void apply(double time, double particleMass, const vector<Vec2d>& positions,
-             vector<Vec2d>& accelerations) const override;
+  void apply(double time, double particleMass, const std::vector<Vec2d>& positions,
+             std::vector<Vec2d>& accelerations) const override;
   double constant() const;
   void setConstant(double intensity);
   
@@ -29,8 +29,8 @@ private:
 class SurfaceGravity : public Force {
 public:
   SurfaceGravity(double magnitude) : acceleration_{0.0, -magnitude} {}
-  void apply(double time, double particleMass, const vector<Vec2d>& positions,
-             vector<Vec2d>& accelerations) const override;
+  void apply(double time, double particleMass, const std::vector<Vec2d>& positions,
+             std::vector<Vec2d>& accelerations) const override;
   double magnitude() const { return -acceleration_[1]; }
   void setMagnitude(double newValue) { acceleration_[1] = -newValue; }
   
@@ -53,7 +53,7 @@ class Wall : public Collidable {
 public:
   Wall(const Vec2d& normal, // must be nonzero
        double distanceFromTheOrigin);
-  void resolveCollisions(vector<Vec2d>& positions, vector<Vec2d>& velocities,
+  void resolveCollisions(std::vector<Vec2d>& positions, std::vector<Vec2d>& velocities,
                          double time) const override;
 
 private:

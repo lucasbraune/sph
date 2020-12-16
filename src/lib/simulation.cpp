@@ -2,12 +2,15 @@
 #include <thread>
 
 using std::chrono::milliseconds;
+using std::chrono::high_resolution_clock;
+using std::chrono::time_point;
 
 static milliseconds toMilliseconds(double seconds) {
   return milliseconds((long)(seconds * 1e3));
 }
 
 namespace sph {
+namespace detail {
 
 Synchronizer::Synchronizer()
     : fixedRealTime_(high_resolution_clock::now()), fixedSimTime_(0.0) {}
@@ -24,5 +27,6 @@ void Synchronizer::waitUntil(const double simulationTime,
   std::this_thread::sleep_until(realTime);
 }
 
+} // end namespace detail
 } // end namespace sph
 

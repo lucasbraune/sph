@@ -1,15 +1,9 @@
 #ifndef SIMULATION_HPP
 #define SIMULATION_HPP
 
-#include <vector>
 #include <chrono>
 #include <memory>
 #include "particle_system.hpp"
-
-using std::vector;
-using std::chrono::high_resolution_clock;
-using std::chrono::time_point;
-using std::unique_ptr;
 
 namespace sph {
 
@@ -17,7 +11,7 @@ class SimulationInterface {
 public:
   virtual ~SimulationInterface() {}
 
-  virtual const vector<Vec2d>& positions() const = 0;
+  virtual const std::vector<Vec2d>& positions() const = 0;
   virtual double time() const = 0;
   virtual double targetSpeed() const = 0;
   virtual bool paused() const = 0;
@@ -30,6 +24,8 @@ public:
   void decreaseTargetSpeed() { setTargetSpeed(0.5 * targetSpeed()); }
 };
 
+namespace detail {
+
 class Synchronizer {
 public:
   Synchronizer();
@@ -38,10 +34,13 @@ public:
 
 private:
   // Time of an event, as recorded by the system clock
-  time_point<high_resolution_clock> fixedRealTime_;
-  // Time of the same event, as recorded by the simulation clock. Measured in seconds.
+  std::chrono::time_point<
+      std::chrono::high_resolution_clock> fixedRealTime_;
+  // Time of the same event, as recorded by the simulation clock; in seconds
   double fixedSimTime_;
 };
+
+} // end namespace detail
 
 template<class PhysicsType,                       // must be convertible to Physics&
          class IntegratorType = VerletIntegrator> // models implementation of TimeIntegrator
@@ -59,7 +58,7 @@ public:
     fps_{fps},
     paused_{true} {}
   
-  const vector<Vec2d>& positions() const { return ps_.positions; }
+  const std::vector<Vec2d>& positions() const { return ps_.positions; }
   double time() const { return ps_.time; }
   double targetSpeed() const { return simulationSpeed_; }
   bool paused() const { return paused_; }
@@ -92,7 +91,7 @@ private:
   ParticleSystem ps_;
   PhysicsType physics_;
   IntegratorType integrator_;
-  Synchronizer synchronizer_;
+  detail::Synchronizer synchronizer_;
   double simulationSpeed_;
   const int fps_;
   bool paused_;

@@ -11,9 +11,9 @@ namespace sph {
 struct CentralGravityPhysics : public PrePhysics {
   CentralGravityPhysics(double gravityConstant, double dampingConstant);
 
-  const vector<const Force*> createForceVector() const override {return {&gravity_}; }
-  const vector<const Damping*> createDampingVector() const override {return {&damping_}; }
-  const vector<const Collidable*> createCollidableVector() const override { return {}; }
+  const std::vector<const Force*> createForceVector() const override {return {&gravity_}; }
+  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
+  const std::vector<const Collidable*> createCollidableVector() const override { return {}; }
 
   PointGravity gravity_;
   LinearDamping damping_;
@@ -22,13 +22,13 @@ struct CentralGravityPhysics : public PrePhysics {
 struct WallBouncingPhysics : public PrePhysics {
   WallBouncingPhysics(double gravityConstant, double dampingConstant);
 
-  const vector<const Force*> createForceVector() const override {return {&gravity_}; }
-  const vector<const Damping*> createDampingVector() const override {return {&damping_}; }
-  const vector<const Collidable*> createCollidableVector() const override; 
+  const std::vector<const Force*> createForceVector() const override {return {&gravity_}; }
+  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
+  const std::vector<const Collidable*> createCollidableVector() const override; 
 
   SurfaceGravity gravity_;
   LinearDamping damping_;
-  vector<Wall> walls_;
+  std::vector<Wall> walls_;
 };
 
 struct ToyStarPhysics : public PrePhysics {
@@ -37,9 +37,9 @@ struct ToyStarPhysics : public PrePhysics {
                  double pressureConstant,
                  double interactionRadius);
 
-  const vector<const Force*> createForceVector() const override {return {&gravity_, &pressure_}; }
-  const vector<const Damping*> createDampingVector() const override {return {&damping_}; }
-  const vector<const Collidable*> createCollidableVector() const override { return {}; }
+  const std::vector<const Force*> createForceVector() const override {return {&gravity_, &pressure_}; }
+  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
+  const std::vector<const Collidable*> createCollidableVector() const override { return {}; }
 
   PointGravity gravity_;
   LinearDamping damping_;
@@ -52,14 +52,14 @@ struct WellPhysics : public PrePhysics {
               double pressureConstant,
               double interactionRadius);
 
-  const vector<const Force*> createForceVector() const override {return {&gravity_, &pressure_}; }
-  const vector<const Damping*> createDampingVector() const override {return {&damping_}; }
-  const vector<const Collidable*> createCollidableVector() const override; 
+  const std::vector<const Force*> createForceVector() const override {return {&gravity_, &pressure_}; }
+  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
+  const std::vector<const Collidable*> createCollidableVector() const override; 
 
   SurfaceGravity gravity_;
   PressureForce pressure_;
   LinearDamping damping_;
-  vector<Wall> walls_;
+  std::vector<Wall> walls_;
 };
 
 Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation(

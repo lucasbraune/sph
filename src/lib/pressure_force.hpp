@@ -1,16 +1,9 @@
 #ifndef PRESSURE_FORCE_H
 #define PRESSURE_FORCE_H
 
-#include <vector>
 #include <memory>
 #include <functional>
-#include <cmath>
-#include "util.hpp"
 #include "particle_system.hpp"
-
-using std::vector;
-using std::unique_ptr;
-using std::function;
 
 namespace sph {
 
@@ -26,9 +19,9 @@ using NeighborIterator = Iterator<size_t>;
 
 class NeighborIteratorFactory {
 public:
-  virtual void refresh(const vector<Vec2d>& positions) = 0; // when particles move
-  virtual unique_ptr<NeighborIterator> build(Vec2d position) const = 0;
-  virtual unique_ptr<NeighborIteratorFactory> clone() const = 0;
+  virtual void refresh(const std::vector<Vec2d>& positions) = 0; // when particles move
+  virtual std::unique_ptr<NeighborIterator> build(Vec2d position) const = 0;
+  virtual std::unique_ptr<NeighborIteratorFactory> clone() const = 0;
   virtual ~NeighborIteratorFactory() {};
 };
 
@@ -38,31 +31,32 @@ class SmoothingKernel {
   virtual Vec2d gradientAt(Vec2d x) const = 0;
   virtual double interactionRadius() const = 0;
   
-  virtual unique_ptr<SmoothingKernel> clone() const = 0;
+  virtual std::unique_ptr<SmoothingKernel> clone() const = 0;
   virtual ~SmoothingKernel() {};
 };
 
 class PressureForce : public Force {
 public:
-  PressureForce(unique_ptr<NeighborIteratorFactory> iteratorFactory,
-                unique_ptr<SmoothingKernel> kernel,
-                function<double(double)> pressure);
-  PressureForce(double interactionRadius, function<double(double)> pressure);
+  PressureForce(std::unique_ptr<NeighborIteratorFactory> iteratorFactory,
+                std::unique_ptr<SmoothingKernel> kernel,
+                std::function<double(double)> pressure);
+  PressureForce(double interactionRadius, std::function<double(double)> pressure);
   PressureForce(const PressureForce& other); 
   PressureForce(PressureForce&& other) = default;
   PressureForce& operator=(const PressureForce& other);
   PressureForce& operator=(PressureForce&& other) = default;
   ~PressureForce() = default;
   
-  void apply(const double time, const double particleMass, const vector<Vec2d>& positions,
-             vector<Vec2d>& accelerations) const;
+  void apply(const double time, const double particleMass, const std::vector<Vec2d>& positions,
+             std::vector<Vec2d>& accelerations) const;
 
 private:
-  vector<double> computeDensities(double particleMass, const vector<Vec2d>& positions) const;
+  std::vector<double> computeDensities(double particleMass,
+                                       const std::vector<Vec2d>& positions) const;
 
-  unique_ptr<SmoothingKernel> kernel_;
-  unique_ptr<NeighborIteratorFactory> neighborIteratorFactory_;
-  function<double(double)> pressure_;
+  std::unique_ptr<SmoothingKernel> kernel_;
+  std::unique_ptr<NeighborIteratorFactory> neighborIteratorFactory_;
+  std::function<double(double)> pressure_;
 };
 
 template<typename T>
@@ -80,9 +74,9 @@ private:
 class TrivialNeighborIteratorFactory : public NeighborIteratorFactory {
 public:
   TrivialNeighborIteratorFactory(size_t numberOfParticles = 0);
-  void refresh(const vector<Vec2d>& positions);
-  unique_ptr<NeighborIterator> build(Vec2d position) const;
-  unique_ptr<NeighborIteratorFactory> clone() const;
+  void refresh(const std::vector<Vec2d>& positions);
+  std::unique_ptr<NeighborIterator> build(Vec2d position) const;
+  std::unique_ptr<NeighborIteratorFactory> clone() const;
 
 private:
   size_t numberOfParticles_;
@@ -95,7 +89,7 @@ public:
   Vec2d gradientAt(Vec2d x) const override;
   double interactionRadius() const override;
 
-  unique_ptr<SmoothingKernel> clone() const override;
+  std::unique_ptr<SmoothingKernel> clone() const override;
 
 private:
   const double smoothingLength_;
