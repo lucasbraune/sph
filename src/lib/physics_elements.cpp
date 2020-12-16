@@ -29,9 +29,10 @@ void SurfaceGravity::apply(const vector<Vec2d>&, double, double, vector<Vec2d>& 
 LinearDamping::LinearDamping(double dampingConstant) :
   intensity_(dampingConstant)
 {}
-Vec2d LinearDamping::acceleration(const Vec2d& velocity, double) const
+
+Vec2d LinearDamping::acceleration(const Vec2d& velocity, double mass) const
 {
-  return -intensity_ * velocity;
+  return -intensity_ * velocity / mass;
 }
 
 Wall::Wall(const Vec2d& normal, double distanceFromTheOrigin) :

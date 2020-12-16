@@ -15,9 +15,9 @@ namespace detail {
 Synchronizer::Synchronizer()
     : fixedRealTime_(high_resolution_clock::now()), fixedSimTime_(0.0) {}
 
-void Synchronizer::synchronize(const double simulationTime) {
+void Synchronizer::synchronize(const double simulationNow) {
   fixedRealTime_ = high_resolution_clock::now();
-  fixedSimTime_ = simulationTime;
+  fixedSimTime_ = simulationNow;
 }
 
 void Synchronizer::waitUntil(const double simulationTime,

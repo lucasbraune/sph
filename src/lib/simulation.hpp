@@ -29,13 +29,12 @@ namespace detail {
 class Synchronizer {
 public:
   Synchronizer();
-  void synchronize(double simulationTime);
+  void synchronize(double simulationNow);
   void waitUntil(double simulationTime, double simulationSpeed) const;
 
 private:
   // Time of an event, as recorded by the system clock
-  std::chrono::time_point<
-      std::chrono::high_resolution_clock> fixedRealTime_;
+  std::chrono::time_point<std::chrono::high_resolution_clock> fixedRealTime_;
   // Time of the same event, as recorded by the simulation clock; in seconds
   double fixedSimTime_;
 };

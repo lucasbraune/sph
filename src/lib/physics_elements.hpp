@@ -47,7 +47,7 @@ public:
 
 private:
   Vec2d acceleration(const Vec2d& velocity, double mass) const override;
-  double intensity_;
+  double intensity_; // force per unit velocity
 };
 
 class Wall : public Collidable {

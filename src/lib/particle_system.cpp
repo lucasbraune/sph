@@ -86,6 +86,7 @@ void EulerIntegrator::step(ParticleSystem& ps, Physics& physics)
   }
 }
 
+// Used in VerletIntegrator::step
 static Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc,
                           const Damping& damping, double mass, double timeStep)
 {

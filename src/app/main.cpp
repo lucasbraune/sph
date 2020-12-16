@@ -11,6 +11,9 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
+// auto simulation = createCentralGravitySimulation();
+// auto simulation = createWallBouncingSimulation();
+// auto simulation = createToyStarSimulation();
 auto simulation = createWellSimulation();
 const View view(simulation);
 const Controller controller(simulation);

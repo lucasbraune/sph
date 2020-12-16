@@ -27,11 +27,11 @@ Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation
     double totalMass = 1.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
     double gravityConstant = 1.0,
-    double dampingConstant = 0.01,
+    double dampingConstant = 1e-4,
     double timeStep = 0.01);
 
 struct WallBouncingPhysics : public PrePhysics {
-  WallBouncingPhysics(double gravityConstant, double dampingConstant);
+  WallBouncingPhysics(double gravityAcceleration, double dampingConstant);
 
   const std::vector<const Force*> createForceVector() const override {return {&gravity_}; }
   const std::vector<const Collidable*> createCollidableVector() const override; 
@@ -46,8 +46,8 @@ Simulation<PhysicsAdapter<WallBouncingPhysics>> createWallBouncingSimulation(
     size_t numberOfParticles = 1000,
     double totalMass = 1.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
-    double gravityConstant = 1.0,
-    double dampingConstant = 0.01,
+    double gravityAcceleration = 10.0,
+    double dampingConstant = 1e-4,
     double timeStep = 0.01);
 
 struct ToyStarPhysics : public PrePhysics {
@@ -73,7 +73,7 @@ Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
     double starMass = 2.0,
     double starRadius = 0.75,
     Rectangle initialRegion = {-1.0, -1.0, 1.0, 1.0},
-    double dampingConstant = 1.0,
+    double dampingConstant = 0.01,
     double pressureConstant = 1.0,
     double timeStep = 0.01);
 
@@ -101,7 +101,7 @@ Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
     double totalMass = 2.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
     double gravityAcceleration = 10.0,
-    double dampingConstant = 1.0,
+    double dampingConstant = 0.05,
     double pressureConstant = 1.0,
     double timeStep = 0.01);
 
