@@ -22,6 +22,14 @@ struct CentralGravityPhysics : public PrePhysics {
   LinearDamping damping_;
 };
 
+Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation(
+    size_t numberOfParticles = 1000,
+    double totalMass = 1.0,
+    Rectangle region = {-1.0, -1.0, 1.0, 1.0},
+    double gravityConstant = 1.0,
+    double dampingConstant = 0.01,
+    double timeStep = 0.01);
+
 struct WallBouncingPhysics : public PrePhysics {
   WallBouncingPhysics(double gravityConstant, double dampingConstant);
 
@@ -34,45 +42,6 @@ struct WallBouncingPhysics : public PrePhysics {
   std::vector<Wall> walls_;
 };
 
-struct ToyStarPhysics : public PrePhysics {
-  ToyStarPhysics(double gravityConstant,
-                 double dampingConstant,
-                 double pressureConstant,
-                 double interactionRadius);
-
-  const std::vector<const Force*> createForceVector() const override {return {&gravity_, &pressure_}; }
-  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
-  const std::vector<const Collidable*> createCollidableVector() const override { return {}; }
-
-  PointGravity gravity_;
-  LinearDamping damping_;
-  PressureForce pressure_;
-};
-
-struct WellPhysics : public PrePhysics {
-  WellPhysics(double gravityAcceleration,
-              double dampingConstant,
-              double pressureConstant,
-              double interactionRadius);
-
-  const std::vector<const Force*> createForceVector() const override {return {&gravity_, &pressure_}; }
-  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
-  const std::vector<const Collidable*> createCollidableVector() const override; 
-
-  SurfaceGravity gravity_;
-  PressureForce pressure_;
-  LinearDamping damping_;
-  std::vector<Wall> walls_;
-};
-
-Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation(
-    size_t numberOfParticles = 1000,
-    double totalMass = 1.0,
-    Rectangle region = {-1.0, -1.0, 1.0, 1.0},
-    double gravityConstant = 1.0,
-    double dampingConstant = 0.01,
-    double timeStep = 0.01);
-
 Simulation<PhysicsAdapter<WallBouncingPhysics>> createWallBouncingSimulation(
     size_t numberOfParticles = 1000,
     double totalMass = 1.0,
@@ -80,6 +49,24 @@ Simulation<PhysicsAdapter<WallBouncingPhysics>> createWallBouncingSimulation(
     double gravityConstant = 1.0,
     double dampingConstant = 0.01,
     double timeStep = 0.01);
+
+struct ToyStarPhysics : public PrePhysics {
+  ToyStarPhysics(double gravityConstant,
+                 double dampingConstant,
+                 double pressureConstant,
+                 double interactionRadius);
+
+  const std::vector<const Force*> createForceVector() const override
+  {
+    return {&gravity_, &pressure_};
+  }
+  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
+  const std::vector<const Collidable*> createCollidableVector() const override { return {}; }
+
+  PointGravity gravity_;
+  LinearDamping damping_;
+  PressureForce pressure_;
+};
 
 Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
     size_t numberOfParticles = 250,
@@ -89,6 +76,25 @@ Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
     double dampingConstant = 1.0,
     double pressureConstant = 1.0,
     double timeStep = 0.01);
+
+struct WellPhysics : public PrePhysics {
+  WellPhysics(double gravityAcceleration,
+              double dampingConstant,
+              double pressureConstant,
+              double interactionRadius);
+
+  const std::vector<const Force*> createForceVector() const override
+  {
+    return {&gravity_, &pressure_};
+  }
+  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
+  const std::vector<const Collidable*> createCollidableVector() const override; 
+
+  SurfaceGravity gravity_;
+  PressureForce pressure_;
+  LinearDamping damping_;
+  std::vector<Wall> walls_;
+};
 
 Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
     size_t numberOfParticles = 250,
