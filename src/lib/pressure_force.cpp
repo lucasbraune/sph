@@ -41,24 +41,26 @@ void PressureForce::apply(const vector<Vec2d>& positions, double particleMass, d
                           vector<Vec2d>& accelerations) const
 {
   neighborIteratorFactory_->refresh(positions);
-  vector<double> densities = computeDensities(particleMass, positions);
+  static auto densities = vector<double>(positions.size()); // static to avoid reallocation
+  updateDensities(particleMass, positions, densities); 
   for (size_t i=0; i<positions.size(); i++) {
-    Vec2d sum = ZERO_VECTOR;
-    double A = pressure_(densities[i]) / (densities[i] * densities[i]);
+    auto sum = ZERO_VECTOR;
+    auto A = pressure_(densities[i]) / (densities[i] * densities[i]);
     auto it = neighborIteratorFactory_->build(positions[i]);
     while (it->hasNext()) {
-      size_t j = it->next();
+      auto j = it->next();
       if (j == i) continue; // OK to skip, assuming (1/r)(dW/dr) -> 0 as r -> 0
-      double B = pressure_(densities[j]) / (densities[j] * densities[j]);
+      auto B = pressure_(densities[j]) / (densities[j] * densities[j]);
       sum += (A + B) * kernel_->gradientAt(positions[i] - positions[j]);
     }
     accelerations[i] -= particleMass * sum;
   }
 }
 
-vector<double> PressureForce::computeDensities(double particleMass, const vector<Vec2d>& positions) const
+void PressureForce::updateDensities(double particleMass, const vector<Vec2d>& positions, 
+                                    vector<double>& densities) const
 {
-  vector<double> densities(positions.size());
+  densities.resize(positions.size());
   for (size_t i=0; i<positions.size(); i++) {
     densities[i] = 0;
     auto it = neighborIteratorFactory_->build(positions[i]);
@@ -67,7 +69,6 @@ vector<double> PressureForce::computeDensities(double particleMass, const vector
     }
     densities[i] *= particleMass;
   }
-  return densities;
 }
 
 template<typename T>

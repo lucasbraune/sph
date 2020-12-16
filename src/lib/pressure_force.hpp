@@ -51,8 +51,8 @@ public:
              std::vector<Vec2d>& accelerations) const;
 
 private:
-  std::vector<double> computeDensities(double particleMass,
-                                       const std::vector<Vec2d>& positions) const;
+  void updateDensities(double particleMass, const std::vector<Vec2d>& positions,
+                        std::vector<double>& densities) const;
 
   std::unique_ptr<SmoothingKernel> kernel_;
   std::unique_ptr<NeighborIteratorFactory> neighborIteratorFactory_;
