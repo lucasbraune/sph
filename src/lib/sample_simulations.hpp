@@ -15,8 +15,8 @@ struct CentralGravityPhysics : public PrePhysics {
   CentralGravityPhysics(double gravityConstant, double dampingConstant);
 
   const std::vector<const Force*> createForceVector() const override {return {&gravity_}; }
-  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
   const std::vector<const Collidable*> createCollidableVector() const override { return {}; }
+  const Damping* dampingPtr() const override {return &damping_; }
 
   PointGravity gravity_;
   LinearDamping damping_;
@@ -34,8 +34,8 @@ struct WallBouncingPhysics : public PrePhysics {
   WallBouncingPhysics(double gravityConstant, double dampingConstant);
 
   const std::vector<const Force*> createForceVector() const override {return {&gravity_}; }
-  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
   const std::vector<const Collidable*> createCollidableVector() const override; 
+  const Damping* dampingPtr() const override {return &damping_; }
 
   SurfaceGravity gravity_;
   LinearDamping damping_;
@@ -60,8 +60,8 @@ struct ToyStarPhysics : public PrePhysics {
   {
     return {&gravity_, &pressure_};
   }
-  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
   const std::vector<const Collidable*> createCollidableVector() const override { return {}; }
+  const Damping* dampingPtr() const override {return &damping_; }
 
   PointGravity gravity_;
   LinearDamping damping_;
@@ -87,8 +87,8 @@ struct WellPhysics : public PrePhysics {
   {
     return {&gravity_, &pressure_};
   }
-  const std::vector<const Damping*> createDampingVector() const override {return {&damping_}; }
   const std::vector<const Collidable*> createCollidableVector() const override; 
+  const Damping* dampingPtr() const override {return &damping_; }
 
   SurfaceGravity gravity_;
   PressureForce pressure_;

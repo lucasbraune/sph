@@ -53,16 +53,12 @@ private:
 
 struct Physics {
   virtual ~Physics() {}
-  // The pointers returned by the next two functions are guaranteed to be not null
+  // Returns a vector of non-null pointers
   virtual const std::vector<const Force*>& forcePtrs() const = 0;
+  // Returns a vector of non-null pointers
   virtual const std::vector<const Collidable*>& collidablePtrs() const = 0;
-  virtual const std::vector<const Damping*>& dampingPtrs() const = 0;
-
-  // Warning: may return nullptr
-  const Damping* dampingPtr() const
-  {
-    return dampingPtrs().size() > 0 ? dampingPtrs()[0] : nullptr;
-  }
+  // Warning: may return a null pointer
+  virtual const Damping* dampingPtr() const = 0;
 };
 
 struct TimeIntegrator {
