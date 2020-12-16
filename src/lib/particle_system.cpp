@@ -1,4 +1,5 @@
 #include "particle_system.hpp"
+#include <cassert>
 
 using std::vector;
 
@@ -16,19 +17,23 @@ Vec2d Damping::acceleration(const vector<const Damping*>& dampings, double time,
 
 ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions,
                                const vector<Vec2d>& initialVelocities,
+                               const vector<Vec2d>& initialAccelerations,
                                double particleMass) :
-  numberOfParticles(initialPositions.size()),
-  particleMass(particleMass),
-  positions(initialPositions),
-  velocities(initialVelocities),
-  accelerations(positions.size()),
-  time(0.0)
-{}
+  numberOfParticles{initialPositions.size()},
+  particleMass{particleMass},
+  positions{initialPositions},
+  velocities{initialVelocities},
+  accelerations{initialAccelerations}
+{
+  // TODO: handle error where the specified vectors have different lengths.
+}
 
-ParticleSystem::ParticleSystem(size_t numberOfParticles, double totalMass, Rectangle region) :
-  ParticleSystem(randomVectors(region, numberOfParticles),
-                 vector<Vec2d>(numberOfParticles),
-                 totalMass / numberOfParticles)
+ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions, double particleMass) :
+  numberOfParticles{initialPositions.size()},
+  particleMass{particleMass},
+  positions{initialPositions},
+  velocities(numberOfParticles),    // parentheses, not braces!
+  accelerations(numberOfParticles)  // same!
 {}
 
 void TimeIntegrator::integrate(ParticleSystem& ps, Physics& physics, double duration)

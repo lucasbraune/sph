@@ -31,11 +31,8 @@ struct Rectangle {
   double width() const;
   double height() const;
   Vec2d bottomLeft() const;
-  
   const double xmin, ymin, xmax, ymax;
 };
-
-std::vector<Vec2d> randomVectors(const Rectangle region, const size_t numberOfVectors);
 
 } // end namespace sph
 

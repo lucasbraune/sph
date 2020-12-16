@@ -8,6 +8,9 @@
 
 namespace sph {
 
+ParticleSystem particlesInRandomPositions(size_t numberOfParticles, double totalMass,
+                                          const Rectangle& region);
+
 struct CentralGravityPhysics : public PrePhysics {
   CentralGravityPhysics(double gravityConstant, double dampingConstant);
 

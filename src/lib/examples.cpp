@@ -1,9 +1,27 @@
 #include "examples.hpp"
+#include <random>
 #include <cmath>
 
 using std::vector;
 
+vector<sph::Vec2d> randomVectors(const sph::Rectangle region, const size_t N) {
+  auto result = vector<sph::Vec2d>{};
+  auto xDist = std::uniform_real_distribution<double>{region.xmin, region.xmax};
+  auto yDist = std::uniform_real_distribution<double>{region.ymin, region.ymax};
+  auto re = std::default_random_engine{};
+  for (size_t i=0; i<N; i++) {
+    result.push_back(sph::Vec2d{xDist(re), yDist(re)});
+  }
+  return result;
+}
+
 namespace sph {
+
+ParticleSystem particlesInRandomPositions(size_t numberOfParticles, double totalMass,
+                                          const Rectangle& region)
+{
+  return {randomVectors(region, numberOfParticles), totalMass / numberOfParticles};
+}
 
 CentralGravityPhysics::CentralGravityPhysics(double gravityConstant, double dampingConstant) :
   gravity_{gravityConstant},
@@ -66,7 +84,7 @@ Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation
     double dampingConstant,
     double timeStep)
 {
-  return {ParticleSystem{numberOfParticles, totalMass, region},
+  return {particlesInRandomPositions(numberOfParticles, totalMass, region),
           PhysicsAdapter<CentralGravityPhysics>{
               CentralGravityPhysics{gravityConstant, dampingConstant}},
           VerletIntegrator{timeStep}};
@@ -80,7 +98,7 @@ Simulation<PhysicsAdapter<WallBouncingPhysics>> createWallBouncingSimulation(
     double dampingConstant,
     double timeStep)
 {
-  return {ParticleSystem{numberOfParticles, totalMass, region},
+  return {particlesInRandomPositions(numberOfParticles, totalMass, region),
           PhysicsAdapter<WallBouncingPhysics>{
               WallBouncingPhysics{gravityConstant, dampingConstant}},
           VerletIntegrator{timeStep}};
@@ -105,7 +123,7 @@ Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
     double pressureConstant,
     double timeStep)
 {
-  return {ParticleSystem{numberOfParticles, starMass, initialRegion},
+  return {particlesInRandomPositions(numberOfParticles, starMass, initialRegion),
           PhysicsAdapter<ToyStarPhysics>{
               ToyStarPhysics{gravityConstant(starMass, pressureConstant, starRadius),
                              dampingConstant,
@@ -123,7 +141,7 @@ Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
     double pressureConstant,
     double timeStep)
 {
-  return {ParticleSystem{numberOfParticles, totalMass, region},
+  return {particlesInRandomPositions(numberOfParticles, totalMass, region),
           PhysicsAdapter<WellPhysics>{
               WellPhysics{gravityConstant,
                           dampingConstant,
