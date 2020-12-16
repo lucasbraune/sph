@@ -61,27 +61,30 @@ struct Physics {
   virtual const Damping* dampingPtr() const = 0;
 };
 
-struct TimeIntegrator {
+class TimeIntegrator {
+public:
   virtual ~TimeIntegrator() {};
-  virtual void step(ParticleSystem& ps, Physics& physics) = 0;
   void integrate(ParticleSystem& ps, Physics& physics, double duration);
+
+private:
+  virtual void step(ParticleSystem& ps, Physics& physics) = 0;
 };
 
 class EulerIntegrator : public TimeIntegrator {
 public:
   EulerIntegrator(double timeStep) : timeStep_{timeStep} {};
-  void step(ParticleSystem& ps, Physics& physics) override;
-
+  
 private:
+  void step(ParticleSystem& ps, Physics& physics) override;
   const double timeStep_;
 };
 
 class VerletIntegrator : public TimeIntegrator {
 public:
   VerletIntegrator(double timeStep) : timeStep_{timeStep} {};
-  void step(ParticleSystem& ps, Physics& physics) override;
-
+  
 private:
+  void step(ParticleSystem& ps, Physics& physics) override;
   const double timeStep_;
 };
 
