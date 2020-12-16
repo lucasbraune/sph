@@ -5,6 +5,8 @@
 #include "view.hpp"
 #include "controller.hpp"
 
+using namespace sph;
+
 void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);

@@ -1,6 +1,8 @@
 #include "pressure_force.hpp"
 #include <cassert>
 
+namespace sph {
+
 PressureForce::PressureForce(
     unique_ptr<NeighborIteratorFactory> iteratorFactory,
     unique_ptr<SmoothingKernel> kernel,
@@ -168,3 +170,5 @@ double GasPressure::operator()(double density) const
 {
   return pressureConstant_ * density * density;
 }
+
+} // end namespace sph 

@@ -5,6 +5,8 @@
 #include <vector>
 #include <random>
 
+namespace sph {
+
 using Vec2d = std::array<double, 2>;
 using std::vector;
 
@@ -36,5 +38,9 @@ struct Rectangle {
 };
 
 vector<Vec2d> randomVectors(const Rectangle region, const size_t numberOfVectors);
+
+} // end namespace sph
+
+
 
 #endif

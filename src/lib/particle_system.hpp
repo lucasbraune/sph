@@ -7,6 +7,8 @@
 
 using std::vector;
 
+namespace sph {
+
 struct ParticleSystem {
   ParticleSystem(const vector<Vec2d>& initialPositions,
                  const vector<Vec2d>& initialVelocities,
@@ -76,5 +78,7 @@ private:
   const double timeStep_;
   vector<Vec2d> nextForceAcc_;
 };
+
+} // end namespace sph
 
 #endif

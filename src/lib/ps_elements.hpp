@@ -1,7 +1,17 @@
+/*
+ * File: ps_elements.hpp
+ * 
+ * This header declares "particle system elements", that is, basic implementations of the Force, 
+ * Damping and Collidable interfaces defined in particle_system.hpp. These elements are used to 
+ * construct example simulations in examples.hpp/cpp.
+ */
+
 #ifndef PS_ELEMENTS_HPP
 #define PS_ELEMENTS_HPP
 
 #include "particle_system.hpp"
+
+namespace sph {
 
 class PointGravity : public Force {
 public:
@@ -48,9 +58,10 @@ public:
 
 private:
   void resolveCollision(Vec2d& pos, Vec2d& vel) const;
-  Vec2d unitNormal_; // outward unit normal
+  Vec2d unitNormal_; // points out of the wall
   Vec2d ptOnWall_; 
 };
 
+} // end namespace sph
 
 #endif

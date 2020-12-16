@@ -6,6 +6,8 @@
 #include "pre_physics.hpp"
 #include "simulation.hpp"
 
+namespace sph {
+
 struct CentralGravityPhysics : public PrePhysics {
   CentralGravityPhysics(double gravityConstant, double dampingConstant);
 
@@ -93,5 +95,7 @@ Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
     double dampingConstant = 1.0,
     double pressureConstant = 1.0,
     double timeStep = 0.01);
+
+} // end namespace sph 
 
 #endif

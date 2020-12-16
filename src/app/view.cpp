@@ -1,6 +1,8 @@
 #include "view.hpp"
 #include <cmath>
 
+using namespace sph;
+
 RegularPolygon::RegularPolygon(Vec2d center, double radius, size_t sides)
 {
   for (size_t i=0; i<sides; i++) {

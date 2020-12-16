@@ -1,6 +1,8 @@
 #include "util.hpp"
 #include <cmath>
 
+namespace sph {
+
 Vec2d& operator+=(Vec2d& a, const Vec2d& b)
 {
   a[0] += b[0];
@@ -103,3 +105,5 @@ vector<Vec2d> randomVectors(const Rectangle region, const size_t N) {
   }
   return result;
 }
+
+} // end namespace sph

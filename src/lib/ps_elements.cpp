@@ -1,5 +1,7 @@
 #include "ps_elements.hpp"
 
+namespace sph {
+
 PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :
   center_(center), intensity_(gravityConstant)
 {}
@@ -67,3 +69,5 @@ void Wall::resolveCollision(Vec2d& pos, Vec2d& vel) const
   pos -= 2 * project(w, unitNormal_);
   vel -= 2 * project(vel, unitNormal_);
 }
+
+} // end namespace sph

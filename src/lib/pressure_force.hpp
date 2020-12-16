@@ -12,6 +12,8 @@ using std::vector;
 using std::unique_ptr;
 using std::function;
 
+namespace sph {
+
 template<typename T>
 class Iterator {
 public:
@@ -118,5 +120,7 @@ public:
 private:
   const double pressureConstant_;
 };
+
+} // end namespace sph 
 
 #endif

@@ -1,6 +1,8 @@
 #include "examples.hpp"
 #include <cmath>
 
+namespace sph {
+
 CentralGravityPhysics::CentralGravityPhysics(double gravityConstant, double dampingConstant) :
   gravity_{gravityConstant},
   damping_{dampingConstant} {}
@@ -127,3 +129,5 @@ Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
                           interactionRadius(numberOfParticles)}},
           VerletIntegrator{timeStep}};
 }
+
+} // end namespace sph 

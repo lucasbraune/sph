@@ -5,11 +5,11 @@
 
 class Controller {
 public:
-  Controller(SimulationInterface& simulation);
+  Controller(sph::SimulationInterface& simulation);
   void handleKeyboardInput(char c) const;
 
 private:
-  SimulationInterface& simulation_;
+  sph::SimulationInterface& simulation_;
 };
 
 

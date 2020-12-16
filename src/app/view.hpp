@@ -15,34 +15,34 @@ using std::string;
  */
 class RegularPolygon {
 public:
-  RegularPolygon(Vec2d center, double radius, size_t sides);
+  RegularPolygon(sph::Vec2d center, double radius, size_t sides);
   RegularPolygon(double radius, size_t sides);
-  const vector<Vec2d>& vertices() const;
+  const vector<sph::Vec2d>& vertices() const;
 
 private:
-  vector<Vec2d> vertices_;
+  vector<sph::Vec2d> vertices_;
 };
 
 class View {
 public:
-  View(const SimulationInterface& simulation, const Rectangle region, const int windowHeight,
-       const string title, const vector<Vec2d> particlePolygon);
-  View(const SimulationInterface& simulation,
-       const Rectangle region = {-1.0, -1.0, 1.0, 1.0},
+  View(const sph::SimulationInterface& simulation, const sph::Rectangle region, const int windowHeight,
+       const string title, const vector<sph::Vec2d> particlePolygon);
+  View(const sph::SimulationInterface& simulation,
+       const sph::Rectangle region = {-1.0, -1.0, 1.0, 1.0},
        const double particleRadius = 0.02,
        const size_t sides = 10,
        const int windowHeight = 750,
        const string title = "Fluid simulation");
   void draw() const;
-  Rectangle region() const;
+  sph::Rectangle region() const;
   int windowHeight() const;
   int windowWidth() const;
   const char* title() const;
 
 private:
-  const SimulationInterface& simulation_;
-  const Rectangle region_;
-  const vector<Vec2d> particlePolygon_;
+  const sph::SimulationInterface& simulation_;
+  const sph::Rectangle region_;
+  const vector<sph::Vec2d> particlePolygon_;
   const int heightInPixels_;  // window height in pixels
   const string title_;        // window title 
 };

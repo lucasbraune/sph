@@ -1,5 +1,7 @@
 #include "particle_system.hpp"
 
+namespace sph {
+
 Vec2d Damping::acceleration(const vector<const Damping*>& dampings, double time, double mass,
                             const Vec2d& velocity)
 {
@@ -91,3 +93,5 @@ inline Vec2d VerletIntegrator::nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d 
   approxDampingAcc = Damping::acceleration(dampings, time, mass, approxVel);
   return currVel + (0.5 * timeStep) * (currAcc + nextForceAcc + approxDampingAcc);
 }
+
+} // end namespace sph

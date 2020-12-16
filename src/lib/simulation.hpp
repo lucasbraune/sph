@@ -11,6 +11,8 @@ using std::chrono::high_resolution_clock;
 using std::chrono::time_point;
 using std::unique_ptr;
 
+namespace sph {
+
 class SimulationInterface {
 public:
   virtual ~SimulationInterface() {}
@@ -95,5 +97,7 @@ private:
   const int fps_;
   bool paused_;
 };
+
+} // end namespace sph
 
 #endif

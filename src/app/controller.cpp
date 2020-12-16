@@ -1,5 +1,7 @@
 #include "controller.hpp"
 
+using namespace sph;
+
 Controller::Controller(SimulationInterface& simulation) :
   simulation_(simulation)
 {}

@@ -12,6 +12,8 @@
 
 #include "particle_system.hpp"
 
+namespace sph {
+
 struct PrePhysics {
   virtual ~PrePhysics() {}
   virtual const vector<const Force*> createForceVector() const = 0;
@@ -79,5 +81,6 @@ private:
   }
 };
 
+} // end namespace sph 
 
 #endif
