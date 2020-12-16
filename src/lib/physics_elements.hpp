@@ -17,12 +17,12 @@ namespace sph {
 class PointGravity : public Force {
 public:
   PointGravity(double gravityConstant, const Vec2d& center = ZERO_VECTOR);
-  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
-             std::vector<Vec2d>& accelerations) const override;
   double constant() const;
   void setConstant(double intensity);
   
 private:
+  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
+             std::vector<Vec2d>& accelerations) const override;
   Vec2d center_;
   double intensity_;
 };
@@ -30,23 +30,23 @@ private:
 class SurfaceGravity : public Force {
 public:
   SurfaceGravity(double magnitude) : acceleration_{0.0, -magnitude} {}
-  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
-             std::vector<Vec2d>& accelerations) const override;
   double magnitude() const { return -acceleration_[1]; }
   void setMagnitude(double newValue) { acceleration_[1] = -newValue; }
   
 private:
+  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
+             std::vector<Vec2d>& accelerations) const override;
   Vec2d acceleration_;
 };
 
 class LinearDamping : public Damping {
 public:
   LinearDamping(double dampingConstant);
-  Vec2d acceleration(const Vec2d& velocity, double mass) const override;
   double constant() const;
   void setConstant(double newValue);
 
 private:
+  Vec2d acceleration(const Vec2d& velocity, double mass) const override;
   double intensity_;
 };
 
@@ -54,10 +54,10 @@ class Wall : public Collidable {
 public:
   Wall(const Vec2d& normal, // must be nonzero
        double distanceFromTheOrigin);
-  void resolveCollisions(std::vector<Vec2d>& positions, std::vector<Vec2d>& velocities,
-                         double time) const override;
 
 private:
+  void resolveCollisions(std::vector<Vec2d>& positions, std::vector<Vec2d>& velocities,
+                         double time) const override;
   void resolveCollision(Vec2d& pos, Vec2d& vel) const;
   Vec2d unitNormal_; // points out of the wall
   Vec2d ptOnWall_; 

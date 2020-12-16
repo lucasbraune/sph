@@ -10,7 +10,7 @@ namespace sph {
 PressureForce::PressureForce(
     unique_ptr<NeighborIteratorFactory> iteratorFactory,
     unique_ptr<SmoothingKernel> kernel,
-    function<double(double)> pressure) :
+    const function<double(double)>& pressure) :
   kernel_(move(kernel)),
   neighborIteratorFactory_(move(iteratorFactory)),
   pressure_(pressure)

@@ -3,8 +3,8 @@
  * Author: Lucas Braune
  * 
  * This header defines the PrePhysics interface, which is similar to the Physics interface, but
- * is easier to implement. It also provides an adapter that converts implementations of PrePhysics
- * into implementations of Physics.
+ * is easier to implement. This header also provides an adapter that converts implementations of
+ * PrePhysics into implementations of Physics.
 */
 
 #ifndef PRE_PHYSICS_HPP

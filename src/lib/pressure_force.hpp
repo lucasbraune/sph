@@ -39,7 +39,7 @@ class PressureForce : public Force {
 public:
   PressureForce(std::unique_ptr<NeighborIteratorFactory> iteratorFactory,
                 std::unique_ptr<SmoothingKernel> kernel,
-                std::function<double(double)> pressure);
+                const std::function<double(double)>& pressure);
   PressureForce(double interactionRadius, std::function<double(double)> pressure);
   PressureForce(const PressureForce& other); 
   PressureForce(PressureForce&& other) = default;
@@ -47,12 +47,11 @@ public:
   PressureForce& operator=(PressureForce&& other) = default;
   ~PressureForce() = default;
   
+private:
   void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
              std::vector<Vec2d>& accelerations) const;
-
-private:
   void updateDensities(double particleMass, const std::vector<Vec2d>& positions,
-                        std::vector<double>& densities) const;
+                       std::vector<double>& densities) const;
 
   std::unique_ptr<SmoothingKernel> kernel_;
   std::unique_ptr<NeighborIteratorFactory> neighborIteratorFactory_;
