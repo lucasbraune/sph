@@ -1,4 +1,4 @@
-#include "examples.hpp"
+#include "sample_simulations.hpp"
 #include <random>
 #include <cmath>
 

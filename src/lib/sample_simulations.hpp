@@ -1,7 +1,7 @@
 #ifndef EXAMPLES_HPP
 #define EXAMPLES_HPP
 
-#include "ps_elements.hpp"
+#include "physics_elements.hpp"
 #include "pressure_force.hpp"
 #include "pre_physics.hpp"
 #include "simulation.hpp"

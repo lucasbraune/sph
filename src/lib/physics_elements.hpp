@@ -1,9 +1,10 @@
 /*
- * File: ps_elements.hpp
+ * File: physics_elements.hpp
  * 
- * This header declares "particle system elements", that is, basic implementations of the Force, 
- * Damping and Collidable interfaces defined in particle_system.hpp. These elements are used to 
- * construct example simulations in examples.hpp/cpp.
+ * A "physics element" is an implementation of Force, Damping or Collidable, three interfaces 
+ * defined in particle_system.hpp. This header and its implementation file define basic physics 
+ * elements, which are used as building blocks for simulations in the files
+ * sample_simulations.hpp/cpp.
  */
 
 #ifndef PS_ELEMENTS_HPP
