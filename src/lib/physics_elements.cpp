@@ -16,15 +16,8 @@ void PointGravity::apply(const vector<Vec2d>& positions, double, double,
   }
 }
 
-double PointGravity::constant() const
-{
-  return intensity_;
-}
-
-void PointGravity::setConstant(double newValue)
-{
-  intensity_ = newValue;
-}
+SurfaceGravity::SurfaceGravity(double magnitude) :
+  acceleration_{0.0, -magnitude} {}
 
 void SurfaceGravity::apply(const vector<Vec2d>&, double, double, vector<Vec2d>& accelerations) const
 {
@@ -36,20 +29,9 @@ void SurfaceGravity::apply(const vector<Vec2d>&, double, double, vector<Vec2d>& 
 LinearDamping::LinearDamping(double dampingConstant) :
   intensity_(dampingConstant)
 {}
-
 Vec2d LinearDamping::acceleration(const Vec2d& velocity, double) const
 {
   return -intensity_ * velocity;
-}
-
-double LinearDamping::constant() const
-{
-  return intensity_;
-}
-
-void LinearDamping::setConstant(double newValue)
-{
-  intensity_ = newValue;
 }
 
 Wall::Wall(const Vec2d& normal, double distanceFromTheOrigin) :
