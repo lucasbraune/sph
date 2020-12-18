@@ -28,20 +28,21 @@ template<class PrePhysicsType /* models implementation of PrePhysics */>
 class PhysicsAdapter : public Physics {
 public:
   PhysicsAdapter(const PrePhysicsType& prePhysics) : 
-    prePhysics_{prePhysics},
-    forcePtrs_{prePhysics_.createForceVector()},
-    collidablePtrs_{prePhysics_.createCollidableVector()} {}
+    prePhysics_{prePhysics}
+  {
+    updatePtrs(*this);
+  }
 
   PhysicsAdapter(const PhysicsAdapter& other) :
-    prePhysics_{other.prePhysics_},
-    forcePtrs_{prePhysics_.createForceVector()},
-    collidablePtrs_{prePhysics_.createCollidableVector()} {}
+    prePhysics_{other.prePhysics_}
+  {
+    updatePtrs(*this);
+  }
 
   PhysicsAdapter(PhysicsAdapter&& other) :
-    prePhysics_{other.prePhysics_},
-    forcePtrs_{prePhysics_.createForceVector()},
-    collidablePtrs_{prePhysics_.createCollidableVector()}
+    prePhysics_{other.prePhysics_}
   {
+    updatePtrs(*this);
     updatePtrs(other);
   }
 
@@ -66,10 +67,13 @@ public:
   const std::vector<const Collidable*>& collidablePtrs() const override { return collidablePtrs_; }
   const Damping* dampingPtr() const override { return prePhysics_.dampingPtr(); }
 
-protected:
-  PrePhysicsType prePhysics_;
-  std::vector<const Force*> forcePtrs_;
-  std::vector<const Collidable*> collidablePtrs_;
+  /**
+   * Return a non-const reference to the PrePhysics object adapted by this adaptor. Warning: this 
+   * adapter should be discarded if the attending PrePhysics object is modified so that the 
+   * pointers returned by its member function createForceVector() are different from those returned
+   * by this adapter's forcePtrs() function.
+   */
+  PrePhysicsType& prePhysics() { return prePhysics_; }
 
 private:
   static void updatePtrs(PhysicsAdapter& adapter)
@@ -77,6 +81,9 @@ private:
     adapter.forcePtrs_ = adapter.prePhysics_.createForceVector();
     adapter.collidablePtrs_ = adapter.prePhysics_.createCollidableVector();
   }
+  PrePhysicsType prePhysics_;
+  std::vector<const Force*> forcePtrs_;
+  std::vector<const Collidable*> collidablePtrs_;
 };
 
 } // end namespace sph 
