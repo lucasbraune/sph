@@ -150,4 +150,38 @@ Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
           VerletIntegrator{timeStep}};
 }
 
+BreakingDamPhysics::BreakingDamPhysics(double gravityConstant,
+                         double dampingConstant,
+                         double pressureConstant,
+                         double interactionRadius) :
+  gravity_{gravityConstant},
+  pressure_{interactionRadius, GasPressure{pressureConstant}},
+  damping_{dampingConstant},
+  leftWall_{Vec2d{1.0, 0.0},  WALL_OFFSET_},
+  bottomWall_{Vec2d{0.0, 1.0},  WALL_OFFSET_},
+  rightWall_{Vec2d{-1.0, 0.0},  0.0} {}
+
+const vector<const Collidable*> BreakingDamPhysics::createCollidableVector() const
+{
+  return {&leftWall_, &bottomWall_, &rightWall_};
+}
+
+Simulation<PhysicsAdapter<BreakingDamPhysics>> createBreakingDamSimulation(
+    size_t numberOfParticles,
+    double totalMass,
+    Rectangle region,
+    double gravityConstant,
+    double dampingConstant,
+    double pressureConstant,
+    double timeStep)
+{
+  return {particlesInRandomPositions(numberOfParticles, totalMass, region),
+          PhysicsAdapter<BreakingDamPhysics>{
+              BreakingDamPhysics{gravityConstant,
+                          dampingConstant,
+                          pressureConstant, 
+                          interactionRadius(numberOfParticles)}},
+          VerletIntegrator{timeStep}};
+}
+
 } // end namespace sph 

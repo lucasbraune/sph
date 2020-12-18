@@ -54,6 +54,7 @@ class Wall : public Collidable {
 public:
   Wall(const Vec2d& normal, // must be nonzero
        double distanceFromTheOrigin);
+  void move(const Vec2d& displacement) { ptOnWall_ += displacement; }
 
 private:
   void resolveCollisions(std::vector<Vec2d>& positions, std::vector<Vec2d>& velocities,

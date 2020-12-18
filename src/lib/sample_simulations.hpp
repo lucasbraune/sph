@@ -93,10 +93,40 @@ struct WellPhysics : public PrePhysics {
   SurfaceGravity gravity_;
   PressureForce pressure_;
   LinearDamping damping_;
-  std::vector<Wall> walls_;
+  const std::vector<Wall> walls_;
 };
 
 Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
+    size_t numberOfParticles = 250,
+    double totalMass = 2.0,
+    Rectangle region = {-1.0, -1.0, 1.0, 1.0},
+    double gravityAcceleration = 10.0,
+    double dampingConstant = 0.05,
+    double pressureConstant = 1.0,
+    double timeStep = 0.01);
+
+struct BreakingDamPhysics : public PrePhysics {
+  BreakingDamPhysics(double gravityAcceleration,
+              double dampingConstant,
+              double pressureConstant,
+              double interactionRadius);
+
+  const std::vector<const Force*> createForceVector() const override
+  {
+    return {&gravity_, &pressure_};
+  }
+  const std::vector<const Collidable*> createCollidableVector() const override; 
+  const Damping* dampingPtr() const override {return &damping_; }
+  void breakDam() { rightWall_.move(Vec2d{WALL_OFFSET_, 0.0}); }
+
+  SurfaceGravity gravity_;
+  PressureForce pressure_;
+  LinearDamping damping_;
+  Wall leftWall_, bottomWall_, rightWall_;
+  static constexpr double WALL_OFFSET_ = 0.9;
+};
+
+Simulation<PhysicsAdapter<BreakingDamPhysics>> createBreakingDamSimulation(
     size_t numberOfParticles = 250,
     double totalMass = 2.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},

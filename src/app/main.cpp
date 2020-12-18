@@ -11,12 +11,12 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-// auto simulation = createCentralGravitySimulation();
 // auto simulation = createWallBouncingSimulation();
 // auto simulation = createToyStarSimulation();
-auto simulation = createWellSimulation();
-const View view(simulation);
-const Controller controller(simulation);
+// auto simulation = createWellSimulation();
+auto simulation = createBreakingDamSimulation();
+const auto view = View{simulation};
+const auto controller = Controller{simulation};
 
 int main(int argc, char** argv)
 {
