@@ -4,6 +4,7 @@
 #include <chrono>
 #include <memory>
 #include "particle_system.hpp"
+#include "pre_physics.hpp"
 
 namespace sph {
 
@@ -41,16 +42,16 @@ private:
 
 } // end namespace detail
 
-template<class PhysicsType,                       // must be convertible to Physics&
+template<class PrePhysicsType,                    // models implementation of PrePhysics
          class IntegratorType = VerletIntegrator> // models implementation of TimeIntegrator
 class Simulation : public SimulationInterface {
 public:
   Simulation(const ParticleSystem& ps,
-             const PhysicsType& physics,
+             const PrePhysicsType& prePhysics,
              const IntegratorType& integrator,
              double simulationSpeed = 1.0, int fps = 60) :
     ps_{ps},
-    physics_{physics},
+    physics_{prePhysics},
     integrator_{integrator},
     synchronizer_{},
     simulationSpeed_{simulationSpeed},
@@ -84,11 +85,17 @@ public:
     paused_ = !paused_;
   }
 
+protected:
+  PrePhysicsType& prePhysics() { return physics_.prePhysics(); }
+  
+  // TODO: Document when this should be called.
+  void updateInternalPointers() { physics_.updatePtrs(); }
+
 private:
   void synchronize() { synchronizer_.synchronize(ps_.time); }
 
   ParticleSystem ps_;
-  PhysicsType physics_;
+  PhysicsAdapter<PrePhysicsType> physics_;
   IntegratorType integrator_;
   detail::Synchronizer synchronizer_;
   double simulationSpeed_;

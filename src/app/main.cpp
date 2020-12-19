@@ -16,7 +16,6 @@ void keyboard(unsigned char key, int x, int y);
 // auto simulation = createWellSimulation();
 auto simulation = createBreakingDamSimulation();
 const auto view = View{simulation};
-const auto controller = Controller{simulation};
 
 int main(int argc, char** argv)
 {
@@ -52,5 +51,5 @@ void idle()
 
 void keyboard(unsigned char c, int, int)
 {
-  controller.handleKeyboardInput(c);
+  handleKeyboardInput(simulation, c);
 }

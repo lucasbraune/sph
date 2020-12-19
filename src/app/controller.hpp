@@ -2,15 +2,9 @@
 #define CONTROLLER_HPP
 
 #include "simulation.hpp"
+#include "sample_simulations.hpp"
 
-class Controller {
-public:
-  Controller(sph::SimulationInterface& simulation);
-  void handleKeyboardInput(char c) const;
-
-private:
-  sph::SimulationInterface& simulation_;
-};
-
+void handleKeyboardInput(sph::SimulationInterface& sim, char c);
+void handleKeyboardInput(sph::BreakingDamSimulation& sim, char c);
 
 #endif

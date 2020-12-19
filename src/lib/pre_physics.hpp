@@ -30,34 +30,34 @@ public:
   PhysicsAdapter(const PrePhysicsType& prePhysics) : 
     prePhysics_{prePhysics}
   {
-    updatePtrs(*this);
+    updatePtrs();
   }
 
   PhysicsAdapter(const PhysicsAdapter& other) :
     prePhysics_{other.prePhysics_}
   {
-    updatePtrs(*this);
+    updatePtrs();
   }
 
   PhysicsAdapter(PhysicsAdapter&& other) :
     prePhysics_{other.prePhysics_}
   {
-    updatePtrs(*this);
-    updatePtrs(other);
+    updatePtrs();
+    other.updatePtrs();
   }
 
   PhysicsAdapter& operator=(const PhysicsAdapter& other)
   {
     prePhysics_ = other.prePhysics_;
-    updatePtrs(*this);
+    updatePtrs();
     return *this;
   }
 
   PhysicsAdapter& operator=(PhysicsAdapter&& other)
   {
     prePhysics_ = other.prePhysics_;
-    updatePtrs(*this);
-    updatePtrs(other);
+    updatePtrs();
+    other.updatePtrs();
     return *this;
   }
   
@@ -68,19 +68,21 @@ public:
   const Damping* dampingPtr() const override { return prePhysics_.dampingPtr(); }
 
   /**
-   * Return a non-const reference to the PrePhysics object adapted by this adaptor. Warning: this 
-   * adapter should be discarded if the attending PrePhysics object is modified so that the 
-   * pointers returned by its member function createForceVector() are different from those returned
-   * by this adapter's forcePtrs() function.
+   * Returns a non-const reference to the adaptee.
+   * 
+   * Warning: The user of this class is responsible for calling the updatePtrs() function each time 
+   * the adaptee is modifed in a way that changes the pointers returned by its createForceVector()
+   * and createCollidableVector() functions. 
    */
   PrePhysicsType& prePhysics() { return prePhysics_; }
+  void updatePtrs()
+  {
+    forcePtrs_ = prePhysics_.createForceVector();
+    collidablePtrs_ = prePhysics_.createCollidableVector();
+  }
 
 private:
-  static void updatePtrs(PhysicsAdapter& adapter)
-  {
-    adapter.forcePtrs_ = adapter.prePhysics_.createForceVector();
-    adapter.collidablePtrs_ = adapter.prePhysics_.createCollidableVector();
-  }
+  
   PrePhysicsType prePhysics_;
   std::vector<const Force*> forcePtrs_;
   std::vector<const Collidable*> collidablePtrs_;

@@ -3,7 +3,6 @@
 
 #include "physics_elements.hpp"
 #include "pressure_force.hpp"
-#include "pre_physics.hpp"
 #include "simulation.hpp"
 
 namespace sph {
@@ -22,7 +21,7 @@ struct CentralGravityPhysics : public PrePhysics {
   LinearDamping damping_;
 };
 
-Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation(
+Simulation<CentralGravityPhysics> createCentralGravitySimulation(
     size_t numberOfParticles = 1000,
     double totalMass = 1.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
@@ -42,7 +41,7 @@ struct WallBouncingPhysics : public PrePhysics {
   std::vector<Wall> walls_;
 };
 
-Simulation<PhysicsAdapter<WallBouncingPhysics>> createWallBouncingSimulation(
+Simulation<WallBouncingPhysics> createWallBouncingSimulation(
     size_t numberOfParticles = 1000,
     double totalMass = 1.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
@@ -68,7 +67,7 @@ struct ToyStarPhysics : public PrePhysics {
   PressureForce pressure_;
 };
 
-Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
+Simulation<ToyStarPhysics> createToyStarSimulation(
     size_t numberOfParticles = 250,
     double starMass = 2.0,
     double starRadius = 0.75,
@@ -96,7 +95,7 @@ struct WellPhysics : public PrePhysics {
   const std::vector<Wall> walls_;
 };
 
-Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
+Simulation<WellPhysics> createWellSimulation(
     size_t numberOfParticles = 250,
     double totalMass = 2.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
@@ -107,9 +106,9 @@ Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
 
 struct BreakingDamPhysics : public PrePhysics {
   BreakingDamPhysics(double gravityAcceleration,
-              double dampingConstant,
-              double pressureConstant,
-              double interactionRadius);
+                     double dampingConstant,
+                     double pressureConstant,
+                     double interactionRadius);
 
   const std::vector<const Force*> createForceVector() const override
   {
@@ -126,7 +125,21 @@ struct BreakingDamPhysics : public PrePhysics {
   static constexpr double WALL_OFFSET_ = 0.9;
 };
 
-Simulation<PhysicsAdapter<BreakingDamPhysics>> createBreakingDamSimulation(
+class BreakingDamSimulation : public Simulation<BreakingDamPhysics> {
+public:
+  BreakingDamSimulation(const ParticleSystem& ps,
+                        const BreakingDamPhysics& prePhysics,
+                        const VerletIntegrator& integrator,
+                        double simulationSpeed = 1.0, int fps = 60);
+
+  void breakDam() { prePhysics().breakDam(); }
+  void increaseDamping();
+  void decreaseDamping();
+  void increaseGravity();
+  void decreaseGravity();
+};
+
+BreakingDamSimulation createBreakingDamSimulation(
     size_t numberOfParticles = 250,
     double totalMass = 2.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},

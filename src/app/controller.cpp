@@ -2,23 +2,41 @@
 
 using namespace sph;
 
-Controller::Controller(SimulationInterface& simulation) :
-  simulation_(simulation)
-{}
-
-void Controller::handleKeyboardInput(char c) const
+static void helper(SimulationInterface& simulation, char c)
 {
   switch (c) {
   case 'p':
-    // Fall through
   case 'P':
-    simulation_.togglePause();
+    simulation.togglePause();
     break;
   case 's':
-    simulation_.decreaseTargetSpeed();
+    simulation.decreaseTargetSpeed();
     break;
   case 'S':
-    simulation_.increaseTargetSpeed();
+    simulation.increaseTargetSpeed();
     break;
+  }
+}
+
+void handleKeyboardInput(SimulationInterface& simulation, char c)
+{
+  return helper(simulation, c);
+}
+
+void handleKeyboardInput(BreakingDamSimulation& simulation, char c)
+{
+  switch (c) {
+  case 'b':
+  case 'B':
+    simulation.breakDam();
+    break;
+  case 'd':
+    simulation.decreaseDamping();
+    break;
+  case 'D':
+    simulation.increaseDamping();
+    break;
+  default:
+    helper(simulation, c);
   }
 }

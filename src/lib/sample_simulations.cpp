@@ -27,7 +27,7 @@ CentralGravityPhysics::CentralGravityPhysics(double gravityConstant, double damp
   gravity_{gravityConstant},
   damping_{dampingConstant} {}
 
-Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation(
+Simulation<CentralGravityPhysics> createCentralGravitySimulation(
     size_t numberOfParticles,
     double totalMass,
     Rectangle region,
@@ -36,8 +36,7 @@ Simulation<PhysicsAdapter<CentralGravityPhysics>> createCentralGravitySimulation
     double timeStep)
 {
   return {particlesInRandomPositions(numberOfParticles, totalMass, region),
-          PhysicsAdapter<CentralGravityPhysics>{
-              CentralGravityPhysics{gravityConstant, dampingConstant}},
+          CentralGravityPhysics{gravityConstant, dampingConstant},
           VerletIntegrator{timeStep}};
 }
 
@@ -59,7 +58,7 @@ const vector<const Collidable*> WallBouncingPhysics::createCollidableVector() co
   return result;
 }
 
-Simulation<PhysicsAdapter<WallBouncingPhysics>> createWallBouncingSimulation(
+Simulation<WallBouncingPhysics> createWallBouncingSimulation(
     size_t numberOfParticles,
     double totalMass,
     Rectangle region,
@@ -68,8 +67,7 @@ Simulation<PhysicsAdapter<WallBouncingPhysics>> createWallBouncingSimulation(
     double timeStep)
 {
   return {particlesInRandomPositions(numberOfParticles, totalMass, region),
-          PhysicsAdapter<WallBouncingPhysics>{
-              WallBouncingPhysics{gravityConstant, dampingConstant}},
+          WallBouncingPhysics{gravityConstant, dampingConstant},
           VerletIntegrator{timeStep}};
 }
 
@@ -92,7 +90,7 @@ static double interactionRadius(double numberOfParticles)
   return sqrt(10.0 / numberOfParticles);
 }
 
-Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
+Simulation<ToyStarPhysics> createToyStarSimulation(
     size_t numberOfParticles,
     double starMass,
     double starRadius,
@@ -102,11 +100,10 @@ Simulation<PhysicsAdapter<ToyStarPhysics>> createToyStarSimulation(
     double timeStep)
 {
   return {particlesInRandomPositions(numberOfParticles, starMass, initialRegion),
-          PhysicsAdapter<ToyStarPhysics>{
-              ToyStarPhysics{gravityConstant(starMass, pressureConstant, starRadius),
-                             dampingConstant,
-                             pressureConstant,
-                             interactionRadius(numberOfParticles)}},
+          ToyStarPhysics{gravityConstant(starMass, pressureConstant, starRadius),
+                         dampingConstant,
+                         pressureConstant,
+                         interactionRadius(numberOfParticles)},
           VerletIntegrator{timeStep}};
 }
 
@@ -132,7 +129,7 @@ const vector<const Collidable*> WellPhysics::createCollidableVector() const
   return result;
 }
 
-Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
+Simulation<WellPhysics> createWellSimulation(
     size_t numberOfParticles,
     double totalMass,
     Rectangle region,
@@ -142,11 +139,10 @@ Simulation<PhysicsAdapter<WellPhysics>> createWellSimulation(
     double timeStep)
 {
   return {particlesInRandomPositions(numberOfParticles, totalMass, region),
-          PhysicsAdapter<WellPhysics>{
-              WellPhysics{gravityConstant,
-                          dampingConstant,
-                          pressureConstant, 
-                          interactionRadius(numberOfParticles)}},
+          WellPhysics{gravityConstant,
+                      dampingConstant,
+                      pressureConstant, 
+                      interactionRadius(numberOfParticles)},
           VerletIntegrator{timeStep}};
 }
 
@@ -166,7 +162,37 @@ const vector<const Collidable*> BreakingDamPhysics::createCollidableVector() con
   return {&leftWall_, &bottomWall_, &rightWall_};
 }
 
-Simulation<PhysicsAdapter<BreakingDamPhysics>> createBreakingDamSimulation(
+BreakingDamSimulation::BreakingDamSimulation(const ParticleSystem& ps,
+                                             const BreakingDamPhysics& prePhysics,
+                                             const VerletIntegrator& integrator,
+                                             double simulationSpeed, int fps) :
+    Simulation<BreakingDamPhysics>{ps, prePhysics, integrator, simulationSpeed, fps} {}
+
+void BreakingDamSimulation::increaseDamping()
+{
+  auto& damping = prePhysics().damping_;
+  damping.setConstant(2.0 * damping.constant());
+}
+
+void BreakingDamSimulation::decreaseDamping()
+{
+  auto& damping = prePhysics().damping_;
+  damping.setConstant(0.5 * damping.constant());
+}
+
+void BreakingDamSimulation::increaseGravity()
+{
+  auto& gravity = prePhysics().gravity_;
+  gravity.setMagnitude(2.0 * gravity.magnitude());
+}
+
+void BreakingDamSimulation::decreaseGravity()
+{
+  auto& gravity = prePhysics().gravity_;
+  gravity.setMagnitude(0.5 * gravity.magnitude());
+}
+
+BreakingDamSimulation createBreakingDamSimulation(
     size_t numberOfParticles,
     double totalMass,
     Rectangle region,
@@ -176,11 +202,10 @@ Simulation<PhysicsAdapter<BreakingDamPhysics>> createBreakingDamSimulation(
     double timeStep)
 {
   return {particlesInRandomPositions(numberOfParticles, totalMass, region),
-          PhysicsAdapter<BreakingDamPhysics>{
-              BreakingDamPhysics{gravityConstant,
-                          dampingConstant,
-                          pressureConstant, 
-                          interactionRadius(numberOfParticles)}},
+          BreakingDamPhysics{gravityConstant,
+                             dampingConstant,
+                             pressureConstant, 
+                             interactionRadius(numberOfParticles)},
           VerletIntegrator{timeStep}};
 }
 
