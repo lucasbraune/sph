@@ -59,14 +59,6 @@ void TimeIntegrator::integrate(ParticleSystem& ps, Physics& physics, double dura
   }
 }
 
-template<typename Container, typename Value>
-void setAll(Container& cont, const Value& val)
-{
-  for (auto& x : cont) {
-    x = val;
-  }
-}
-
 void EulerIntegrator::step(ParticleSystem& ps, Physics& physics)
 {
   ps.time += timeStep_;
@@ -77,7 +69,7 @@ void EulerIntegrator::step(ParticleSystem& ps, Physics& physics)
   for (auto collidablePtr : physics.collidablePtrs()) {
     collidablePtr->resolveCollisions(ps);
   }
-  setAll(ps.accelerations, ZERO_VECTOR);
+  std::fill(ps.accelerations.begin(), ps.accelerations.end(), ZERO_VECTOR);
   for (auto forcePtr : physics.forcePtrs()) {
     forcePtr->apply(ps);
   }
@@ -112,7 +104,7 @@ void VerletIntegrator::step(ParticleSystem& ps, Physics& physics)
     for (size_t i=0; i<ps.numberOfParticles; i++) {
       ps.velocities[i] += 0.5 * timeStep_ * ps.accelerations[i];
     }
-    setAll(ps.accelerations, ZERO_VECTOR);
+    std::fill(ps.accelerations.begin(), ps.accelerations.end(), ZERO_VECTOR);
     for (auto forcePtr : physics.forcePtrs()) {
       forcePtr->apply(ps);
     }
@@ -122,7 +114,7 @@ void VerletIntegrator::step(ParticleSystem& ps, Physics& physics)
   } else {
     static auto nextForceAcc = std::vector<Vec2d>(ps.numberOfParticles);
     nextForceAcc.resize(ps.numberOfParticles); // does not decrease capacity
-    setAll(nextForceAcc, ZERO_VECTOR);
+    std::fill(nextForceAcc.begin(), nextForceAcc.end(), ZERO_VECTOR);
     for (auto forcePtr : physics.forcePtrs()) {
       forcePtr->apply(ps, nextForceAcc);
     }
