@@ -37,7 +37,7 @@ Simulation<CentralGravityPhysics> createCentralGravitySimulation(
 {
   return {particlesInRandomPositions(numberOfParticles, totalMass, region),
           CentralGravityPhysics{gravityConstant, dampingConstant},
-          VerletIntegrator{timeStep}};
+          Verlet{timeStep}};
 }
 
 WallBouncingPhysics::WallBouncingPhysics(double gravityConstant, double dampingConstant) :
@@ -66,7 +66,7 @@ Simulation<WallBouncingPhysics> createWallBouncingSimulation(
 {
   return {particlesInRandomPositions(numberOfParticles, totalMass, region),
           WallBouncingPhysics{gravityConstant, dampingConstant},
-          VerletIntegrator{timeStep}};
+          Verlet{timeStep}};
 }
 
 ToyStarPhysics::ToyStarPhysics(double gravityConstant,
@@ -102,7 +102,7 @@ Simulation<ToyStarPhysics> createToyStarSimulation(
                          dampingConstant,
                          pressureConstant,
                          interactionRadius(numberOfParticles)},
-          VerletIntegrator{timeStep}};
+          Verlet{timeStep}};
 }
 
 WellPhysics::WellPhysics(double gravityConstant,
@@ -139,7 +139,7 @@ Simulation<WellPhysics> createWellSimulation(
                       dampingConstant,
                       pressureConstant, 
                       interactionRadius(numberOfParticles)},
-          VerletIntegrator{timeStep}};
+          Verlet{timeStep}};
 }
 
 BreakingDamPhysics::BreakingDamPhysics(double gravityConstant,
@@ -162,7 +162,7 @@ void BreakingDamPhysics::resolveCollisions(ParticleSystem& ps) const
 
 BreakingDamSimulation::BreakingDamSimulation(const ParticleSystem& ps,
                                              const BreakingDamPhysics& physics,
-                                             const VerletIntegrator& integrator,
+                                             const Verlet& integrator,
                                              double simulationSpeed, int fps) :
     Simulation<BreakingDamPhysics>{ps, physics, integrator, simulationSpeed, fps} {}
 
@@ -204,7 +204,7 @@ BreakingDamSimulation createBreakingDamSimulation(
                              dampingConstant,
                              pressureConstant, 
                              interactionRadius(numberOfParticles)},
-          VerletIntegrator{timeStep}};
+          Verlet{timeStep}};
 }
 
 } // end namespace sph 

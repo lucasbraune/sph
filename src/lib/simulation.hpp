@@ -41,8 +41,8 @@ private:
 
 } // end namespace detail
 
-template<class PhysicsType,                       // models implementation of Physics
-         class IntegratorType = VerletIntegrator> // models implementation of TimeIntegrator
+template<class PhysicsType,                 // models implementation of Physics
+         class IntegratorType = Verlet>     // models implementation of TimeIntegrator
 class Simulation : public SimulationInterface {
 public:
   Simulation(const ParticleSystem& ps,

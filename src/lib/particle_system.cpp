@@ -38,7 +38,7 @@ static void fillWithZeros(std::vector<Vec2d>& v) {
   std::fill(v.begin(), v.end(), ZERO_VECTOR);
 }
 
-void EulerIntegrator::step(ParticleSystem& ps, Physics& physics)
+void Euler::step(ParticleSystem& ps, Physics& physics)
 {
   ps.time += timeStep_;
   for (size_t i=0; i<ps.numberOfParticles; i++) {
@@ -51,7 +51,7 @@ void EulerIntegrator::step(ParticleSystem& ps, Physics& physics)
   physics.applyDamping(ps);
 }
 
-void VerletIntegrator::step(ParticleSystem& ps, Physics& physics)
+void Verlet::step(ParticleSystem& ps, Physics& physics)
 {
   ps.time += timeStep_;
   for (size_t i=0; i<ps.numberOfParticles; i++) {

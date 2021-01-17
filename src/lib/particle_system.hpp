@@ -37,18 +37,18 @@ private:
   virtual void step(ParticleSystem& ps, Physics& physics) = 0;
 };
 
-class EulerIntegrator : public TimeIntegrator {
+class Euler : public TimeIntegrator {
 public:
-  EulerIntegrator(double timeStep) : timeStep_{timeStep} {};
+  Euler(double timeStep) : timeStep_{timeStep} {};
   
 private:
   void step(ParticleSystem& ps, Physics& physics) override;
   const double timeStep_;
 };
 
-class VerletIntegrator : public TimeIntegrator {
+class Verlet : public TimeIntegrator {
 public:
-  VerletIntegrator(double timeStep) : timeStep_{timeStep} {};
+  Verlet(double timeStep) : timeStep_{timeStep} {};
   
 private:
   void step(ParticleSystem& ps, Physics& physics) override;
