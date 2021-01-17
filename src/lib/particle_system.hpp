@@ -18,8 +18,11 @@ struct ParticleSystem {
 
 struct Physics {
   virtual ~Physics() {}
+  // Adds the effect of velocity-independent forces to the accelerations of particles
   virtual void applyForces(ParticleSystem& ps) const = 0;
+  // Adds the effect of damping to the accelerations of particles
   virtual void applyDamping(ParticleSystem& ps) const = 0;
+  // Moves particles to resolve collisions
   virtual void resolveCollisions(ParticleSystem& ps) const = 0;
 };
 

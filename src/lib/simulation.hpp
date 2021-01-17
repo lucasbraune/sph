@@ -2,7 +2,7 @@
 #define SIMULATION_HPP
 
 #include <chrono>
-#include <memory>
+#include <type_traits>
 #include "particle_system.hpp"
 
 namespace sph {
@@ -41,9 +41,11 @@ private:
 
 } // end namespace detail
 
-template<class PhysicsType,                 // models implementation of Physics
-         class IntegratorType = Verlet>     // models implementation of TimeIntegrator
+template<class PhysicsType, class IntegratorType = Verlet>
 class Simulation : public SimulationInterface {
+  static_assert(std::is_base_of_v<Physics, PhysicsType>);
+  static_assert(std::is_base_of_v<TimeIntegrator, IntegratorType>);
+  
 public:
   Simulation(const ParticleSystem& ps,
              const PhysicsType& physics,
@@ -57,28 +59,28 @@ public:
     fps_{fps},
     paused_{true} {}
   
-  const std::vector<Vec2d>& positions() const { return ps_.positions; }
-  double time() const { return ps_.time; }
-  double targetSpeed() const { return simulationSpeed_; }
-  bool paused() const { return paused_; }
-  
-  void computeNextFrame()
+  const std::vector<Vec2d>& positions() const final { return ps_.positions; }
+  double time() const final { return ps_.time; }
+  double targetSpeed() const final { return simulationSpeed_; }
+  bool paused() const final { return paused_; }
+
+  void computeNextFrame() final 
   {
     if (!paused()) integrator_.integrate(ps_, physics_, simulationSpeed_ / fps_);
   }
 
-  void waitForNextFrame()
+  void waitForNextFrame() final
   {
     if (!paused()) synchronizer_.waitUntil(ps_.time, simulationSpeed_);
   }
 
-  void setTargetSpeed(double newSpeed)
+  void setTargetSpeed(double newSpeed) final
   {
     synchronize();
     simulationSpeed_ = newSpeed;
   }
 
-  void togglePause()
+  void togglePause() final
   {
     if (paused()) synchronize();
     paused_ = !paused_;
@@ -86,10 +88,11 @@ public:
 
 private:
   void synchronize() { synchronizer_.synchronize(ps_.time); }
-  
   ParticleSystem ps_;
+  
 protected:
   PhysicsType physics_;
+
 private:
   IntegratorType integrator_;
   detail::Synchronizer synchronizer_;
