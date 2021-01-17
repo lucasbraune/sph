@@ -53,6 +53,10 @@ private:
 
 struct Physics {
   virtual ~Physics() {}
+  void applyForces(ParticleSystem& ps) const;
+  void applyDamping(ParticleSystem& ps) const;
+  void resolveCollisions(ParticleSystem& ps) const;
+
   // Returns a vector of non-null pointers
   virtual const std::vector<const Force*>& forcePtrs() const = 0;
   // Returns a vector of non-null pointers

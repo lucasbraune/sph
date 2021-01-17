@@ -51,12 +51,38 @@ ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions, double par
   accelerations(numberOfParticles)  // same!
 {}
 
+void Physics::applyForces(ParticleSystem& ps) const
+{
+  for (auto force : forcePtrs()) {
+    force->apply(ps);
+  }
+}
+
+void Physics::applyDamping(ParticleSystem& ps) const
+{
+  auto damping = dampingPtr();
+  if (damping) {
+    damping->apply(ps);
+  }
+}
+
+void Physics::resolveCollisions(ParticleSystem& ps) const
+{
+  for (auto collidable : collidablePtrs()) {
+    collidable->resolveCollisions(ps);
+  }
+}
+
 void TimeIntegrator::integrate(ParticleSystem& ps, Physics& physics, double duration)
 {
   double target = ps.time + duration;
   while (ps.time < target) {
     step(ps, physics);
   }
+}
+
+static void fillWithZeros(std::vector<Vec2d>& v) {
+  std::fill(v.begin(), v.end(), ZERO_VECTOR);
 }
 
 void EulerIntegrator::step(ParticleSystem& ps, Physics& physics)
@@ -66,26 +92,10 @@ void EulerIntegrator::step(ParticleSystem& ps, Physics& physics)
     ps.positions[i] += timeStep_ * ps.velocities[i];
     ps.velocities[i] += timeStep_ * ps.accelerations[i];
   }
-  for (auto collidablePtr : physics.collidablePtrs()) {
-    collidablePtr->resolveCollisions(ps);
-  }
-  std::fill(ps.accelerations.begin(), ps.accelerations.end(), ZERO_VECTOR);
-  for (auto forcePtr : physics.forcePtrs()) {
-    forcePtr->apply(ps);
-  }
-  if (physics.dampingPtr()) {
-    physics.dampingPtr()->apply(ps);
-  }
-}
-
-// Used in VerletIntegrator::step
-static Vec2d nextVelocity(Vec2d currVel, Vec2d currAcc, Vec2d nextForceAcc,
-                          const Damping& damping, double mass, double timeStep)
-{
-  auto approxVel = currVel + timeStep * currAcc;
-  approxVel += (0.5 * timeStep) * (nextForceAcc + damping.acceleration(approxVel, mass) - currAcc);
-  return currVel + (0.5 * timeStep) *
-      (currAcc + nextForceAcc + damping.acceleration(approxVel, mass));
+  physics.resolveCollisions(ps);
+  fillWithZeros(ps.accelerations);
+  physics.applyForces(ps);
+  physics.applyDamping(ps);
 }
 
 void VerletIntegrator::step(ParticleSystem& ps, Physics& physics)
@@ -95,36 +105,30 @@ void VerletIntegrator::step(ParticleSystem& ps, Physics& physics)
     ps.positions[i] += timeStep_ * ps.velocities[i] +
                        (0.5 * timeStep_ * timeStep_) * ps.accelerations[i];
   }
-  for (auto collidablePtr : physics.collidablePtrs()) {
-    collidablePtr->resolveCollisions(ps);
+  physics.resolveCollisions(ps);
+  
+  static std::vector<Vec2d> prevVel, prevAcc, currForceAcc;
+  prevVel = ps.velocities;
+  prevAcc = ps.accelerations;
+  fillWithZeros(ps.accelerations);
+  physics.applyForces(ps);
+  swap(currForceAcc, ps.accelerations); // ps.accelerations is reassigned below
+
+  // Approximate velocity
+  for (size_t i=0; i<ps.numberOfParticles; ++i) {
+    ps.velocities[i] += timeStep_ * prevAcc[i];
+  }
+  for (size_t n=0; n<2; ++n) {
+    // Improve velocity approximation
+    ps.accelerations = currForceAcc;
+    physics.applyDamping(ps);
+    for (size_t i=0; i<ps.numberOfParticles; ++i) {
+      ps.velocities[i] = prevVel[i] + 0.5 * timeStep_ * (prevAcc[i] + ps.accelerations[i]);
+    }
   }
   
-  if (!physics.dampingPtr()) {
-    // TODO: Give the user of this class the option to skip this test at compile time.
-    for (size_t i=0; i<ps.numberOfParticles; i++) {
-      ps.velocities[i] += 0.5 * timeStep_ * ps.accelerations[i];
-    }
-    std::fill(ps.accelerations.begin(), ps.accelerations.end(), ZERO_VECTOR);
-    for (auto forcePtr : physics.forcePtrs()) {
-      forcePtr->apply(ps);
-    }
-    for (size_t i=0; i<ps.numberOfParticles; i++) {
-      ps.velocities[i] += 0.5 * timeStep_ * ps.accelerations[i];
-    }
-  } else {
-    static auto nextForceAcc = std::vector<Vec2d>(ps.numberOfParticles);
-    nextForceAcc.resize(ps.numberOfParticles); // does not decrease capacity
-    std::fill(nextForceAcc.begin(), nextForceAcc.end(), ZERO_VECTOR);
-    for (auto forcePtr : physics.forcePtrs()) {
-      forcePtr->apply(ps, nextForceAcc);
-    }
-    for (size_t i=0; i<ps.numberOfParticles; i++) {
-      ps.velocities[i] = nextVelocity(ps.velocities[i], ps.accelerations[i], nextForceAcc[i],
-                                      *physics.dampingPtr(), ps.particleMass, timeStep_);
-      ps.accelerations[i] = nextForceAcc[i] +
-                            physics.dampingPtr()->acceleration(ps.velocities[i], ps.particleMass);
-    }
-  }
+  ps.accelerations = currForceAcc;
+  physics.applyDamping(ps);
 }
 
 } // end namespace sph
