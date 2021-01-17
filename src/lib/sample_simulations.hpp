@@ -123,7 +123,7 @@ public:
                         const Verlet& integrator,
                         double simulationSpeed = 1.0, int fps = 60);
 
-  void breakDam() { physics().breakDam(); }
+  void breakDam() { physics_.breakDam(); }
   void increaseDamping();
   void decreaseDamping();
   void increaseGravity();

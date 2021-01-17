@@ -84,14 +84,13 @@ public:
     paused_ = !paused_;
   }
 
-protected:
-  PhysicsType& physics() { return physics_; }
-
 private:
   void synchronize() { synchronizer_.synchronize(ps_.time); }
-
+  
   ParticleSystem ps_;
+protected:
   PhysicsType physics_;
+private:
   IntegratorType integrator_;
   detail::Synchronizer synchronizer_;
   double simulationSpeed_;

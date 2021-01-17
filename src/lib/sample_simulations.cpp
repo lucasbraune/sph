@@ -168,25 +168,25 @@ BreakingDamSimulation::BreakingDamSimulation(const ParticleSystem& ps,
 
 void BreakingDamSimulation::increaseDamping()
 {
-  auto& damping = physics().damping_;
+  auto& damping = physics_.damping_;
   damping.setConstant(2.0 * damping.constant());
 }
 
 void BreakingDamSimulation::decreaseDamping()
 {
-  auto& damping = physics().damping_;
+  auto& damping = physics_.damping_;
   damping.setConstant(0.5 * damping.constant());
 }
 
 void BreakingDamSimulation::increaseGravity()
 {
-  auto& gravity = physics().gravity_;
+  auto& gravity = physics_.gravity_;
   gravity.setMagnitude(2.0 * gravity.magnitude());
 }
 
 void BreakingDamSimulation::decreaseGravity()
 {
-  auto& gravity = physics().gravity_;
+  auto& gravity = physics_.gravity_;
   gravity.setMagnitude(0.5 * gravity.magnitude());
 }
 
