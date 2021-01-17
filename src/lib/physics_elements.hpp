@@ -1,3 +1,15 @@
+/*
+ * File: physics_elements.hpp
+ * 
+ * This file declares the Force, Damping and Collidable interfaces, each of which
+ * isolates a functionality from the complicated Physics interface defined in the file
+ * particle_system.hpp.
+ * 
+ * Sample implementataions of Force, Damping and Collidable are provided. Such
+ * implementations can be used as bulding blocks for implementations of Physics interface;
+ * see sample_simulations.hpp/cpp for examples.
+ */
+
 #ifndef PS_ELEMENTS_HPP
 #define PS_ELEMENTS_HPP
 
