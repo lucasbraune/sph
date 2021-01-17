@@ -6,17 +6,12 @@
 namespace sph {
 
 struct ParticleSystem {
-  ParticleSystem(const std::vector<Vec2d>& initialPositions,
-                 const std::vector<Vec2d>& initialVelocities,
-                 const std::vector<Vec2d>& initialAccelerations,
-                 double particleMass);
-  ParticleSystem(const std::vector<Vec2d>& initialPositions, double particleMass);
+  ParticleSystem(const std::vector<Vec2d>& pos, const std::vector<Vec2d>& vel,
+                 const std::vector<Vec2d>& acc, double mass);
+  ParticleSystem(const std::vector<Vec2d>& pos, double mass);
   
-  // Properties
   const size_t numberOfParticles;
   const double particleMass;
-
-  // State
   std::vector<Vec2d> positions, velocities, accelerations;
   double time;
 };

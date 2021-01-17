@@ -5,23 +5,21 @@ using std::vector;
 
 namespace sph {
 
-ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions,
-                               const vector<Vec2d>& initialVelocities,
-                               const vector<Vec2d>& initialAccelerations,
-                               double particleMass) :
-  numberOfParticles{initialPositions.size()},
-  particleMass{particleMass},
-  positions{initialPositions},
-  velocities{initialVelocities},
-  accelerations{initialAccelerations}
+ParticleSystem::ParticleSystem(const vector<Vec2d>& pos, const vector<Vec2d>& vel,
+                               const vector<Vec2d>& acc, double mass) :
+  numberOfParticles{pos.size()},
+  particleMass{mass},
+  positions{pos},
+  velocities{vel},
+  accelerations{acc}
 {
   // TODO: handle error where the specified vectors have different lengths.
 }
 
-ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions, double particleMass) :
-  numberOfParticles{initialPositions.size()},
-  particleMass{particleMass},
-  positions{initialPositions},
+ParticleSystem::ParticleSystem(const vector<Vec2d>& pos, double mass) :
+  numberOfParticles{pos.size()},
+  particleMass{mass},
+  positions{pos},
   velocities(numberOfParticles),    // parentheses, not braces!
   accelerations(numberOfParticles)  // same!
 {}
@@ -59,29 +57,27 @@ void Verlet::step(ParticleSystem& ps, Physics& physics)
                        (0.5 * timeStep_ * timeStep_) * ps.accelerations[i];
   }
   physics.resolveCollisions(ps);
-  
+
   static std::vector<Vec2d> prevVel, prevAcc, currForceAcc;
   prevVel = ps.velocities;
   prevAcc = ps.accelerations;
   fillWithZeros(ps.accelerations);
   physics.applyForces(ps);
-  swap(currForceAcc, ps.accelerations); // ps.accelerations is reassigned below
-
-  // Approximate velocity
+  currForceAcc = ps.accelerations;
+  // Approximate velocities
   for (size_t i=0; i<ps.numberOfParticles; ++i) {
     ps.velocities[i] += timeStep_ * prevAcc[i];
   }
+  physics.applyDamping(ps);
   for (size_t n=0; n<2; ++n) {
-    // Improve velocity approximation
-    ps.accelerations = currForceAcc;
-    physics.applyDamping(ps);
+    // Improve velocity approximations
     for (size_t i=0; i<ps.numberOfParticles; ++i) {
       ps.velocities[i] = prevVel[i] + 0.5 * timeStep_ * (prevAcc[i] + ps.accelerations[i]);
     }
+    // Recompute accelerations
+    ps.accelerations = currForceAcc;
+    physics.applyDamping(ps);
   }
-  
-  ps.accelerations = currForceAcc;
-  physics.applyDamping(ps);
 }
 
 } // end namespace sph
