@@ -10,12 +10,12 @@ namespace sph {
 ParticleSystem particlesInRandomPositions(size_t numberOfParticles, double totalMass,
                                           const Rectangle& region);
 
-struct CentralGravityPhysics : public PrePhysics {
+struct CentralGravityPhysics final : public Physics {
   CentralGravityPhysics(double gravityConstant, double dampingConstant);
 
-  const std::vector<const Force*> createForceVector() const override {return {&gravity_}; }
-  const std::vector<const Collidable*> createCollidableVector() const override { return {}; }
-  const Damping* dampingPtr() const override {return &damping_; }
+  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); }
+  void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); }
+  void resolveCollisions(ParticleSystem&) const final {}
 
   PointGravity gravity_;
   LinearDamping damping_;
@@ -29,12 +29,12 @@ Simulation<CentralGravityPhysics> createCentralGravitySimulation(
     double dampingConstant = 1e-4,
     double timeStep = 0.01);
 
-struct WallBouncingPhysics : public PrePhysics {
+struct WallBouncingPhysics : public Physics {
   WallBouncingPhysics(double gravityAcceleration, double dampingConstant);
 
-  const std::vector<const Force*> createForceVector() const override {return {&gravity_}; }
-  const std::vector<const Collidable*> createCollidableVector() const override; 
-  const Damping* dampingPtr() const override {return &damping_; }
+  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); }
+  void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
+  void resolveCollisions(ParticleSystem& ps) const final;
 
   SurfaceGravity gravity_;
   LinearDamping damping_;
@@ -49,18 +49,15 @@ Simulation<WallBouncingPhysics> createWallBouncingSimulation(
     double dampingConstant = 1e-4,
     double timeStep = 0.01);
 
-struct ToyStarPhysics : public PrePhysics {
+struct ToyStarPhysics : public Physics {
   ToyStarPhysics(double gravityConstant,
                  double dampingConstant,
                  double pressureConstant,
                  double interactionRadius);
 
-  const std::vector<const Force*> createForceVector() const override
-  {
-    return {&gravity_, &pressure_};
-  }
-  const std::vector<const Collidable*> createCollidableVector() const override { return {}; }
-  const Damping* dampingPtr() const override {return &damping_; }
+  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); pressure_.apply(ps); }
+  void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
+  void resolveCollisions(ParticleSystem&) const final {};
 
   PointGravity gravity_;
   LinearDamping damping_;
@@ -76,18 +73,15 @@ Simulation<ToyStarPhysics> createToyStarSimulation(
     double pressureConstant = 1.0,
     double timeStep = 0.01);
 
-struct WellPhysics : public PrePhysics {
+struct WellPhysics : public Physics {
   WellPhysics(double gravityAcceleration,
               double dampingConstant,
               double pressureConstant,
               double interactionRadius);
 
-  const std::vector<const Force*> createForceVector() const override
-  {
-    return {&gravity_, &pressure_};
-  }
-  const std::vector<const Collidable*> createCollidableVector() const override; 
-  const Damping* dampingPtr() const override {return &damping_; }
+  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); pressure_.apply(ps); }
+  void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
+  void resolveCollisions(ParticleSystem& ps) const final;
 
   SurfaceGravity gravity_;
   PressureForce pressure_;
@@ -104,18 +98,15 @@ Simulation<WellPhysics> createWellSimulation(
     double pressureConstant = 1.0,
     double timeStep = 0.01);
 
-struct BreakingDamPhysics : public PrePhysics {
+struct BreakingDamPhysics : public Physics {
   BreakingDamPhysics(double gravityAcceleration,
                      double dampingConstant,
                      double pressureConstant,
                      double interactionRadius);
 
-  const std::vector<const Force*> createForceVector() const override
-  {
-    return {&gravity_, &pressure_};
-  }
-  const std::vector<const Collidable*> createCollidableVector() const override; 
-  const Damping* dampingPtr() const override {return &damping_; }
+  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); pressure_.apply(ps); }
+  void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
+  void resolveCollisions(ParticleSystem& ps) const final;
   void breakDam() { rightWall_.move(Vec2d{WALL_OFFSET_, 0.0}); }
 
   SurfaceGravity gravity_;
@@ -132,7 +123,7 @@ public:
                         const VerletIntegrator& integrator,
                         double simulationSpeed = 1.0, int fps = 60);
 
-  void breakDam() { prePhysics().breakDam(); }
+  void breakDam() { physics().breakDam(); }
   void increaseDamping();
   void decreaseDamping();
   void increaseGravity();

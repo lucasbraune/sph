@@ -21,48 +21,11 @@ struct ParticleSystem {
   double time;
 };
 
-class Force {
-public:
-  virtual ~Force() {}
-  // Adds this force's contribution to the acceleration of the ith particle to the ith entry
-  // of the input vector.
-  void apply(const ParticleSystem& ps, std::vector<Vec2d>& accelerations) const;
-  void apply(ParticleSystem& ps) const;
-
-private:
-  virtual void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
-                     std::vector<Vec2d>& accelerations) const = 0;
-};
-
-struct Damping {
-  virtual ~Damping() {}
-  void apply(const ParticleSystem& ps, std::vector<Vec2d>& accelerations) const;
-  void apply(ParticleSystem& ps) const;
-  virtual Vec2d acceleration(const Vec2d& velocity, double mass) const = 0;
-};
-
-class Collidable {
-public:
-  virtual ~Collidable() {}
-  void resolveCollisions(ParticleSystem& ps) const;
-
-private:
-  virtual void resolveCollisions(std::vector<Vec2d>& positions, std::vector<Vec2d>& velocities,
-                                 double time) const = 0;
-};
-
 struct Physics {
   virtual ~Physics() {}
-  void applyForces(ParticleSystem& ps) const;
-  void applyDamping(ParticleSystem& ps) const;
-  void resolveCollisions(ParticleSystem& ps) const;
-
-  // Returns a vector of non-null pointers
-  virtual const std::vector<const Force*>& forcePtrs() const = 0;
-  // Returns a vector of non-null pointers
-  virtual const std::vector<const Collidable*>& collidablePtrs() const = 0;
-  // Warning: may return a null pointer
-  virtual const Damping* dampingPtr() const = 0;
+  virtual void applyForces(ParticleSystem& ps) const = 0;
+  virtual void applyDamping(ParticleSystem& ps) const = 0;
+  virtual void resolveCollisions(ParticleSystem& ps) const = 0;
 };
 
 class TimeIntegrator {

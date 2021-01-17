@@ -8,20 +8,19 @@ PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :
   center_(center), intensity_(gravityConstant)
 {}
 
-void PointGravity::apply(const vector<Vec2d>& positions, double, double,
-                         vector<Vec2d>& accelerations) const
+void PointGravity::apply(ParticleSystem& ps) const
 {
-  for (size_t i=0; i<positions.size(); i++) {
-    accelerations[i] -= intensity_ * (positions[i] - center_);
+  for (size_t i=0; i<ps.numberOfParticles; ++i) {
+    ps.accelerations[i] -= intensity_ * (ps.positions[i] - center_);
   }
 }
 
 SurfaceGravity::SurfaceGravity(double magnitude) :
   acceleration_{0.0, -magnitude} {}
 
-void SurfaceGravity::apply(const vector<Vec2d>&, double, double, vector<Vec2d>& accelerations) const
+void SurfaceGravity::apply(ParticleSystem& ps) const
 {
-  for (auto& acc : accelerations) {
+  for (auto& acc : ps.accelerations) {
     acc += acceleration_;
   }
 }
@@ -30,19 +29,21 @@ LinearDamping::LinearDamping(double dampingConstant) :
   intensity_(dampingConstant)
 {}
 
-Vec2d LinearDamping::acceleration(const Vec2d& velocity, double mass) const
+void LinearDamping::apply(ParticleSystem& ps) const
 {
-  return -intensity_ * velocity / mass;
+  for (size_t i=0; i<ps.numberOfParticles; ++i) {
+    ps.accelerations[i] -= (intensity_ / ps.particleMass) * ps.velocities[i];
+  }
 }
 
 Wall::Wall(const Vec2d& normal, double distanceFromTheOrigin) :
   unitNormal_{unit(normal)},
   ptOnWall_{-distanceFromTheOrigin * unitNormal_} {}
 
-void Wall::resolveCollisions(vector<Vec2d>& positions, vector<Vec2d>& velocities, double) const
+void Wall::resolveCollisions(ParticleSystem& ps) const
 {
-  for (size_t i=0; i<positions.size(); i++) {
-    resolveCollision(positions[i], velocities[i]);
+  for (size_t i=0; i<ps.numberOfParticles; ++i) {
+    resolveCollision(ps.positions[i], ps.velocities[i]);
   }
 }
 

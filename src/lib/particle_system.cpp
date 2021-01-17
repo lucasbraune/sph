@@ -5,31 +5,6 @@ using std::vector;
 
 namespace sph {
 
-void Force::apply(ParticleSystem& ps) const {
-  apply(ps, ps.accelerations);
-}
-
-void Force::apply(const ParticleSystem& ps, std::vector<Vec2d>& accelerations) const
-{
-  apply(ps.positions, ps.particleMass, ps.time, accelerations); 
-}
-
-void Damping::apply(ParticleSystem& ps) const {
-  apply(ps, ps.accelerations);
-}
-
-void Damping::apply(const ParticleSystem& ps, std::vector<Vec2d>& accelerations) const
-{
-  for (size_t i=0; i<ps.numberOfParticles; i++) {
-    accelerations[i] += acceleration(ps.velocities[i], ps.particleMass);
-  }
-}
-
-void Collidable::resolveCollisions(ParticleSystem& ps) const
-{
-  resolveCollisions(ps.positions, ps.velocities, ps.time);
-}
-
 ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions,
                                const vector<Vec2d>& initialVelocities,
                                const vector<Vec2d>& initialAccelerations,
@@ -50,28 +25,6 @@ ParticleSystem::ParticleSystem(const vector<Vec2d>& initialPositions, double par
   velocities(numberOfParticles),    // parentheses, not braces!
   accelerations(numberOfParticles)  // same!
 {}
-
-void Physics::applyForces(ParticleSystem& ps) const
-{
-  for (auto force : forcePtrs()) {
-    force->apply(ps);
-  }
-}
-
-void Physics::applyDamping(ParticleSystem& ps) const
-{
-  auto damping = dampingPtr();
-  if (damping) {
-    damping->apply(ps);
-  }
-}
-
-void Physics::resolveCollisions(ParticleSystem& ps) const
-{
-  for (auto collidable : collidablePtrs()) {
-    collidable->resolveCollisions(ps);
-  }
-}
 
 void TimeIntegrator::integrate(ParticleSystem& ps, Physics& physics, double duration)
 {

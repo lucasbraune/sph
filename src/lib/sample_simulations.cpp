@@ -49,13 +49,11 @@ WallBouncingPhysics::WallBouncingPhysics(double gravityConstant, double dampingC
     {Vec2d{-1.0, 1.0},  0.8},
   } {}
 
-const vector<const Collidable*> WallBouncingPhysics::createCollidableVector() const
+void WallBouncingPhysics::resolveCollisions(ParticleSystem& ps) const
 {
-  vector<const Collidable*> result;
-  for (const auto& wall : walls_) {
-    result.emplace_back(&wall);
+  for (auto& wall : walls_) {
+    wall.resolveCollisions(ps);
   }
-  return result;
 }
 
 Simulation<WallBouncingPhysics> createWallBouncingSimulation(
@@ -120,13 +118,11 @@ WellPhysics::WellPhysics(double gravityConstant,
     {Vec2d{-1.0, 1.0},  0.8},
   } {}
 
-const vector<const Collidable*> WellPhysics::createCollidableVector() const
+void WellPhysics::resolveCollisions(ParticleSystem& ps) const
 {
-  vector<const Collidable*> result;
-  for (const auto& wall : walls_) {
-    result.emplace_back(&wall);
+  for (auto& wall : walls_) {
+    wall.resolveCollisions(ps);
   }
-  return result;
 }
 
 Simulation<WellPhysics> createWellSimulation(
@@ -157,38 +153,40 @@ BreakingDamPhysics::BreakingDamPhysics(double gravityConstant,
   bottomWall_{Vec2d{0.0, 1.0},  WALL_OFFSET_},
   rightWall_{Vec2d{-1.0, 0.0},  0.0} {}
 
-const vector<const Collidable*> BreakingDamPhysics::createCollidableVector() const
+void BreakingDamPhysics::resolveCollisions(ParticleSystem& ps) const
 {
-  return {&leftWall_, &bottomWall_, &rightWall_};
+  leftWall_.resolveCollisions(ps);
+  bottomWall_.resolveCollisions(ps);
+  rightWall_.resolveCollisions(ps);
 }
 
 BreakingDamSimulation::BreakingDamSimulation(const ParticleSystem& ps,
-                                             const BreakingDamPhysics& prePhysics,
+                                             const BreakingDamPhysics& physics,
                                              const VerletIntegrator& integrator,
                                              double simulationSpeed, int fps) :
-    Simulation<BreakingDamPhysics>{ps, prePhysics, integrator, simulationSpeed, fps} {}
+    Simulation<BreakingDamPhysics>{ps, physics, integrator, simulationSpeed, fps} {}
 
 void BreakingDamSimulation::increaseDamping()
 {
-  auto& damping = prePhysics().damping_;
+  auto& damping = physics().damping_;
   damping.setConstant(2.0 * damping.constant());
 }
 
 void BreakingDamSimulation::decreaseDamping()
 {
-  auto& damping = prePhysics().damping_;
+  auto& damping = physics().damping_;
   damping.setConstant(0.5 * damping.constant());
 }
 
 void BreakingDamSimulation::increaseGravity()
 {
-  auto& gravity = prePhysics().gravity_;
+  auto& gravity = physics().gravity_;
   gravity.setMagnitude(2.0 * gravity.magnitude());
 }
 
 void BreakingDamSimulation::decreaseGravity()
 {
-  auto& gravity = prePhysics().gravity_;
+  auto& gravity = physics().gravity_;
   gravity.setMagnitude(0.5 * gravity.magnitude());
 }
 

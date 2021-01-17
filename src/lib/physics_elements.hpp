@@ -1,12 +1,3 @@
-/*
- * File: physics_elements.hpp
- * 
- * A "physics element" is an implementation of Force, Damping or Collidable, three interfaces 
- * defined in particle_system.hpp. This header and its implementation file define basic physics 
- * elements, which are used as building blocks for simulations in the files
- * sample_simulations.hpp/cpp.
- */
-
 #ifndef PS_ELEMENTS_HPP
 #define PS_ELEMENTS_HPP
 
@@ -14,15 +5,29 @@
 
 namespace sph {
 
+struct Force {
+  virtual ~Force() {}
+  virtual void apply(ParticleSystem& ps) const = 0;
+};
+
+struct Damping {
+  virtual ~Damping() {}
+  virtual void apply(ParticleSystem& ps) const = 0;
+};
+
+struct Collidable {
+  virtual ~Collidable() {}
+  virtual void resolveCollisions(ParticleSystem& ps) const = 0;
+};
+
 class PointGravity : public Force {
 public:
   PointGravity(double gravityConstant, const Vec2d& center = ZERO_VECTOR);
+  void apply(ParticleSystem& ps) const final;
   double constant() const { return intensity_; }
   void setConstant(double intensity) { intensity_ = intensity; }
-  
+
 private:
-  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
-             std::vector<Vec2d>& accelerations) const override;
   Vec2d center_;
   double intensity_;
 };
@@ -30,23 +35,22 @@ private:
 class SurfaceGravity : public Force {
 public:
   SurfaceGravity(double magnitude);
+  void apply(ParticleSystem& ps) const final;
   double magnitude() const { return -acceleration_[1]; }
   void setMagnitude(double newValue) { acceleration_[1] = -newValue; }
   
 private:
-  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
-             std::vector<Vec2d>& accelerations) const override;
   Vec2d acceleration_;
 };
 
 class LinearDamping : public Damping {
 public:
   LinearDamping(double dampingConstant);
+  void apply(ParticleSystem& ps) const final;
   double constant() const { return intensity_; }
   void setConstant(double newValue) { intensity_ = newValue; }
 
 private:
-  Vec2d acceleration(const Vec2d& velocity, double mass) const override;
   double intensity_; // force per unit velocity
 };
 
@@ -54,11 +58,10 @@ class Wall : public Collidable {
 public:
   Wall(const Vec2d& normal, // must be nonzero
        double distanceFromTheOrigin);
+  void resolveCollisions(ParticleSystem& ps) const final;
   void move(const Vec2d& displacement) { ptOnWall_ += displacement; }
 
 private:
-  void resolveCollisions(std::vector<Vec2d>& positions, std::vector<Vec2d>& velocities,
-                         double time) const override;
   void resolveCollision(Vec2d& pos, Vec2d& vel) const;
   Vec2d unitNormal_; // points out of the wall
   Vec2d ptOnWall_; 

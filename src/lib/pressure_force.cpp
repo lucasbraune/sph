@@ -37,23 +37,22 @@ PressureForce& PressureForce::operator=(const PressureForce& other)
 
 }
 
-void PressureForce::apply(const vector<Vec2d>& positions, double particleMass, double,
-                          vector<Vec2d>& accelerations) const
+void PressureForce::apply(ParticleSystem& ps) const
 {
-  neighborIteratorFactory_->refresh(positions);
-  static auto densities = vector<double>(positions.size()); // static to avoid reallocation
-  updateDensities(particleMass, positions, densities); 
-  for (size_t i=0; i<positions.size(); i++) {
+  neighborIteratorFactory_->refresh(ps.positions);
+  static auto densities = vector<double>(ps.numberOfParticles); // static to avoid reallocation
+  updateDensities(ps.particleMass, ps.positions, densities); 
+  for (size_t i=0; i<ps.numberOfParticles; ++i) {
     auto sum = ZERO_VECTOR;
     auto A = pressure_(densities[i]) / (densities[i] * densities[i]);
-    auto it = neighborIteratorFactory_->build(positions[i]);
+    auto it = neighborIteratorFactory_->build(ps.positions[i]);
     while (it->hasNext()) {
       auto j = it->next();
       if (j == i) continue; // OK to skip, assuming (1/r)(dW/dr) -> 0 as r -> 0
       auto B = pressure_(densities[j]) / (densities[j] * densities[j]);
-      sum += (A + B) * kernel_->gradientAt(positions[i] - positions[j]);
+      sum += (A + B) * kernel_->gradientAt(ps.positions[i] - ps.positions[j]);
     }
-    accelerations[i] -= particleMass * sum;
+    ps.accelerations[i] -= ps.particleMass * sum;
   }
 }
 

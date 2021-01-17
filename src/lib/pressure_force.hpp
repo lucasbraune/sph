@@ -4,6 +4,7 @@
 #include <memory>
 #include <functional>
 #include "particle_system.hpp"
+#include "physics_elements.hpp"
 
 namespace sph {
 
@@ -46,10 +47,9 @@ public:
   PressureForce& operator=(const PressureForce& other);
   PressureForce& operator=(PressureForce&& other) = default;
   ~PressureForce() = default;
-  
+  void apply(ParticleSystem& ps) const;
+
 private:
-  void apply(const std::vector<Vec2d>& positions, double particleMass, double time,
-             std::vector<Vec2d>& accelerations) const;
   void updateDensities(double particleMass, const std::vector<Vec2d>& positions,
                        std::vector<double>& densities) const;
 
