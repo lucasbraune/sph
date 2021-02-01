@@ -50,7 +50,7 @@ void Wall::resolveCollisions(ParticleSystem& ps) const
 void Wall::resolveCollision(Vec2d& pos, Vec2d& vel) const
 {
   auto w = pos - ptOnWall_;
-  if (w * unitNormal_ > 0) return;
+  if (dotProduct(w, unitNormal_) > 0) return;
   pos -= 2 * project(w, unitNormal_);
   vel -= 2 * project(vel, unitNormal_);
 }

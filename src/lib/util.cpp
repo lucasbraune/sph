@@ -13,3 +13,8 @@ sph::Disk::Disk(const Vec2d& center, double radius) :
 {
   assert(radius > 0);
 }
+
+Vec2d sph::project(const Vec2d& x, const Vec2d& normal)
+{
+  return (dotProduct(x, normal) / dotProduct(normal, normal)) * normal;
+}
