@@ -43,15 +43,17 @@ inline double norm(const Vec2d& x) { return hypot(x[0], x[1]); }
 inline double dist(const Vec2d& x, const Vec2d& y) { return norm(x - y); }
 inline Vec2d unit(const Vec2d& x) { return x / norm(x); }
 
-struct Rectangle {
-  double width() const { return xmax - xmin; }
-  double height() const { return ymax - ymin; }
-  Vec2d bottomLeft() const { return Vec2d{xmin, ymin}; }
-  const double xmin = 0.0, ymin = 0.0, xmax = 1.0, ymax = 1.0;
+struct Rectangle final {
+  Rectangle(double xmin = 0.0, double ymin = 0.0, double xmax = 1.0, double ymax = 1.0);
+  const double xmin, ymin, xmax, ymax;
+};
+
+struct Disk final {
+  Disk(const Vec2d& center = {}, double radius = 1.0);
+  const Vec2d center;
+  const double radius;
 };
 
 } // end namespace sph
-
-
 
 #endif

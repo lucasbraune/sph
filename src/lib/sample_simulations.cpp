@@ -6,21 +6,29 @@ using std::vector;
 
 namespace sph {
 
-static vector<sph::Vec2d> randomVectors(const sph::Rectangle region, const size_t N) {
-  auto result = vector<sph::Vec2d>{};
-  auto xDist = std::uniform_real_distribution<double>{region.xmin, region.xmax};
-  auto yDist = std::uniform_real_distribution<double>{region.ymin, region.ymax};
-  auto re = std::default_random_engine{};
-  for (size_t i=0; i<N; i++) {
-    result.push_back(sph::Vec2d{xDist(re), yDist(re)});
-  }
-  return result;
+namespace {
+
+Vec2d randomVec2d(const Rectangle &r = {0.0, 0.0, 1.0, 1.0})
+{
+  static auto dist = std::uniform_real_distribution<double>{};
+  static auto re = std::default_random_engine{};
+  constexpr auto affineFn = [](double a, double b, double x) {
+    return a + (b - a) * x;
+  };
+  return {affineFn(r.xmin, r.xmax, dist(re)),
+          affineFn(r.ymin, r.ymax, dist(re))};
 }
 
-ParticleSystem particlesInRandomPositions(size_t numberOfParticles, double totalMass,
-                                          const Rectangle& region)
+} // namespace
+
+std::vector<Particle> randomParticles(const Rectangle& region, size_t N)
 {
-  return {randomVectors(region, numberOfParticles), totalMass / numberOfParticles};
+  std::vector<Particle> result;
+  for (size_t i = 0; i < N; ++i) {
+    auto p = Particle{randomVec2d(region), Vec2d{}, Vec2d{}};
+    result.emplace_back(p);
+  }
+  return result;
 }
 
 CentralGravityPhysics::CentralGravityPhysics(double gravityConstant, double dampingConstant) :
@@ -35,7 +43,7 @@ Simulation<CentralGravityPhysics> createCentralGravitySimulation(
     double dampingConstant,
     double timeStep)
 {
-  return {particlesInRandomPositions(numberOfParticles, totalMass, region),
+  return {ParticleSystem{randomParticles(region, numberOfParticles), totalMass},
           CentralGravityPhysics{gravityConstant, dampingConstant},
           Verlet{timeStep}};
 }
@@ -64,7 +72,7 @@ Simulation<WallBouncingPhysics> createWallBouncingSimulation(
     double dampingConstant,
     double timeStep)
 {
-  return {particlesInRandomPositions(numberOfParticles, totalMass, region),
+  return {ParticleSystem{randomParticles(region, numberOfParticles), totalMass},
           WallBouncingPhysics{gravityConstant, dampingConstant},
           Verlet{timeStep}};
 }
@@ -90,15 +98,15 @@ static double interactionRadius(double numberOfParticles)
 
 Simulation<ToyStarPhysics> createToyStarSimulation(
     size_t numberOfParticles,
-    double starMass,
+    double totalMass,
     double starRadius,
-    Rectangle initialRegion,
+    Rectangle region,
     double dampingConstant,
     double pressureConstant,
     double timeStep)
 {
-  return {particlesInRandomPositions(numberOfParticles, starMass, initialRegion),
-          ToyStarPhysics{gravityConstant(starMass, pressureConstant, starRadius),
+  return {ParticleSystem{randomParticles(region, numberOfParticles), totalMass},
+          ToyStarPhysics{gravityConstant(totalMass, pressureConstant, starRadius),
                          dampingConstant,
                          pressureConstant,
                          interactionRadius(numberOfParticles)},
@@ -134,7 +142,7 @@ Simulation<WellPhysics> createWellSimulation(
     double pressureConstant,
     double timeStep)
 {
-  return {particlesInRandomPositions(numberOfParticles, totalMass, region),
+  return {ParticleSystem{randomParticles(region, numberOfParticles), totalMass},
           WellPhysics{gravityConstant,
                       dampingConstant,
                       pressureConstant, 
@@ -199,7 +207,7 @@ BreakingDamSimulation createBreakingDamSimulation(
     double pressureConstant,
     double timeStep)
 {
-  return {particlesInRandomPositions(numberOfParticles, totalMass, region),
+  return {ParticleSystem{randomParticles(region, numberOfParticles), totalMass},
           BreakingDamPhysics{gravityConstant,
                              dampingConstant,
                              pressureConstant, 

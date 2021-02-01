@@ -10,8 +10,8 @@ PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :
 
 void PointGravity::apply(ParticleSystem& ps) const
 {
-  for (size_t i=0; i<ps.numberOfParticles; ++i) {
-    ps.accelerations[i] -= intensity_ * (ps.positions[i] - center_);
+  for (auto& particle : ps.particles) {
+    particle.acc -= intensity_ * (particle.pos - center_);
   }
 }
 
@@ -20,7 +20,7 @@ SurfaceGravity::SurfaceGravity(double magnitude) :
 
 void SurfaceGravity::apply(ParticleSystem& ps) const
 {
-  for (auto& acc : ps.accelerations) {
+  for (auto& acc : accelerations(ps)) {
     acc += acceleration_;
   }
 }
@@ -31,8 +31,8 @@ LinearDamping::LinearDamping(double dampingConstant) :
 
 void LinearDamping::apply(ParticleSystem& ps) const
 {
-  for (size_t i=0; i<ps.numberOfParticles; ++i) {
-    ps.accelerations[i] -= (intensity_ / ps.particleMass) * ps.velocities[i];
+  for (auto& particle : ps.particles) {
+    particle.acc -= (intensity_ / ps.particleMass) * particle.vel;
   }
 }
 
@@ -42,8 +42,8 @@ Wall::Wall(const Vec2d& normal, double distanceFromTheOrigin) :
 
 void Wall::resolveCollisions(ParticleSystem& ps) const
 {
-  for (size_t i=0; i<ps.numberOfParticles; ++i) {
-    resolveCollision(ps.positions[i], ps.velocities[i]);
+  for (auto& particle : ps.particles) {
+    resolveCollision(particle.pos, particle.vel);
   }
 }
 

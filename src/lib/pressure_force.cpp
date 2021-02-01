@@ -8,104 +8,65 @@ using std::function;
 namespace sph {
 
 PressureForce::PressureForce(
-    unique_ptr<NeighborIteratorFactory> iteratorFactory,
+    unique_ptr<ParticleFilter> filter,
     unique_ptr<SmoothingKernel> kernel,
     const function<double(double)>& pressure) :
   kernel_(move(kernel)),
-  neighborIteratorFactory_(move(iteratorFactory)),
+  filter_(move(filter)),
   pressure_(pressure)
 {}
 
 PressureForce::PressureForce(double interactionRadius, function<double(double)> pressure) :
-  PressureForce(std::make_unique<TrivialNeighborIteratorFactory>(),
+  PressureForce(std::make_unique<TrivialFilter>(),
                 std::make_unique<CubicKernel>(interactionRadius / 2),
                 pressure)
 {}
 
 PressureForce::PressureForce(const PressureForce& other) :
   kernel_(other.kernel_->clone()),
-  neighborIteratorFactory_(other.neighborIteratorFactory_->clone()),
+  filter_(other.filter_->clone()),
   pressure_(other.pressure_)
 {}
 
 PressureForce& PressureForce::operator=(const PressureForce& other)
 {
-  neighborIteratorFactory_ = other.neighborIteratorFactory_->clone();
+  filter_ = other.filter_->clone();
   kernel_ = other.kernel_->clone();
   pressure_ = other.pressure_;
   return *this;
-
 }
 
 void PressureForce::apply(ParticleSystem& ps) const
 {
-  neighborIteratorFactory_->refresh(ps.positions);
-  static auto densities = vector<double>(ps.numberOfParticles); // static to avoid reallocation
-  updateDensities(ps.particleMass, ps.positions, densities); 
-  for (size_t i=0; i<ps.numberOfParticles; ++i) {
+  synchronizeWith(ps);
+  const auto densities = computeDensities(ps);
+  const auto quotient = [&pressure = std::as_const(pressure_), &densities](auto& particle) {
+    auto density = densities.at(&particle);
+    return pressure(density) / (density * density);
+  };
+  for (auto& particle: ps.particles) {
+    const auto q = quotient(particle);
     auto sum = Vec2d{};
-    auto A = pressure_(densities[i]) / (densities[i] * densities[i]);
-    auto it = neighborIteratorFactory_->build(ps.positions[i]);
-    while (it->hasNext()) {
-      auto j = it->next();
-      if (j == i) continue; // OK to skip, assuming (1/r)(dW/dr) -> 0 as r -> 0
-      auto B = pressure_(densities[j]) / (densities[j] * densities[j]);
-      sum += (A + B) * kernel_->gradientAt(ps.positions[i] - ps.positions[j]);
+    for (auto& neighbor : neighbors(particle)) {
+      if (&neighbor == &particle) continue; // OK to skip, assuming (1/r)(d kernel /dr)->0 as r->0
+      sum += (q + quotient(neighbor)) * kernel_->gradientAt(particle.pos - neighbor.pos);
     }
-    ps.accelerations[i] -= ps.particleMass * sum;
+    particle.acc -= ps.particleMass * sum;
   }
 }
 
-void PressureForce::updateDensities(double particleMass, const vector<Vec2d>& positions, 
-                                    vector<double>& densities) const
+std::unordered_map<const Particle*, double>
+PressureForce::computeDensities(const ParticleSystem& ps) const
 {
-  densities.resize(positions.size());
-  for (size_t i=0; i<positions.size(); i++) {
-    densities[i] = 0;
-    auto it = neighborIteratorFactory_->build(positions[i]);
-    while (it->hasNext()) {
-      densities[i] += (*kernel_)(positions[i] - positions[it->next()]);
+  auto densities = std::unordered_map<const Particle*, double>{};
+  for (const auto& particle : ps.particles) {
+    auto sum = 0.0;
+    for (auto& neighbor : neighbors(particle)) {
+      sum += (*kernel_)(particle.pos - neighbor.pos);
     }
-    densities[i] *= particleMass;
+    densities[&particle] = ps.particleMass * sum;
   }
-}
-
-template<typename T>
-RangeIterator<T>::RangeIterator(T begin, T end) :
-  begin_(begin),
-  end_(end),
-  next_(begin)
-{}
-
-template<typename T>
-bool RangeIterator<T>::hasNext() const 
-{
-  return next_ < end_;
-}
-
-template<typename T>
-T RangeIterator<T>::next()
-{
-  return next_++; // return pre-increment value
-}
-
-TrivialNeighborIteratorFactory::TrivialNeighborIteratorFactory(size_t numberOfParticles) :
-  numberOfParticles_(numberOfParticles)
-{}
-
-void TrivialNeighborIteratorFactory::refresh(const vector<Vec2d>& positions)
-{
-  numberOfParticles_ = positions.size();
-}
-
-unique_ptr<NeighborIterator> TrivialNeighborIteratorFactory::build(Vec2d) const
-{
-  return std::make_unique<RangeIterator<size_t>>(0, numberOfParticles_);
-}
-
-unique_ptr<NeighborIteratorFactory> TrivialNeighborIteratorFactory::clone() const
-{
-  return std::make_unique<TrivialNeighborIteratorFactory>(numberOfParticles_);
+  return densities;
 }
 
 CubicKernel::CubicKernel(double smoothingLength) :

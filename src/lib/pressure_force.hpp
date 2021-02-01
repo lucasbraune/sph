@@ -3,28 +3,12 @@
 
 #include <memory>
 #include <functional>
+#include <unordered_map>
 #include "particle_system.hpp"
 #include "physics_elements.hpp"
+#include "particle_filter.hpp"
 
 namespace sph {
-
-template<typename T>
-class Iterator {
-public:
-  virtual bool hasNext() const = 0;
-  virtual T next() = 0;
-  virtual ~Iterator() {};
-};
-
-using NeighborIterator = Iterator<size_t>;
-
-class NeighborIteratorFactory {
-public:
-  virtual void refresh(const std::vector<Vec2d>& positions) = 0; // when particles move
-  virtual std::unique_ptr<NeighborIterator> build(Vec2d position) const = 0;
-  virtual std::unique_ptr<NeighborIteratorFactory> clone() const = 0;
-  virtual ~NeighborIteratorFactory() {};
-};
 
 class SmoothingKernel {
   public:
@@ -38,7 +22,7 @@ class SmoothingKernel {
 
 class PressureForce : public Force {
 public:
-  PressureForce(std::unique_ptr<NeighborIteratorFactory> iteratorFactory,
+  PressureForce(std::unique_ptr<ParticleFilter> filter,
                 std::unique_ptr<SmoothingKernel> kernel,
                 const std::function<double(double)>& pressure);
   PressureForce(double interactionRadius, std::function<double(double)> pressure);
@@ -50,35 +34,17 @@ public:
   void apply(ParticleSystem& ps) const;
 
 private:
-  void updateDensities(double particleMass, const std::vector<Vec2d>& positions,
-                       std::vector<double>& densities) const;
+  std::unordered_map<const Particle*, double> computeDensities(const ParticleSystem& ps) const;
+  // synchronizeWith should NOT be const
+  void synchronizeWith(const ParticleSystem& ps) const { filter_->syncWith(ps); }
+  auto neighbors(const Particle& particle) const
+  {
+    return filter_->particlesIn(Disk{particle.pos, kernel_->interactionRadius()});
+  }
 
   std::unique_ptr<SmoothingKernel> kernel_;
-  std::unique_ptr<NeighborIteratorFactory> neighborIteratorFactory_;
+  std::unique_ptr<ParticleFilter> filter_;
   std::function<double(double)> pressure_;
-};
-
-template<typename T>
-class RangeIterator : public Iterator<T> {
-public:
-  RangeIterator(T begin, T end);
-  bool hasNext() const override;
-  T next() override;
-
-private:
-  const T begin_, end_;
-  T next_;
-};
-
-class TrivialNeighborIteratorFactory : public NeighborIteratorFactory {
-public:
-  TrivialNeighborIteratorFactory(size_t numberOfParticles = 0);
-  void refresh(const std::vector<Vec2d>& positions);
-  std::unique_ptr<NeighborIterator> build(Vec2d position) const;
-  std::unique_ptr<NeighborIteratorFactory> clone() const;
-
-private:
-  size_t numberOfParticles_;
 };
 
 class CubicKernel : public SmoothingKernel {

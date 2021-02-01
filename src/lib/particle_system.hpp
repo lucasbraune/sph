@@ -2,19 +2,41 @@
 #define PARTICLE_SYSTEM_HPP
 
 #include "util.hpp"
+#include "range/v3/view/transform.hpp"
 
 namespace sph {
 
-struct ParticleSystem {
-  ParticleSystem(const std::vector<Vec2d>& pos, const std::vector<Vec2d>& vel,
-                 const std::vector<Vec2d>& acc, double mass);
-  ParticleSystem(const std::vector<Vec2d>& pos, double mass);
-  
-  const size_t numberOfParticles;
-  const double particleMass;
-  std::vector<Vec2d> positions, velocities, accelerations;
+struct Particle final {
+  Vec2d pos, vel, acc;
+};
+
+struct ParticleSystem final {
+  ParticleSystem(const std::vector<Particle>& particles, double totalMass);
+  std::vector<Particle> particles;
+  double particleMass;
   double time;
 };
+
+template<class ParticleSystemType>
+auto positions(ParticleSystemType& ps)
+{
+  constexpr auto pos = [](auto& particle)->auto&{ return particle.pos; };
+  return ps.particles | ranges::views::transform(pos);
+}
+
+template<class ParticleSystemType>
+auto velocities(ParticleSystemType& ps)
+{
+  constexpr auto vel = [](auto& particle)->auto&{ return particle.vel; };
+  return ps.particles | ranges::views::transform(vel);
+}
+
+template<class ParticleSystemType>
+auto accelerations(ParticleSystemType& ps)
+{
+  constexpr auto acc = [](auto& particle)->auto&{ return particle.acc; };
+  return ps.particles | ranges::views::transform(acc);
+}
 
 struct Physics {
   virtual ~Physics() {}

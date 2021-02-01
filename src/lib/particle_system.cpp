@@ -1,30 +1,18 @@
 #include "particle_system.hpp"
-#include <cassert>
+#include "range/v3/algorithm/copy.hpp"
+#include "range/v3/algorithm/fill.hpp"
+#include "range/v3/view/zip.hpp"
 
-using std::vector;
+using namespace sph;
 
-namespace sph {
-
-ParticleSystem::ParticleSystem(const vector<Vec2d>& pos, const vector<Vec2d>& vel,
-                               const vector<Vec2d>& acc, double mass) :
-  numberOfParticles{pos.size()},
-  particleMass{mass},
-  positions{pos},
-  velocities{vel},
-  accelerations{acc}
+sph::ParticleSystem::ParticleSystem(const std::vector<Particle>& particles, double totalMass) :
+  particles{particles},
+  particleMass{totalMass / particles.size()}
 {
-  // TODO: handle error where the specified vectors have different lengths.
+  assert(particles.size() > 0);
 }
 
-ParticleSystem::ParticleSystem(const vector<Vec2d>& pos, double mass) :
-  numberOfParticles{pos.size()},
-  particleMass{mass},
-  positions{pos},
-  velocities(numberOfParticles),    // parentheses, not braces!
-  accelerations(numberOfParticles)  // same!
-{}
-
-void TimeIntegrator::integrate(ParticleSystem& ps, Physics& physics, double duration)
+void sph::TimeIntegrator::integrate(ParticleSystem& ps, Physics& physics, double duration)
 {
   double target = ps.time + duration;
   while (ps.time < target) {
@@ -32,47 +20,49 @@ void TimeIntegrator::integrate(ParticleSystem& ps, Physics& physics, double dura
   }
 }
 
-void Euler::step(ParticleSystem& ps, Physics& physics)
+void sph::Euler::step(ParticleSystem& ps, Physics& physics)
 {
   ps.time += timeStep_;
-  for (size_t i=0; i<ps.numberOfParticles; i++) {
-    ps.positions[i] += timeStep_ * ps.velocities[i];
-    ps.velocities[i] += timeStep_ * ps.accelerations[i];
+  for (auto& particle : ps.particles) {
+    particle.pos += timeStep_ * particle.vel;
+    particle.vel += timeStep_ * particle.acc;
+    particle.acc = Vec2d{};
   }
-  std::fill(ps.accelerations.begin(), ps.accelerations.end(), Vec2d{});
   physics.applyForces(ps);
   physics.applyDamping(ps);
 }
 
-void Verlet::step(ParticleSystem& ps, Physics& physics)
+void sph::Verlet::step(ParticleSystem& ps, Physics& physics)
 {
   ps.time += timeStep_;
-  for (size_t i=0; i<ps.numberOfParticles; i++) {
-    ps.positions[i] += timeStep_ * ps.velocities[i] +
-                       (0.5 * timeStep_ * timeStep_) * ps.accelerations[i];
+  for (auto& particle : ps.particles) {
+    particle.pos += timeStep_ * particle.vel + (0.5 * timeStep_ * timeStep_) * particle.acc;
   }
   physics.resolveCollisions(ps);
 
-  static std::vector<Vec2d> prevVel, prevAcc, currForceAcc;
-  prevVel = ps.velocities;
-  prevAcc = ps.accelerations;
-  std::fill(ps.accelerations.begin(), ps.accelerations.end(), Vec2d{});
+  static std::vector<Vec2d> prevVels, prevAccs, currForceAccs;
+  prevVels.resize(ps.particles.size());
+  prevAccs.resize(ps.particles.size());
+  currForceAccs.resize(ps.particles.size());
+
+  using namespace ranges;
+  copy(velocities(ps), prevVels.begin());
+  copy(accelerations(ps), prevAccs.begin());
+  fill(accelerations(ps), Vec2d{});
   physics.applyForces(ps);
-  currForceAcc = ps.accelerations;
+  copy(accelerations(ps), currForceAccs.begin());
   // Approximate velocities
-  for (size_t i=0; i<ps.numberOfParticles; ++i) {
-    ps.velocities[i] += timeStep_ * prevAcc[i];
+  for (auto [particle, prevAcc] : views::zip(ps.particles, prevAccs)) {
+    particle.vel += timeStep_ * prevAcc;
   }
   physics.applyDamping(ps);
   for (size_t n=0; n<2; ++n) {
     // Improve velocity approximations
-    for (size_t i=0; i<ps.numberOfParticles; ++i) {
-      ps.velocities[i] = prevVel[i] + 0.5 * timeStep_ * (prevAcc[i] + ps.accelerations[i]);
+    for (auto [particle, prevVel, prevAcc] : views::zip(ps.particles, prevVels, prevAccs)) {
+      particle.vel = prevVel + (0.5 * timeStep_) * (prevAcc + particle.acc);
     }
     // Recompute accelerations
-    ps.accelerations = currForceAcc;
+    copy(currForceAccs, accelerations(ps).begin());
     physics.applyDamping(ps);
   }
 }
-
-} // namespace sph

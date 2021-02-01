@@ -7,8 +7,7 @@
 
 namespace sph {
 
-ParticleSystem particlesInRandomPositions(size_t numberOfParticles, double totalMass,
-                                          const Rectangle& region);
+std::vector<Particle> randomParticles(size_t N, const Rectangle& region);
 
 struct CentralGravityPhysics final : public Physics {
   CentralGravityPhysics(double gravityConstant, double dampingConstant);

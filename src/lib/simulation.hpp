@@ -4,6 +4,7 @@
 #include <chrono>
 #include <type_traits>
 #include "particle_system.hpp"
+#include "range/v3/view/any_view.hpp"
 
 namespace sph {
 
@@ -11,7 +12,7 @@ class SimulationInterface {
 public:
   virtual ~SimulationInterface() {}
 
-  virtual const std::vector<Vec2d>& positions() const = 0;
+  virtual ranges::any_view<const Vec2d&> positions() const = 0;
   virtual double time() const = 0;
   virtual double targetSpeed() const = 0;
   virtual bool paused() const = 0;
@@ -59,7 +60,7 @@ public:
     fps_{fps},
     paused_{true} {}
   
-  const std::vector<Vec2d>& positions() const final { return ps_.positions; }
+  ranges::any_view<const Vec2d&> positions() const final { return sph::positions(ps_); }
   double time() const final { return ps_.time; }
   double targetSpeed() const final { return simulationSpeed_; }
   bool paused() const final { return paused_; }

@@ -64,7 +64,7 @@ void View::draw() const
   glClear(GL_COLOR_BUFFER_BIT);
 
   glColor3f(0.0, 0.0, 0.0);
-  for (auto position : simulation_.positions()) {
+  for (auto& position : simulation_.positions()) {
     glBegin(GL_POLYGON);
     for (auto vertex : particlePolygon_) {
       Vec2d translate = vertex + position;
