@@ -2,7 +2,6 @@
 #define PARTICLE_SYSTEM_HPP
 
 #include "util.hpp"
-#include "range/v3/view/transform.hpp"
 
 namespace sph {
 
@@ -16,27 +15,6 @@ struct ParticleSystem final {
   double particleMass;
   double time;
 };
-
-template<class ParticleSystemType>
-auto positions(ParticleSystemType& ps)
-{
-  constexpr auto pos = [](auto& particle)->auto&{ return particle.pos; };
-  return ps.particles | ranges::views::transform(pos);
-}
-
-template<class ParticleSystemType>
-auto velocities(ParticleSystemType& ps)
-{
-  constexpr auto vel = [](auto& particle)->auto&{ return particle.vel; };
-  return ps.particles | ranges::views::transform(vel);
-}
-
-template<class ParticleSystemType>
-auto accelerations(ParticleSystemType& ps)
-{
-  constexpr auto acc = [](auto& particle)->auto&{ return particle.acc; };
-  return ps.particles | ranges::views::transform(acc);
-}
 
 struct Physics {
   virtual ~Physics() {}

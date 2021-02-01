@@ -20,8 +20,8 @@ SurfaceGravity::SurfaceGravity(double magnitude) :
 
 void SurfaceGravity::apply(ParticleSystem& ps)
 {
-  for (auto& acc : accelerations(ps)) {
-    acc += acceleration_;
+  for (auto& particle : ps.particles) {
+    particle.acc += acceleration_;
   }
 }
 

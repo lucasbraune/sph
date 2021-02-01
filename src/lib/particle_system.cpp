@@ -1,6 +1,4 @@
 #include "particle_system.hpp"
-#include "range/v3/algorithm/copy.hpp"
-#include "range/v3/algorithm/fill.hpp"
 #include "range/v3/view/zip.hpp"
 
 using namespace sph;
@@ -32,6 +30,41 @@ void sph::Euler::step(ParticleSystem& ps, Physics& physics)
   physics.applyDamping(ps);
 }
 
+namespace {
+
+void copyVelocities(const ParticleSystem& ps, std::vector<Vec2d>& out)
+{
+  out.clear();
+  for (auto& particle : ps.particles) {
+    out.emplace_back(particle.vel);
+  }
+}
+
+void copyAccelerations(const ParticleSystem& ps, std::vector<Vec2d>& out)
+{
+  out.clear();
+  for (auto& particle : ps.particles) {
+    out.emplace_back(particle.acc);
+  }
+}
+
+void copyIntoAccelerations(const std::vector<Vec2d>& in, ParticleSystem& ps)
+{
+  assert(in.size() == ps.particles.size());
+  for (auto [a, particle] : ranges::views::zip(in, ps.particles)) {
+    particle.acc = a;
+  }
+}
+
+void fillAccelerations(ParticleSystem& ps, const Vec2d& val)
+{
+  for (auto& particle : ps.particles) {
+    particle.acc = val;
+  }
+}
+
+} // namespace
+
 void sph::Verlet::step(ParticleSystem& ps, Physics& physics)
 {
   ps.time += timeStep_;
@@ -41,28 +74,23 @@ void sph::Verlet::step(ParticleSystem& ps, Physics& physics)
   physics.resolveCollisions(ps);
 
   static std::vector<Vec2d> prevVels, prevAccs, currForceAccs;
-  prevVels.resize(ps.particles.size());
-  prevAccs.resize(ps.particles.size());
-  currForceAccs.resize(ps.particles.size());
-
-  using namespace ranges;
-  copy(velocities(ps), prevVels.begin());
-  copy(accelerations(ps), prevAccs.begin());
-  fill(accelerations(ps), Vec2d{});
+  copyVelocities(ps, prevVels);
+  copyAccelerations(ps, prevAccs);
+  fillAccelerations(ps, Vec2d{});
   physics.applyForces(ps);
-  copy(accelerations(ps), currForceAccs.begin());
+  copyAccelerations(ps, currForceAccs);
   // Approximate velocities
-  for (auto [particle, prevAcc] : views::zip(ps.particles, prevAccs)) {
+  for (auto [particle, prevAcc] : ranges::views::zip(ps.particles, prevAccs)) {
     particle.vel += timeStep_ * prevAcc;
   }
   physics.applyDamping(ps);
   for (size_t n=0; n<2; ++n) {
     // Improve velocity approximations
-    for (auto [particle, prevVel, prevAcc] : views::zip(ps.particles, prevVels, prevAccs)) {
+    for (auto [particle, prevVel, prevAcc] : ranges::views::zip(ps.particles, prevVels, prevAccs)) {
       particle.vel = prevVel + (0.5 * timeStep_) * (prevAcc + particle.acc);
     }
     // Recompute accelerations
-    copy(currForceAccs, accelerations(ps).begin());
+    copyIntoAccelerations(currForceAccs, ps);
     physics.applyDamping(ps);
   }
 }
