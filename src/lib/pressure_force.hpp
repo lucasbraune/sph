@@ -26,6 +26,8 @@ public:
                 std::unique_ptr<SmoothingKernel> kernel,
                 const std::function<double(double)>& pressure);
   PressureForce(double interactionRadius, std::function<double(double)> pressure);
+  PressureForce(double interactionRadius, std::function<double(double)> pressure,
+                const Rectangle& region);
   PressureForce(const PressureForce& other); 
   PressureForce(PressureForce&& other) = default;
   PressureForce& operator=(const PressureForce& other);

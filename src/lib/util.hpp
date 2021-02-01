@@ -45,10 +45,42 @@ struct Rectangle final {
   const double xmin, ymin, xmax, ymax;
 };
 
+inline double width(const Rectangle& rect) { return rect.xmax - rect.xmin; }
+inline double height(const Rectangle& rect) { return rect.ymax - rect.ymin; }
+
 struct Disk final {
   Disk(const Vec2d& center = {}, double radius = 1.0);
   const Vec2d center;
   const double radius;
+};
+
+template<typename T>
+class Matrix final {
+public:
+  Matrix(size_t rows, size_t cols) : 
+    rows_{rows}, cols_{cols}, data_(rows * cols)
+  {
+    assert(rows > 0 && cols > 0);
+  }
+
+  T& operator()(size_t i, size_t j)
+  {
+    assert(i < rows_ && j < cols_);
+    return data_[i * rows_ + j];
+  }
+  
+  const T& operator()(size_t i, size_t j) const
+  {
+    assert(i < rows_ && j < cols_);
+    return data_[i * rows_ + j];
+  }
+
+  size_t rows() const { return rows_; }
+  size_t columns() const { return cols_; }
+
+private:
+  const size_t rows_, cols_;
+  std::vector<T> data_;
 };
 
 } // end namespace sph

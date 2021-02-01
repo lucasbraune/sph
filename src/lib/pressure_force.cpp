@@ -22,6 +22,13 @@ PressureForce::PressureForce(double interactionRadius, function<double(double)> 
                 pressure)
 {}
 
+PressureForce::PressureForce(double interactionRadius, function<double(double)> pressure, 
+                             const Rectangle& region) :
+  PressureForce{std::make_unique<GridFilter>(makeGridFilter(region, interactionRadius)),
+                std::make_unique<CubicKernel>(interactionRadius / 2),
+                pressure}
+{}
+
 PressureForce::PressureForce(const PressureForce& other) :
   kernel_(other.kernel_->clone()),
   filter_(other.filter_->clone()),

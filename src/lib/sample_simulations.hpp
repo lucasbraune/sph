@@ -52,7 +52,8 @@ struct ToyStarPhysics : public Physics {
   ToyStarPhysics(double gravityConstant,
                  double dampingConstant,
                  double pressureConstant,
-                 double interactionRadius);
+                 double interactionRadius,
+                 const Rectangle& region);
 
   void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); pressure_.apply(ps); }
   void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };

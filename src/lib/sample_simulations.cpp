@@ -80,10 +80,11 @@ Simulation<WallBouncingPhysics> createWallBouncingSimulation(
 ToyStarPhysics::ToyStarPhysics(double gravityConstant,
                                double dampingConstant,
                                double pressureConstant,
-                               double interactionRadius) :
+                               double interactionRadius,
+                               const Rectangle& region) :
   gravity_{gravityConstant},
   damping_{dampingConstant},
-  pressure_{interactionRadius, GasPressure{pressureConstant}}
+  pressure_{interactionRadius, GasPressure{pressureConstant}, region}
 {}
 
 static double gravityConstant(double totalMass, double pressureConstant, double starRadius)
