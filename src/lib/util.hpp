@@ -9,8 +9,6 @@ namespace sph {
 
 using Vec2d = std::array<double, 2>;
 
-constexpr Vec2d ZERO_VECTOR{};
-
 inline Vec2d& operator+=(Vec2d& a, const Vec2d& b)
 {
   a[0] += b[0];

@@ -43,7 +43,7 @@ void PressureForce::apply(ParticleSystem& ps) const
   static auto densities = vector<double>(ps.numberOfParticles); // static to avoid reallocation
   updateDensities(ps.particleMass, ps.positions, densities); 
   for (size_t i=0; i<ps.numberOfParticles; ++i) {
-    auto sum = ZERO_VECTOR;
+    auto sum = Vec2d{};
     auto A = pressure_(densities[i]) / (densities[i] * densities[i]);
     auto it = neighborIteratorFactory_->build(ps.positions[i]);
     while (it->hasNext()) {
@@ -134,7 +134,7 @@ Vec2d CubicKernel::gradientAt(Vec2d x) const
   double q = r / smoothingLength_;
   constexpr double EPSILON = 1e-6;
   if (q < EPSILON || q >= 2) {
-    return ZERO_VECTOR;
+    return Vec2d{};
   }
   double A = 2 - q;
   if (q < 1) {

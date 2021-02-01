@@ -32,10 +32,6 @@ void TimeIntegrator::integrate(ParticleSystem& ps, Physics& physics, double dura
   }
 }
 
-static void fillWithZeros(std::vector<Vec2d>& v) {
-  std::fill(v.begin(), v.end(), ZERO_VECTOR);
-}
-
 void Euler::step(ParticleSystem& ps, Physics& physics)
 {
   ps.time += timeStep_;
@@ -43,8 +39,7 @@ void Euler::step(ParticleSystem& ps, Physics& physics)
     ps.positions[i] += timeStep_ * ps.velocities[i];
     ps.velocities[i] += timeStep_ * ps.accelerations[i];
   }
-  physics.resolveCollisions(ps);
-  fillWithZeros(ps.accelerations);
+  std::fill(ps.accelerations.begin(), ps.accelerations.end(), Vec2d{});
   physics.applyForces(ps);
   physics.applyDamping(ps);
 }
@@ -61,7 +56,7 @@ void Verlet::step(ParticleSystem& ps, Physics& physics)
   static std::vector<Vec2d> prevVel, prevAcc, currForceAcc;
   prevVel = ps.velocities;
   prevAcc = ps.accelerations;
-  fillWithZeros(ps.accelerations);
+  std::fill(ps.accelerations.begin(), ps.accelerations.end(), Vec2d{});
   physics.applyForces(ps);
   currForceAcc = ps.accelerations;
   // Approximate velocities
@@ -80,4 +75,4 @@ void Verlet::step(ParticleSystem& ps, Physics& physics)
   }
 }
 
-} // end namespace sph
+} // namespace sph

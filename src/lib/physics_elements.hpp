@@ -34,7 +34,7 @@ struct Collidable {
 
 class PointGravity : public Force {
 public:
-  PointGravity(double gravityConstant, const Vec2d& center = ZERO_VECTOR);
+  PointGravity(double gravityConstant, const Vec2d& center = {});
   void apply(ParticleSystem& ps) const final;
   double constant() const { return intensity_; }
   void setConstant(double intensity) { intensity_ = intensity; }
