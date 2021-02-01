@@ -41,7 +41,7 @@ auto accelerations(ParticleSystemType& ps)
 struct Physics {
   virtual ~Physics() {}
   // Adds the effect of velocity-independent forces to the accelerations of particles
-  virtual void applyForces(ParticleSystem& ps) const = 0;
+  virtual void applyForces(ParticleSystem& ps) = 0;
   // Adds the effect of damping to the accelerations of particles
   virtual void applyDamping(ParticleSystem& ps) const = 0;
   // Moves particles to resolve collisions

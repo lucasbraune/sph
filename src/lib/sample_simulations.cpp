@@ -110,7 +110,8 @@ Simulation<ToyStarPhysics> createToyStarSimulation(
           ToyStarPhysics{gravityConstant(totalMass, pressureConstant, starRadius),
                          dampingConstant,
                          pressureConstant,
-                         interactionRadius(numberOfParticles)},
+                         interactionRadius(numberOfParticles),
+                         region},
           Verlet{timeStep}};
 }
 

@@ -8,7 +8,7 @@ PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :
   center_(center), intensity_(gravityConstant)
 {}
 
-void PointGravity::apply(ParticleSystem& ps) const
+void PointGravity::apply(ParticleSystem& ps)
 {
   for (auto& particle : ps.particles) {
     particle.acc -= intensity_ * (particle.pos - center_);
@@ -18,7 +18,7 @@ void PointGravity::apply(ParticleSystem& ps) const
 SurfaceGravity::SurfaceGravity(double magnitude) :
   acceleration_{0.0, -magnitude} {}
 
-void SurfaceGravity::apply(ParticleSystem& ps) const
+void SurfaceGravity::apply(ParticleSystem& ps)
 {
   for (auto& acc : accelerations(ps)) {
     acc += acceleration_;

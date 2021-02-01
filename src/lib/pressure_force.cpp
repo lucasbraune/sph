@@ -43,7 +43,7 @@ PressureForce& PressureForce::operator=(const PressureForce& other)
   return *this;
 }
 
-void PressureForce::apply(ParticleSystem& ps) const
+void PressureForce::apply(ParticleSystem& ps)
 {
   synchronizeWith(ps);
   const auto densities = computeDensities(ps);

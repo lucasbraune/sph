@@ -33,12 +33,11 @@ public:
   PressureForce& operator=(const PressureForce& other);
   PressureForce& operator=(PressureForce&& other) = default;
   ~PressureForce() = default;
-  void apply(ParticleSystem& ps) const;
+  void apply(ParticleSystem& ps);
 
 private:
   std::unordered_map<const Particle*, double> computeDensities(const ParticleSystem& ps) const;
-  // synchronizeWith should NOT be const
-  void synchronizeWith(const ParticleSystem& ps) const { filter_->syncWith(ps); }
+  void synchronizeWith(const ParticleSystem& ps) { filter_->syncWith(ps); }
   auto neighbors(const Particle& particle) const
   {
     return filter_->particlesIn(Disk{particle.pos, kernel_->interactionRadius()});

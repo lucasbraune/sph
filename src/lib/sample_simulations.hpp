@@ -12,7 +12,7 @@ std::vector<Particle> randomParticles(size_t N, const Rectangle& region);
 struct CentralGravityPhysics final : public Physics {
   CentralGravityPhysics(double gravityConstant, double dampingConstant);
 
-  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); }
+  void applyForces(ParticleSystem& ps) final { gravity_.apply(ps); }
   void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); }
   void resolveCollisions(ParticleSystem&) const final {}
 
@@ -31,7 +31,7 @@ Simulation<CentralGravityPhysics> createCentralGravitySimulation(
 struct WallBouncingPhysics : public Physics {
   WallBouncingPhysics(double gravityAcceleration, double dampingConstant);
 
-  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); }
+  void applyForces(ParticleSystem& ps) final { gravity_.apply(ps); }
   void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
   void resolveCollisions(ParticleSystem& ps) const final;
 
@@ -55,7 +55,7 @@ struct ToyStarPhysics : public Physics {
                  double interactionRadius,
                  const Rectangle& region);
 
-  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); pressure_.apply(ps); }
+  void applyForces(ParticleSystem& ps) final { gravity_.apply(ps); pressure_.apply(ps); }
   void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
   void resolveCollisions(ParticleSystem&) const final {};
 
@@ -79,7 +79,7 @@ struct WellPhysics : public Physics {
               double pressureConstant,
               double interactionRadius);
 
-  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); pressure_.apply(ps); }
+  void applyForces(ParticleSystem& ps) final { gravity_.apply(ps); pressure_.apply(ps); }
   void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
   void resolveCollisions(ParticleSystem& ps) const final;
 
@@ -104,7 +104,7 @@ struct BreakingDamPhysics : public Physics {
                      double pressureConstant,
                      double interactionRadius);
 
-  void applyForces(ParticleSystem& ps) const final { gravity_.apply(ps); pressure_.apply(ps); }
+  void applyForces(ParticleSystem& ps) final { gravity_.apply(ps); pressure_.apply(ps); }
   void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
   void resolveCollisions(ParticleSystem& ps) const final;
   void breakDam() { rightWall_.move(Vec2d{WALL_OFFSET_, 0.0}); }

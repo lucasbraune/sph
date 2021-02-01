@@ -19,7 +19,7 @@ namespace sph {
 
 struct Force {
   virtual ~Force() {}
-  virtual void apply(ParticleSystem& ps) const = 0;
+  virtual void apply(ParticleSystem& ps) = 0;
 };
 
 struct Damping {
@@ -35,7 +35,7 @@ struct Collidable {
 class PointGravity : public Force {
 public:
   PointGravity(double gravityConstant, const Vec2d& center = {});
-  void apply(ParticleSystem& ps) const final;
+  void apply(ParticleSystem& ps) final;
   double constant() const { return intensity_; }
   void setConstant(double intensity) { intensity_ = intensity; }
 
@@ -47,7 +47,7 @@ private:
 class SurfaceGravity : public Force {
 public:
   SurfaceGravity(double magnitude);
-  void apply(ParticleSystem& ps) const final;
+  void apply(ParticleSystem& ps) final;
   double magnitude() const { return -acceleration_[1]; }
   void setMagnitude(double newValue) { acceleration_[1] = -newValue; }
   
