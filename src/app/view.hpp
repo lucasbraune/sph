@@ -19,23 +19,21 @@ private:
 
 class View {
 public:
-  View(const sph::SimulationInterface& simulation, const sph::Rectangle region,
+  View(const sph::Rectangle region,
        const int windowHeight, const std::string title,
        const std::vector<sph::Vec2d> particlePolygon);
-  View(const sph::SimulationInterface& simulation,
-       const sph::Rectangle region = {-1.0, -1.0, 1.0, 1.0},
+  View(const sph::Rectangle region = {-1.0, -1.0, 1.0, 1.0},
        const double particleRadius = 0.02,
        const size_t sides = 10,
        const int windowHeight = 750,
        const std::string title = "Fluid simulation");
-  void draw() const;
-  sph::Rectangle region() const;
-  int windowHeight() const;
+  void draw(const sph::SimulationState& state) const;
+  sph::Rectangle region() const { return region_; }
+  int windowHeight() const { return heightInPixels_; }
   int windowWidth() const;
-  const char* title() const;
+  const char* title() const { return title_.c_str(); }
 
 private:
-  const sph::SimulationInterface& simulation_;
   const sph::Rectangle region_;
   const std::vector<sph::Vec2d> particlePolygon_;
   const int heightInPixels_;        // window height in pixels

@@ -8,23 +8,6 @@
 
 namespace sph {
 
-class SimulationInterface {
-public:
-  virtual ~SimulationInterface() {}
-
-  virtual ranges::any_view<const Vec2d&> positions() const = 0;
-  virtual double time() const = 0;
-  virtual double targetSpeed() const = 0;
-  virtual bool paused() const = 0;
-  virtual void computeNextFrame() = 0;
-  virtual void waitForNextFrame() = 0;
-  virtual void setTargetSpeed(double newSpeed) = 0;
-  virtual void togglePause() = 0;
-
-  void increaseTargetSpeed() { setTargetSpeed(2.0 * targetSpeed()); }
-  void decreaseTargetSpeed() { setTargetSpeed(0.5 * targetSpeed()); }
-};
-
 namespace detail {
 
 class Synchronizer {
@@ -42,11 +25,18 @@ private:
 
 } // end namespace detail
 
+struct SimulationState {
+  const ParticleSystem& ps;
+  const double targetSpeed;
+  const bool paused;
+};
+
 template<class PhysicsType, class IntegratorType = Verlet>
-class Simulation : public SimulationInterface {
+class Simulation {
   static_assert(std::is_base_of_v<Physics, PhysicsType>);
   static_assert(std::is_base_of_v<TimeIntegrator, IntegratorType>);
   
+
 public:
   Simulation(const ParticleSystem& ps,
              const PhysicsType& physics,
@@ -56,36 +46,36 @@ public:
     physics_{physics},
     integrator_{integrator},
     synchronizer_{},
-    simulationSpeed_{simulationSpeed},
+    targetSpeed_{simulationSpeed},
     fps_{fps},
     paused_{true} {}
   
-  ranges::any_view<const Vec2d&> positions() const final { return sph::positions(ps_); }
-  double time() const final { return ps_.time; }
-  double targetSpeed() const final { return simulationSpeed_; }
-  bool paused() const final { return paused_; }
+  SimulationState state() const { return {ps_, targetSpeed_, paused_}; }
 
-  void computeNextFrame() final 
+  void computeNextFrame() 
   {
-    if (!paused()) integrator_.integrate(ps_, physics_, simulationSpeed_ / fps_);
+    if (!paused_) integrator_.integrate(ps_, physics_, targetSpeed_ / fps_);
   }
 
-  void waitForNextFrame() final
+  void waitForNextFrame()
   {
-    if (!paused()) synchronizer_.waitUntil(ps_.time, simulationSpeed_);
+    if (!paused_) synchronizer_.waitUntil(ps_.time, targetSpeed_);
   }
 
-  void setTargetSpeed(double newSpeed) final
+  void setTargetSpeed(double newSpeed)
   {
     synchronize();
-    simulationSpeed_ = newSpeed;
+    targetSpeed_ = newSpeed;
   }
 
-  void togglePause() final
+  void togglePause()
   {
-    if (paused()) synchronize();
+    if (paused_) synchronize();
     paused_ = !paused_;
   }
+
+  void increaseTargetSpeed() { setTargetSpeed(2.0 * targetSpeed_); }
+  void decreaseTargetSpeed() { setTargetSpeed(0.5 * targetSpeed_); }
 
 private:
   void synchronize() { synchronizer_.synchronize(ps_.time); }
@@ -97,7 +87,7 @@ protected:
 private:
   IntegratorType integrator_;
   detail::Synchronizer synchronizer_;
-  double simulationSpeed_;
+  double targetSpeed_;
   const int fps_;
   bool paused_;
 };

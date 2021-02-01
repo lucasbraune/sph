@@ -15,7 +15,7 @@ void keyboard(unsigned char key, int x, int y);
 auto simulation = createToyStarSimulation();
 // auto simulation = createWellSimulation();
 // auto simulation = createBreakingDamSimulation();
-const auto view = View{simulation};
+const auto view = View{};
 
 int main(int argc, char** argv)
 {
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 
 void display()
 {
-  view.draw();  
+  view.draw(simulation.state());
   glutSwapBuffers();
 }
 
