@@ -17,6 +17,8 @@ struct ParticleSystem final {
   double time;
 };
 
+std::vector<Particle> randomParticles(const Rectangle& region, size_t numberOfParticles);
+
 struct Physics {
   virtual ~Physics() {}
   // Adds the effect of velocity-independent forces to the accelerations of particles
@@ -27,33 +29,68 @@ struct Physics {
   virtual void resolveCollisions(ParticleSystem& ps) const = 0;
 };
 
-class TimeIntegrator {
-public:
-  virtual ~TimeIntegrator() {};
-  void integrate(ParticleSystem& ps, Physics& physics, double duration);
-
-private:
-  virtual void step(ParticleSystem& ps, Physics& physics) = 0;
+struct Force {
+  virtual ~Force() {}
+  virtual void apply(ParticleSystem& ps) = 0;
 };
 
-class Euler : public TimeIntegrator {
+struct Damping {
+  virtual ~Damping() {}
+  virtual void apply(ParticleSystem& ps) const = 0;
+};
+
+struct Collidable {
+  virtual ~Collidable() {}
+  virtual void resolveCollisions(ParticleSystem& ps) const = 0;
+};
+
+class PointGravity : public Force {
 public:
-  Euler(double timeStep) : timeStep_{timeStep} {};
+  PointGravity(double gravityConstant, const Vec2d& center = {});
+  void apply(ParticleSystem& ps) final;
+  double constant() const { return intensity_; }
+  void setConstant(double intensity) { intensity_ = intensity; }
+
+private:
+  Vec2d center_;
+  double intensity_;
+};
+
+class SurfaceGravity : public Force {
+public:
+  SurfaceGravity(double magnitude);
+  void apply(ParticleSystem& ps) final;
+  double magnitude() const { return -acceleration_[1]; }
+  void setMagnitude(double newValue) { acceleration_[1] = -newValue; }
   
 private:
-  void step(ParticleSystem& ps, Physics& physics) override;
-  const double timeStep_;
+  Vec2d acceleration_;
 };
 
-class Verlet : public TimeIntegrator {
+class LinearDamping : public Damping {
 public:
-  Verlet(double timeStep) : timeStep_{timeStep} {};
-  
+  LinearDamping(double dampingConstant);
+  void apply(ParticleSystem& ps) const final;
+  double constant() const { return intensity_; }
+  void setConstant(double newValue) { intensity_ = newValue; }
+
 private:
-  void step(ParticleSystem& ps, Physics& physics) override;
-  const double timeStep_;
+  double intensity_; // force per unit velocity
 };
 
-} // end namespace sph
+class Wall : public Collidable {
+public:
+  Wall(const Vec2d& normal, // must be nonzero
+       double distanceFromTheOrigin);
+  void resolveCollisions(ParticleSystem& ps) const final;
+  void move(const Vec2d& displacement) { ptOnWall_ += displacement; }
+
+private:
+  void resolveCollision(Vec2d& pos, Vec2d& vel) const;
+  Vec2d unitNormal_; // points out of the wall
+  Vec2d ptOnWall_; 
+};
+
+} // namespace sph
 
 #endif

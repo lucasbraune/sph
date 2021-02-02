@@ -27,6 +27,7 @@ inline Vec2d& operator*=(Vec2d& a, const double lambda)
   return a;
 }
 inline Vec2d& operator/=(Vec2d& a, double lambda) { return a *= 1.0 / lambda; }
+
 inline Vec2d operator+(Vec2d a, const Vec2d& b) { return a += b; }
 inline Vec2d operator-(Vec2d a, const Vec2d& b) { return a -= b; }
 inline Vec2d operator*(double lambda, Vec2d a) { return a *= lambda; }
@@ -46,6 +47,8 @@ struct Rectangle final {
 
 inline double width(const Rectangle& rect) { return rect.xmax - rect.xmin; }
 inline double height(const Rectangle& rect) { return rect.ymax - rect.ymin; }
+
+Vec2d randomVec2d(const Rectangle& rect = {0.0, 0.0, 1.0, 1.0});
 
 struct Disk final {
   Disk(const Vec2d& center = {}, double radius = 1.0);

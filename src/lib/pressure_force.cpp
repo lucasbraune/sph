@@ -1,5 +1,5 @@
-#include <cmath> // M_PI
 #include "pressure_force.hpp"
+#include <cmath> // M_PI
 
 using std::vector;
 using std::unique_ptr;

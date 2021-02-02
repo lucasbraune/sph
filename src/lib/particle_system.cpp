@@ -9,93 +9,63 @@ sph::ParticleSystem::ParticleSystem(const std::vector<Particle>& particles, doub
   assert(particles.size() > 0);
 }
 
-void sph::TimeIntegrator::integrate(ParticleSystem& ps, Physics& physics, double duration)
+std::vector<Particle> sph::randomParticles(const Rectangle& region, size_t numberOfParticles)
 {
-  double target = ps.time + duration;
-  while (ps.time < target) {
-    step(ps, physics);
+  std::vector<Particle> result;
+  for (size_t i = 0; i < numberOfParticles; ++i) {
+    auto p = Particle{randomVec2d(region)};
+    result.emplace_back(p);
   }
+  return result;
 }
 
-void sph::Euler::step(ParticleSystem& ps, Physics& physics)
-{
-  ps.time += timeStep_;
-  for (auto& particle : ps.particles) {
-    particle.pos += timeStep_ * particle.vel;
-    particle.vel += timeStep_ * particle.acc;
-    particle.acc = Vec2d{};
-  }
-  physics.applyForces(ps);
-  physics.applyDamping(ps);
-}
+sph::PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :
+  center_(center), intensity_(gravityConstant)
+{}
 
-namespace {
-
-void copyVelocities(const ParticleSystem& ps, std::vector<Vec2d>& out)
-{
-  out.clear();
-  for (auto& particle : ps.particles) {
-    out.emplace_back(particle.vel);
-  }
-}
-
-void copyAccelerations(const ParticleSystem& ps, std::vector<Vec2d>& out)
-{
-  out.clear();
-  for (auto& particle : ps.particles) {
-    out.emplace_back(particle.acc);
-  }
-}
-
-void copyIntoAccelerations(const std::vector<Vec2d>& in, ParticleSystem& ps)
-{
-  assert(in.size() == ps.particles.size());
-  for (size_t i=0; i<ps.particles.size(); ++i) {
-    ps.particles[i].acc = in[i];
-  }
-}
-
-void fillAccelerations(ParticleSystem& ps, const Vec2d& val)
+void sph::PointGravity::apply(ParticleSystem& ps)
 {
   for (auto& particle : ps.particles) {
-    particle.acc = val;
+    particle.acc -= intensity_ * (particle.pos - center_);
   }
 }
 
-} // namespace
+sph::SurfaceGravity::SurfaceGravity(double magnitude) :
+  acceleration_{0.0, -magnitude} {}
 
-void sph::Verlet::step(ParticleSystem& ps, Physics& physics)
+void sph::SurfaceGravity::apply(ParticleSystem& ps)
 {
-  ps.time += timeStep_;
   for (auto& particle : ps.particles) {
-    particle.pos += timeStep_ * particle.vel + (0.5 * timeStep_ * timeStep_) * particle.acc;
+    particle.acc += acceleration_;
   }
-  physics.resolveCollisions(ps);
+}
 
-  static std::vector<Vec2d> prevVels, prevAccs, currForceAccs;
-  copyVelocities(ps, prevVels);
-  copyAccelerations(ps, prevAccs);
-  fillAccelerations(ps, Vec2d{});
-  physics.applyForces(ps);
-  copyAccelerations(ps, currForceAccs);
-  // Approximate velocities
-  
-  for (size_t i=0; i<ps.particles.size(); ++i) {
-    auto& particle = ps.particles[i];
-    auto& prevAcc = prevAccs[i];
-    particle.vel += timeStep_ * prevAcc;
+sph::LinearDamping::LinearDamping(double dampingConstant) :
+  intensity_(dampingConstant)
+{}
+
+void sph::LinearDamping::apply(ParticleSystem& ps) const
+{
+  for (auto& particle : ps.particles) {
+    particle.acc -= (intensity_ / ps.particleMass) * particle.vel;
   }
-  physics.applyDamping(ps);
-  for (size_t n=0; n<2; ++n) {
-    // Improve velocity approximations
-    for (size_t i=0; i<ps.particles.size(); ++i) {
-      auto& particle = ps.particles[i];
-      auto& prevVel = prevVels[i];
-      auto& prevAcc = prevAccs[i];
-      particle.vel = prevVel + (0.5 * timeStep_) * (prevAcc + particle.acc);
-    }
-    // Recompute accelerations
-    copyIntoAccelerations(currForceAccs, ps);
-    physics.applyDamping(ps);
+}
+
+sph::Wall::Wall(const Vec2d& normal, double distanceFromTheOrigin) :
+  unitNormal_{unit(normal)},
+  ptOnWall_{-distanceFromTheOrigin * unitNormal_} {}
+
+void sph::Wall::resolveCollisions(ParticleSystem& ps) const
+{
+  for (auto& particle : ps.particles) {
+    resolveCollision(particle.pos, particle.vel);
   }
+}
+
+void sph::Wall::resolveCollision(Vec2d& pos, Vec2d& vel) const
+{
+  auto w = pos - ptOnWall_;
+  if (dotProduct(w, unitNormal_) > 0) return;
+  pos -= 2 * project(w, unitNormal_);
+  vel -= 2 * project(vel, unitNormal_);
 }

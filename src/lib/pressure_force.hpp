@@ -2,7 +2,6 @@
 #define PRESSURE_FORCE_H
 
 #include "particle_system.hpp"
-#include "physics_elements.hpp"
 #include "loop_strategy.hpp"
 
 namespace sph {

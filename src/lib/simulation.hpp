@@ -4,6 +4,7 @@
 #include <chrono>
 #include <type_traits>
 #include "particle_system.hpp"
+#include "time_integrator.hpp"
 
 namespace sph {
 
@@ -22,7 +23,7 @@ private:
   double fixedSimTime_;
 };
 
-} // end namespace detail
+} // namespace detail
 
 struct SimulationState {
   const ParticleSystem& ps;
@@ -90,6 +91,6 @@ private:
   bool paused_;
 };
 
-} // end namespace sph
+} // namespace sph
 
 #endif

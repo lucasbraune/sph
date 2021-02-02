@@ -34,7 +34,7 @@ private:
 
 namespace detail {
 
-struct SubdividedInterval {
+struct SubdividedInterval final {
   SubdividedInterval(double left, double right, size_t subdivisions);
   size_t subdivision(double x) const;
 
@@ -55,10 +55,12 @@ public:
   accumulate(SummandFn&& summand, const ParticleSystem& ps, const Disk& neighborhood) const
   {
     assert(inSync(ps));
+
     const auto minI = row(neighborhood.center[0] - neighborhood.radius);
     const auto maxI = row(neighborhood.center[0] + neighborhood.radius);
     const auto minJ = column(neighborhood.center[1] - neighborhood.radius);
     const auto maxJ = column(neighborhood.center[1] + neighborhood.radius);
+    
     auto sum = std::result_of_t<SummandFn(const Particle&)>{};
     for (size_t i=minI; i<=maxI; ++i) {
       for (size_t j=minJ; j<=maxJ; ++j) {

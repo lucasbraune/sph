@@ -8,27 +8,6 @@ using namespace sph;
 
 namespace {
 
-Vec2d randomVec2d(const Rectangle &r = {0.0, 0.0, 1.0, 1.0})
-{
-  static auto dist = std::uniform_real_distribution<double>{};
-  static auto re = std::default_random_engine{};
-  constexpr auto affineFn = [](double a, double b, double x) {
-    return a + (b - a) * x;
-  };
-  return {affineFn(r.xmin, r.xmax, dist(re)),
-          affineFn(r.ymin, r.ymax, dist(re))};
-}
-
-std::vector<Particle> randomParticles(const Rectangle& region, size_t numberOfParticles)
-{
-  std::vector<Particle> result;
-  for (size_t i = 0; i < numberOfParticles; ++i) {
-    auto p = Particle{randomVec2d(region)};
-    result.emplace_back(p);
-  }
-  return result;
-}
-
 double interactionRadius(double numberOfParticles)
 {
   return std::sqrt(10.0 / numberOfParticles);
