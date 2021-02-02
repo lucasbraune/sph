@@ -48,7 +48,7 @@ private:
 };
 
 template<class PressureFn,
-         class NeighborLoopStrategy = TrivialLoopStrategy,
+         class NeighborLoopStrategy = GridBasedLoopStrategy,
          class KernelFn = CubicKernel>
 class PressureForce : public Force {
   static_assert(std::is_base_of_v<SmoothingKernel, KernelFn>);
@@ -102,16 +102,17 @@ private:
 template<class PressureFn>
 auto makePressureForce(PressureFn&& pressure, double interactionRadius)
 {
-  return PressureForce<PressureFn>{
+  return PressureForce<PressureFn, TrivialLoopStrategy>{
     pressure, CubicKernel{interactionRadius}, TrivialLoopStrategy{}
   };
 }
 
 template<class PressureFn>
-auto makePressureForce(PressureFn&& pressure, double interactionRadius, const Rectangle&)
+auto makePressureForce(PressureFn&& pressure, double interactionRadius, const Rectangle& region)
 {
   return PressureForce<PressureFn>{
-    pressure, CubicKernel{interactionRadius}, TrivialLoopStrategy{}
+    pressure, CubicKernel{interactionRadius},
+    makeGridBasedLoopStrategy(region, interactionRadius)
   };
 }
 

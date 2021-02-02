@@ -1,4 +1,5 @@
 #include "util.hpp"
+#include <cmath> // hypot
 
 using namespace sph;
 
@@ -17,4 +18,9 @@ sph::Disk::Disk(const Vec2d& center, double radius) :
 Vec2d sph::project(const Vec2d& x, const Vec2d& normal)
 {
   return (dotProduct(x, normal) / dotProduct(normal, normal)) * normal;
+}
+
+double sph::norm(const Vec2d& x)
+{
+  return std::hypot(x[0], x[1]);
 }

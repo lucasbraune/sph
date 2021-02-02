@@ -1,3 +1,4 @@
+#include <cmath> // M_PI
 #include "pressure_force.hpp"
 
 using std::vector;
@@ -6,15 +7,9 @@ using std::function;
 
 using namespace sph;
 
-namespace {
-
-constexpr auto PI = 3.14159265358979323846264338327950288;
-
-} // namespace
-
 sph::CubicKernel::CubicKernel(double interactionRadius) :
   smoothingLength_{interactionRadius / 2},
-  C_{15.0 / (14 * PI * smoothingLength_ * smoothingLength_)},
+  C_{15.0 / (14 * M_PI * smoothingLength_ * smoothingLength_)},
   D_{-3 * C_ / smoothingLength_}
 {}
 

@@ -1,6 +1,6 @@
 #include "sample_simulations.hpp"
+#include <cmath> // sqrt, M_PI
 #include <random>
-#include <cmath>
 
 using std::vector;
 
@@ -31,7 +31,7 @@ std::vector<Particle> randomParticles(const Rectangle& region, size_t numberOfPa
 
 double interactionRadius(double numberOfParticles)
 {
-  return sqrt(10.0 / numberOfParticles);
+  return std::sqrt(10.0 / numberOfParticles);
 }
 
 } // namespace
@@ -68,7 +68,9 @@ sph::BreakingDamPhysics::BreakingDamPhysics(double gravityConstant,
                          double interactionRadius) :
   gravity_{gravityConstant},
   damping_{dampingConstant},
-  pressure_{makePressureForce(GasPressure{pressureConstant}, interactionRadius)},
+  pressure_{makePressureForce(GasPressure{pressureConstant},
+                              interactionRadius,
+                              Rectangle{-1.0, -1.0, 1.0, 1.0})},
   leftWall_{Vec2d{1.0, 0.0},  WALL_OFFSET_},
   bottomWall_{Vec2d{0.0, 1.0},  WALL_OFFSET_},
   rightWall_{Vec2d{-1.0, 0.0},  0.0} {}

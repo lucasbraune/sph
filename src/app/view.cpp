@@ -1,7 +1,7 @@
 #define GL_SILENCE_DEPRECATION
 
 #include "view.hpp"
-#include <cmath>
+#include <cmath> // M_PI, cos, sin
 #include <GL/freeglut.h>
 
 using std::vector;
@@ -12,7 +12,7 @@ RegularPolygon::RegularPolygon(Vec2d center, double radius, size_t sides)
 {
   for (size_t i=0; i<sides; i++) {
     double theta = 2 * M_PI * i / sides;
-    vertices_.push_back(center + radius * Vec2d{cos(theta), sin(theta)});
+    vertices_.push_back(center + radius * Vec2d{std::cos(theta), std::sin(theta)});
   }
 }
 

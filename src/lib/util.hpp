@@ -3,7 +3,6 @@
 
 #include <array>
 #include <vector>
-#include <cmath>
 
 namespace sph {
 
@@ -36,7 +35,7 @@ inline Vec2d operator/(Vec2d a, double lambda) { return a /= lambda; }
 
 inline double dotProduct(const Vec2d& a, const Vec2d& b) { return a[0] * b[0] + a[1] * b[1]; }
 Vec2d project(const Vec2d& x, const Vec2d& normal);
-inline double norm(const Vec2d& x) { return hypot(x[0], x[1]); }
+double norm(const Vec2d& x);
 inline double dist(const Vec2d& x, const Vec2d& y) { return norm(x - y); }
 inline Vec2d unit(const Vec2d& x) { return x / norm(x); }
 
