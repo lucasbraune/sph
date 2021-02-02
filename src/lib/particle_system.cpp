@@ -1,5 +1,4 @@
 #include "particle_system.hpp"
-#include "range/v3/view/zip.hpp"
 
 using namespace sph;
 
@@ -51,8 +50,8 @@ void copyAccelerations(const ParticleSystem& ps, std::vector<Vec2d>& out)
 void copyIntoAccelerations(const std::vector<Vec2d>& in, ParticleSystem& ps)
 {
   assert(in.size() == ps.particles.size());
-  for (auto [a, particle] : ranges::views::zip(in, ps.particles)) {
-    particle.acc = a;
+  for (size_t i=0; i<ps.particles.size(); ++i) {
+    ps.particles[i].acc = in[i];
   }
 }
 
@@ -80,13 +79,19 @@ void sph::Verlet::step(ParticleSystem& ps, Physics& physics)
   physics.applyForces(ps);
   copyAccelerations(ps, currForceAccs);
   // Approximate velocities
-  for (auto [particle, prevAcc] : ranges::views::zip(ps.particles, prevAccs)) {
+  
+  for (size_t i=0; i<ps.particles.size(); ++i) {
+    auto& particle = ps.particles[i];
+    auto& prevAcc = prevAccs[i];
     particle.vel += timeStep_ * prevAcc;
   }
   physics.applyDamping(ps);
   for (size_t n=0; n<2; ++n) {
     // Improve velocity approximations
-    for (auto [particle, prevVel, prevAcc] : ranges::views::zip(ps.particles, prevVels, prevAccs)) {
+    for (size_t i=0; i<ps.particles.size(); ++i) {
+      auto& particle = ps.particles[i];
+      auto& prevVel = prevVels[i];
+      auto& prevAcc = prevAccs[i];
       particle.vel = prevVel + (0.5 * timeStep_) * (prevAcc + particle.acc);
     }
     // Recompute accelerations

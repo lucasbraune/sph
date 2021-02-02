@@ -11,8 +11,8 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-auto simulation = createToyStarSimulation();
-// auto simulation = createBreakingDamSimulation();
+// auto simulation = createToyStarSimulation();
+auto simulation = createBreakingDamSimulation();
 const auto view = View{};
 
 int main(int argc, char** argv)
