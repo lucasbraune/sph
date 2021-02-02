@@ -6,7 +6,8 @@
 namespace sph {
 
 struct Particle final {
-  Vec2d pos, vel, acc;
+  Vec2d pos, vel = {}, acc = {};
+  double density = 0.0;
 };
 
 struct ParticleSystem final {

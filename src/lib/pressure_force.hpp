@@ -1,7 +1,6 @@
 #ifndef PRESSURE_FORCE_H
 #define PRESSURE_FORCE_H
 
-#include <unordered_map>
 #include "particle_system.hpp"
 #include "physics_elements.hpp"
 #include "loop_strategy.hpp"
@@ -61,13 +60,11 @@ public:
   void apply(ParticleSystem& ps)
   {
     loopStategy_.syncWith(ps);
-    const auto densities = computeDensities(ps);
+    updateDensities(ps);
     for (auto& particle : ps.particles) {
-      auto density1 = densities.at(&particle);
-      auto quotient1 = pressure_(density1) / (density1 * density1);
+      auto quotient1 = pressure_(particle.density) / (particle.density * particle.density);
       auto summand = [&](auto& neighbor) {
-        auto density2 = densities.at(&neighbor);
-        auto quotient2 = pressure_(density2) / (density2 * density2);
+        auto quotient2 = pressure_(neighbor.density) / (neighbor.density * neighbor.density);
         return (quotient1 + quotient2) * kernel_.gradientAt(particle.pos - neighbor.pos);
       };
       particle.acc -= ps.particleMass *
@@ -76,17 +73,15 @@ public:
   }
 
 private:
-  std::unordered_map<const Particle*, double> computeDensities(const ParticleSystem& ps) const
+  void updateDensities(ParticleSystem& ps) const
   {
-    auto densities = std::unordered_map<const Particle*, double>{};
-    for (const auto& particle : ps.particles) {
+    for (auto& particle : ps.particles) {
       auto summand = [&](auto& neighbor) { 
         return kernel_(particle.pos - neighbor.pos);
       };
-      densities[&particle] = ps.particleMass *
-                             loopStategy_.accumulate(summand, ps, neighborhood(particle));
+      particle.density = ps.particleMass *
+                         loopStategy_.accumulate(summand, ps, neighborhood(particle));
     }
-    return densities;
   }
 
   Disk neighborhood(const Particle& particle) const

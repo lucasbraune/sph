@@ -23,7 +23,7 @@ std::vector<Particle> randomParticles(const Rectangle& region, size_t numberOfPa
 {
   std::vector<Particle> result;
   for (size_t i = 0; i < numberOfParticles; ++i) {
-    auto p = Particle{randomVec2d(region), Vec2d{}, Vec2d{}};
+    auto p = Particle{randomVec2d(region)};
     result.emplace_back(p);
   }
   return result;

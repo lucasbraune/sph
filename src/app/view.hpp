@@ -23,7 +23,7 @@ public:
        const int windowHeight, const std::string title,
        const std::vector<sph::Vec2d> particlePolygon);
   View(const sph::Rectangle region = {-1.0, -1.0, 1.0, 1.0},
-       const double particleRadius = 0.02,
+       const double particleRadius = 0.015,
        const size_t sides = 10,
        const int windowHeight = 750,
        const std::string title = "Fluid simulation");

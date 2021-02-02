@@ -24,7 +24,7 @@ struct ToyStarPhysics : public Physics {
 };
 
 Simulation<ToyStarPhysics> createToyStarSimulation(
-    size_t numberOfParticles = 1000,
+    size_t numberOfParticles = 5000,
     double starMass = 2.0,
     double starRadius = 0.75,
     Rectangle initialRegion = {-1.0, -1.0, 1.0, 1.0},
