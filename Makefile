@@ -12,7 +12,7 @@ TEST_SRC:=src/test
 TEST_BIN:=bin/test
 TEST_EXEC:=$(TEST_BIN)/main
 
-CXX:=g++ -std=c++17 -g -Wall -Wextra -pedantic -I $(LIB_SRC)
+CXX:=g++ -std=c++17 -o3 -Wall -Wextra -pedantic -I $(LIB_SRC)
 GLUT_FLAGS:=-framework OpenGL -framework GLUT
 
 all: clean directories $(APP_EXEC)

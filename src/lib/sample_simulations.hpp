@@ -24,7 +24,7 @@ struct ToyStarPhysics : public Physics {
 };
 
 Simulation<ToyStarPhysics> createToyStarSimulation(
-    size_t numberOfParticles = 5000,
+    size_t numberOfParticles = 4000,
     double starMass = 2.0,
     double starRadius = 0.75,
     Rectangle initialRegion = {-1.0, -1.0, 1.0, 1.0},
@@ -66,7 +66,7 @@ public:
 };
 
 BreakingDamSimulation createBreakingDamSimulation(
-    size_t numberOfParticles = 1000,
+    size_t numberOfParticles = 3000,
     double totalMass = 2.0,
     Rectangle region = {-1.0, -1.0, 1.0, 1.0},
     double gravityAcceleration = 10.0,
