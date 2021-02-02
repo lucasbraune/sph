@@ -1,61 +1,27 @@
 #ifndef PRESSURE_FORCE_H
 #define PRESSURE_FORCE_H
 
-#include <memory>
-#include <functional>
 #include <unordered_map>
 #include "particle_system.hpp"
 #include "physics_elements.hpp"
-#include "particle_filter.hpp"
+#include "loop_strategy.hpp"
 
 namespace sph {
 
 class SmoothingKernel {
-  public:
+public:
+  virtual ~SmoothingKernel() {};
   virtual double operator()(Vec2d x) const = 0;
   virtual Vec2d gradientAt(Vec2d x) const = 0;
   virtual double interactionRadius() const = 0;
-  
-  virtual std::unique_ptr<SmoothingKernel> clone() const = 0;
-  virtual ~SmoothingKernel() {};
 };
 
-class PressureForce : public Force {
+class CubicKernel final : public SmoothingKernel {
 public:
-  PressureForce(std::unique_ptr<ParticleFilter> filter,
-                std::unique_ptr<SmoothingKernel> kernel,
-                const std::function<double(double)>& pressure);
-  PressureForce(double interactionRadius, std::function<double(double)> pressure);
-  PressureForce(double interactionRadius, std::function<double(double)> pressure,
-                const Rectangle& region);
-  PressureForce(const PressureForce& other); 
-  PressureForce(PressureForce&& other) = default;
-  PressureForce& operator=(const PressureForce& other);
-  PressureForce& operator=(PressureForce&& other) = default;
-  ~PressureForce() = default;
-  void apply(ParticleSystem& ps);
-
-private:
-  std::unordered_map<const Particle*, double> computeDensities(const ParticleSystem& ps) const;
-  void synchronizeWith(const ParticleSystem& ps) { filter_->syncWith(ps); }
-  auto neighbors(const Particle& particle) const
-  {
-    return filter_->particlesIn(Disk{particle.pos, kernel_->interactionRadius()});
-  }
-
-  std::unique_ptr<SmoothingKernel> kernel_;
-  std::unique_ptr<ParticleFilter> filter_;
-  std::function<double(double)> pressure_;
-};
-
-class CubicKernel : public SmoothingKernel {
-public:
-  CubicKernel(double smoothingLength);
-  double operator()(Vec2d x) const override;
-  Vec2d gradientAt(Vec2d x) const override;
-  double interactionRadius() const override;
-
-  std::unique_ptr<SmoothingKernel> clone() const override;
+  CubicKernel(double interactionRadius);
+  double operator()(Vec2d x) const final;
+  Vec2d gradientAt(Vec2d x) const final;
+  double interactionRadius() const final;
 
 private:
   const double smoothingLength_;
@@ -80,6 +46,74 @@ public:
 private:
   const double pressureConstant_;
 };
+
+template<class PressureFn,
+         class NeighborLoopStrategy = TrivialLoopStrategy,
+         class KernelFn = CubicKernel>
+class PressureForce : public Force {
+  static_assert(std::is_base_of_v<SmoothingKernel, KernelFn>);
+
+public:
+  PressureForce(const PressureFn& pressure, const KernelFn& kernel,
+                const NeighborLoopStrategy& loopStrategy) :
+    loopStategy_{loopStrategy}, kernel_{kernel}, pressure_{pressure} {}
+
+  void apply(ParticleSystem& ps)
+  {
+    loopStategy_.syncWith(ps);
+    const auto densities = computeDensities(ps);
+    for (auto& particle : ps.particles) {
+      auto density1 = densities.at(&particle);
+      auto quotient1 = pressure_(density1) / (density1 * density1);
+      auto summand = [&](auto& neighbor) {
+        auto density2 = densities.at(&neighbor);
+        auto quotient2 = pressure_(density2) / (density2 * density2);
+        return (quotient1 + quotient2) * kernel_.gradientAt(particle.pos - neighbor.pos);
+      };
+      particle.acc -= ps.particleMass *
+                      loopStategy_.accumulate(summand, ps, neighborhood(particle));
+    }
+  }
+
+private:
+  std::unordered_map<const Particle*, double> computeDensities(const ParticleSystem& ps) const
+  {
+    auto densities = std::unordered_map<const Particle*, double>{};
+    for (const auto& particle : ps.particles) {
+      auto summand = [&](auto& neighbor) { 
+        return kernel_(particle.pos - neighbor.pos);
+      };
+      densities[&particle] = ps.particleMass *
+                             loopStategy_.accumulate(summand, ps, neighborhood(particle));
+    }
+    return densities;
+  }
+
+  Disk neighborhood(const Particle& particle) const
+  {
+    return Disk{particle.pos, kernel_.interactionRadius()};
+  }
+
+  NeighborLoopStrategy loopStategy_;
+  KernelFn kernel_;
+  PressureFn pressure_;
+};
+
+template<class PressureFn>
+auto makePressureForce(PressureFn&& pressure, double interactionRadius)
+{
+  return PressureForce<PressureFn>{
+    pressure, CubicKernel{interactionRadius}, TrivialLoopStrategy{}
+  };
+}
+
+template<class PressureFn>
+auto makePressureForce(PressureFn&& pressure, double interactionRadius, const Rectangle&)
+{
+  return PressureForce<PressureFn>{
+    pressure, CubicKernel{interactionRadius}, TrivialLoopStrategy{}
+  };
+}
 
 } // end namespace sph 
 

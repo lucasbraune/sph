@@ -36,19 +36,20 @@ class Simulation {
   static_assert(std::is_base_of_v<Physics, PhysicsType>);
   static_assert(std::is_base_of_v<TimeIntegrator, IntegratorType>);
   
-
 public:
   Simulation(const ParticleSystem& ps,
              const PhysicsType& physics,
              const IntegratorType& integrator,
              double simulationSpeed = 1.0, int fps = 60) :
-    ps_{ps},
     physics_{physics},
+    ps_{ps},
     integrator_{integrator},
     synchronizer_{},
     targetSpeed_{simulationSpeed},
     fps_{fps},
     paused_{true} {}
+  
+  virtual ~Simulation() {}
   
   SimulationState state() const { return {ps_, targetSpeed_, paused_}; }
 
@@ -62,12 +63,6 @@ public:
     if (!paused_) synchronizer_.waitUntil(ps_.time, targetSpeed_);
   }
 
-  void setTargetSpeed(double newSpeed)
-  {
-    synchronize();
-    targetSpeed_ = newSpeed;
-  }
-
   void togglePause()
   {
     if (paused_) synchronize();
@@ -77,14 +72,18 @@ public:
   void increaseTargetSpeed() { setTargetSpeed(2.0 * targetSpeed_); }
   void decreaseTargetSpeed() { setTargetSpeed(0.5 * targetSpeed_); }
 
-private:
-  void synchronize() { synchronizer_.synchronize(ps_.time); }
-  ParticleSystem ps_;
-  
 protected:
   PhysicsType physics_;
 
 private:
+  void synchronize() { synchronizer_.synchronize(ps_.time); }
+  void setTargetSpeed(double newSpeed)
+  {
+    synchronize();
+    targetSpeed_ = newSpeed;
+  }
+  
+  ParticleSystem ps_;
   IntegratorType integrator_;
   detail::Synchronizer synchronizer_;
   double targetSpeed_;
