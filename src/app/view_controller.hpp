@@ -1,13 +1,26 @@
-#ifndef CONTROLLER_HPP
-#define CONTROLLER_HPP
+#ifndef VIEW_HPP
+#define VIEW_HPP
 
 #include "simulation.hpp"
 #include "sample_simulations.hpp"
 
+namespace sph {
+
+class View {
+public:
+  View(const Rectangle& region, size_t numberOfParticles,
+       double density = 0.3, size_t sides = 10);
+  void draw(const SimulationState& state) const;
+  const Rectangle region;
+
+private:
+  const std::vector<Vec2d> particlePolygon_;
+};
+
 namespace detail {
 
 template<class Simulation>
-void handleBasicInput(Simulation& simulation, char c)
+void keyboardHelper(Simulation& simulation, char c)
 {
   switch (c) {
   case 'p':
@@ -28,11 +41,11 @@ void handleBasicInput(Simulation& simulation, char c)
 template<class Simulation>
 void handleKeyboardInput(Simulation& simulation, char c)
 {
-  detail::handleBasicInput(simulation, c);
+  detail::keyboardHelper(simulation, c);
 }
 
 template<>
-void handleKeyboardInput(sph::BreakingDamSimulation& simulation, char c)
+inline void handleKeyboardInput(BreakingDamSimulation& simulation, char c)
 {
   switch (c) {
   case 'b':
@@ -46,8 +59,10 @@ void handleKeyboardInput(sph::BreakingDamSimulation& simulation, char c)
     simulation.increaseDamping();
     break;
   default:
-    detail::handleBasicInput(simulation, c);
+    detail::keyboardHelper(simulation, c);
   }
 }
+
+} // namespace sph
 
 #endif

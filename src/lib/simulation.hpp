@@ -47,7 +47,7 @@ public:
     synchronizer_{},
     targetSpeed_{simulationSpeed},
     fps_{fps},
-    paused_{true} {}
+    paused_{false} {}
   
   virtual ~Simulation() {}
   
