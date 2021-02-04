@@ -1,13 +1,12 @@
 #define GL_SILENCE_DEPRECATION
 
-#include <string>
 #include <GL/freeglut.h>
 #include "sample_simulations.hpp"
 #include "view_controller.hpp"
 
 using namespace sph;
 
-void createGlutWindow(const Rectangle& region, int verticalPixels, const std::string title);
+void createGlutWindow(const Rectangle& region, int verticalPixels, const char* title);
 void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
@@ -33,13 +32,13 @@ int horizontalPixels(int verticalPixels, const Rectangle& region)
   return static_cast<int>(result);
 }
 
-void createGlutWindow(const Rectangle& region, int verticalPixels, const std::string title)
+void createGlutWindow(const Rectangle& region, int verticalPixels, const char* title)
 {
   int argc = 0;
   glutInit(&argc, nullptr);
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
   glutInitWindowSize(horizontalPixels(verticalPixels, region), verticalPixels);
-  glutCreateWindow(title.c_str());
+  glutCreateWindow(title);
   gluOrtho2D(region.xmin, region.xmax, region.ymin, region.ymax);
 }
 
