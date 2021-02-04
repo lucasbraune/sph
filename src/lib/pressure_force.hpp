@@ -17,9 +17,9 @@ public:
 class CubicKernel final : public SmoothingKernel {
 public:
   CubicKernel(double interactionRadius);
-  double operator()(Vec2d x) const final;
-  Vec2d gradientAt(Vec2d x) const final;
-  double interactionRadius() const final;
+  double operator()(Vec2d x) const override;
+  Vec2d gradientAt(Vec2d x) const override;
+  double interactionRadius() const override;
 
 private:
   const double smoothingLength_;
@@ -48,7 +48,7 @@ private:
 template<class PressureFn,
          class NeighborLoopStrategy = GridBasedLoopStrategy,
          class KernelFn = CubicKernel>
-class PressureForce : public Force {
+class PressureForce final : public Force {
   static_assert(std::is_base_of_v<SmoothingKernel, KernelFn>);
 
 public:
@@ -56,7 +56,7 @@ public:
                 const NeighborLoopStrategy& loopStrategy) :
     loopStrategy_{loopStrategy}, kernel_{kernel}, pressure_{pressure} {}
 
-  void apply(ParticleSystem& ps)
+  void apply(ParticleSystem& ps) override
   {
     loopStrategy_.syncWith(ps);
     updateDensities(ps);

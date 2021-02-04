@@ -14,7 +14,7 @@ private:
   virtual void step(ParticleSystem& ps, Physics& physics) = 0;
 };
 
-class Euler : public TimeIntegrator {
+class Euler final : public TimeIntegrator {
 public:
   Euler(double timeStep) : timeStep_{timeStep} {};
   
@@ -23,7 +23,7 @@ private:
   const double timeStep_;
 };
 
-class Verlet : public TimeIntegrator {
+class Verlet final : public TimeIntegrator {
 public:
   Verlet(double timeStep) : timeStep_{timeStep} {};
   

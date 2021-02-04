@@ -44,10 +44,10 @@ struct Collidable {
   virtual void resolveCollisions(ParticleSystem& ps) const = 0;
 };
 
-class PointGravity : public Force {
+class PointGravity final : public Force {
 public:
   PointGravity(double gravityConstant, const Vec2d& center = {});
-  void apply(ParticleSystem& ps) final;
+  void apply(ParticleSystem& ps) override;
   double constant() const { return intensity_; }
   void setConstant(double intensity) { intensity_ = intensity; }
 
@@ -56,10 +56,10 @@ private:
   double intensity_;
 };
 
-class SurfaceGravity : public Force {
+class SurfaceGravity final : public Force {
 public:
   SurfaceGravity(double magnitude);
-  void apply(ParticleSystem& ps) final;
+  void apply(ParticleSystem& ps) override;
   double magnitude() const { return -acceleration_[1]; }
   void setMagnitude(double newValue) { acceleration_[1] = -newValue; }
   
@@ -67,10 +67,10 @@ private:
   Vec2d acceleration_;
 };
 
-class LinearDamping : public Damping {
+class LinearDamping final : public Damping {
 public:
   LinearDamping(double dampingConstant);
-  void apply(ParticleSystem& ps) const final;
+  void apply(ParticleSystem& ps) const override;
   double constant() const { return intensity_; }
   void setConstant(double newValue) { intensity_ = newValue; }
 
@@ -78,10 +78,10 @@ private:
   double intensity_; // force per unit velocity
 };
 
-class Wall : public Collidable {
+class Wall final : public Collidable {
 public:
   Wall(const Vec2d& normal, const Vec2d& ptOnWall);
-  void resolveCollisions(ParticleSystem& ps) const final;
+  void resolveCollisions(ParticleSystem& ps) const override;
   void move(const Vec2d& displacement) { ptOnWall_ += displacement; }
 
 private:

@@ -24,12 +24,12 @@ struct ToyStarParameters {
   double gravityConstant() const;
 };
 
-struct ToyStarPhysics : public Physics {
+struct ToyStarPhysics final : public Physics {
   ToyStarPhysics(const ToyStarParameters& params);
 
-  void applyForces(ParticleSystem& ps) final { gravity_.apply(ps); pressure_.apply(ps); }
-  void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
-  void resolveCollisions(ParticleSystem&) const final {};
+  void applyForces(ParticleSystem& ps) override { gravity_.apply(ps); pressure_.apply(ps); }
+  void applyDamping(ParticleSystem& ps) const override { damping_.apply(ps); };
+  void resolveCollisions(ParticleSystem&) const override {};
 
   PointGravity gravity_;
   LinearDamping damping_;
@@ -56,11 +56,11 @@ struct BreakingDamParameters {
   double restDensity() const;
 };
 
-struct BreakingDamPhysics : public Physics {
+struct BreakingDamPhysics final : public Physics {
   BreakingDamPhysics(const BreakingDamParameters& params);
-  void applyForces(ParticleSystem& ps) final { gravity_.apply(ps); pressure_.apply(ps); }
-  void applyDamping(ParticleSystem& ps) const final { damping_.apply(ps); };
-  void resolveCollisions(ParticleSystem& ps) const final;
+  void applyForces(ParticleSystem& ps) override { gravity_.apply(ps); pressure_.apply(ps); }
+  void applyDamping(ParticleSystem& ps) const override { damping_.apply(ps); };
+  void resolveCollisions(ParticleSystem& ps) const override;
   void breakDam() { rightWall_ = rightWallAfter_; }
 
   SurfaceGravity gravity_;
