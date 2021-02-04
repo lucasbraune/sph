@@ -1,4 +1,4 @@
 # sph-fluids
 Fluid simulation using smoothed particle hydrodynamics
 
-![Demo](toystar.gif)
+<img src="toystar.gif" width="600">
