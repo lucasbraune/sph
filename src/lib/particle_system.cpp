@@ -25,7 +25,7 @@ ParticleSystem sph::createParticleSystem(size_t numberOfParticles, double totalM
 }
 
 sph::PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :
-  center_(center), intensity_(gravityConstant)
+  center_{center}, intensity_{gravityConstant}
 {}
 
 void sph::PointGravity::apply(ParticleSystem& ps)
@@ -46,7 +46,7 @@ void sph::SurfaceGravity::apply(ParticleSystem& ps)
 }
 
 sph::LinearDamping::LinearDamping(double dampingConstant) :
-  intensity_(dampingConstant)
+  intensity_{dampingConstant}
 {}
 
 void sph::LinearDamping::apply(ParticleSystem& ps) const

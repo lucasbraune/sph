@@ -51,8 +51,8 @@ double sph::CubicKernel::interactionRadius() const
 }
 
 sph::WaterPressure::WaterPressure(double pressureConstant, double restDensity) :
-  pressureConstant_(pressureConstant),
-  restDensity_(restDensity)
+  pressureConstant_{pressureConstant},
+  restDensity_{restDensity}
 {}
 
 double sph::WaterPressure::operator()(double density) const
@@ -61,7 +61,7 @@ double sph::WaterPressure::operator()(double density) const
 }
 
 sph::GasPressure::GasPressure(double pressureConstant) :
-  pressureConstant_(pressureConstant)
+  pressureConstant_{pressureConstant}
 {}
 
 double sph::GasPressure::operator()(double density) const
