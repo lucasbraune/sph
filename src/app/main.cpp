@@ -12,8 +12,8 @@ void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-// auto simulation = createSimulation(ToyStarParameters{});
-auto simulation = createSimulation(BreakingDamParameters{});
+auto simulation = createSimulation(ToyStarParameters{});
+// auto simulation = createSimulation(BreakingDamParameters{});
 
 int main()
 {

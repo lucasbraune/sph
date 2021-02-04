@@ -54,11 +54,11 @@ class PressureForce : public Force {
 public:
   PressureForce(const PressureFn& pressure, const KernelFn& kernel,
                 const NeighborLoopStrategy& loopStrategy) :
-    loopStategy_{loopStrategy}, kernel_{kernel}, pressure_{pressure} {}
+    loopStrategy_{loopStrategy}, kernel_{kernel}, pressure_{pressure} {}
 
   void apply(ParticleSystem& ps)
   {
-    loopStategy_.syncWith(ps);
+    loopStrategy_.syncWith(ps);
     updateDensities(ps);
     for (auto& particle : ps.particles) {
       auto quotient1 = pressure_(particle.density) / (particle.density * particle.density);
@@ -67,7 +67,7 @@ public:
         return (quotient1 + quotient2) * kernel_.gradientAt(particle.pos - neighbor.pos);
       };
       particle.acc -= ps.particleMass *
-                      loopStategy_.accumulate(summand, ps, neighborhood(particle));
+                      loopStrategy_.accumulate(summand, ps, neighborhood(particle));
     }
   }
 
@@ -79,7 +79,7 @@ private:
         return kernel_(particle.pos - neighbor.pos);
       };
       particle.density = ps.particleMass *
-                         loopStategy_.accumulate(summand, ps, neighborhood(particle));
+                         loopStrategy_.accumulate(summand, ps, neighborhood(particle));
     }
   }
 
@@ -88,7 +88,7 @@ private:
     return Disk{particle.pos, kernel_.interactionRadius()};
   }
 
-  NeighborLoopStrategy loopStategy_;
+  NeighborLoopStrategy loopStrategy_;
   KernelFn kernel_;
   PressureFn pressure_;
 };
