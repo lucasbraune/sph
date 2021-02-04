@@ -2,14 +2,9 @@
 
 using namespace sph;
 
-sph::ParticleSystem::ParticleSystem(const std::vector<Particle>& particles, double totalMass) :
-  particles{particles},
-  particleMass{totalMass / particles.size()}
-{
-  assert(particles.size() > 0);
-}
+namespace {
 
-std::vector<Particle> sph::randomParticles(const Rectangle& region, size_t numberOfParticles)
+std::vector<Particle> randomParticles(size_t numberOfParticles, const Rectangle& region)
 {
   std::vector<Particle> result;
   for (size_t i = 0; i < numberOfParticles; ++i) {
@@ -17,6 +12,16 @@ std::vector<Particle> sph::randomParticles(const Rectangle& region, size_t numbe
     result.emplace_back(p);
   }
   return result;
+}
+
+} // namespace
+
+ParticleSystem sph::createParticleSystem(size_t numberOfParticles, double totalMass, 
+                                         const Rectangle& region)
+{
+  assert(numberOfParticles > 0);
+  return {randomParticles(numberOfParticles, region),
+          totalMass / numberOfParticles};
 }
 
 sph::PointGravity::PointGravity(double gravityConstant, const Vec2d& center) :
@@ -51,9 +56,10 @@ void sph::LinearDamping::apply(ParticleSystem& ps) const
   }
 }
 
-sph::Wall::Wall(const Vec2d& normal, double distanceFromTheOrigin) :
+sph::Wall::Wall(const Vec2d& normal, const Vec2d& ptOnWall) :
   unitNormal_{unit(normal)},
-  ptOnWall_{-distanceFromTheOrigin * unitNormal_} {}
+  ptOnWall_{ptOnWall}
+{}
 
 void sph::Wall::resolveCollisions(ParticleSystem& ps) const
 {

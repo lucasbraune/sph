@@ -39,19 +39,25 @@ class Simulation {
 public:
   Simulation(const ParticleSystem& ps,
              const PhysicsType& physics,
+             const Rectangle& region,
              const IntegratorType& integrator,
-             double simulationSpeed = 1.0, int fps = 60) :
+             double simulationSpeed,
+             int fps) :
     physics_{physics},
     ps_{ps},
+    region_{region},
     integrator_{integrator},
     synchronizer_{},
     targetSpeed_{simulationSpeed},
     fps_{fps},
-    paused_{false} {}
+    paused_{false}
+  {}
   
   virtual ~Simulation() {}
   
   SimulationState state() const { return {ps_, targetSpeed_, paused_}; }
+  const Rectangle& region() const { return region_; }
+  size_t numberOfParticles() const { return ps_.particles.size(); }
 
   void computeNextFrame() 
   {
@@ -84,6 +90,7 @@ private:
   }
   
   ParticleSystem ps_;
+  const Rectangle region_;
   IntegratorType integrator_;
   detail::Synchronizer synchronizer_;
   double targetSpeed_;

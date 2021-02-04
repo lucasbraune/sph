@@ -1,5 +1,6 @@
 #include "sample_simulations.hpp"
-#include <cmath> // sqrt, M_PI
+#include <cassert>
+#include <cmath>
 #include <random>
 
 using std::vector;
@@ -8,51 +9,69 @@ using namespace sph;
 
 namespace {
 
-double interactionRadius(double numberOfParticles)
+double interactionRadius(const Rectangle& region, size_t numberOfParticles)
 {
-  return std::sqrt(10.0 / numberOfParticles);
+  constexpr auto neighborsPerParticle = 10;
+  auto areaPerParticle = neighborsPerParticle * area(region) / numberOfParticles;
+  return std::sqrt(areaPerParticle / M_PI);
 }
 
 } // namespace
 
-sph::ToyStarPhysics::ToyStarPhysics(double gravityConstant,
-                               double dampingConstant,
-                               double pressureConstant,
-                               double interactionRadius,
-                               const Rectangle& region) :
-  gravity_{gravityConstant},
-  damping_{dampingConstant},
-  pressure_{makePressureForce(GasPressure{pressureConstant}, interactionRadius, region)}
-{}
-
-Simulation<ToyStarPhysics> sph::createToyStarSimulation(
-    size_t numberOfParticles,
-    double totalMass,
-    double starRadius,
-    Rectangle region,
-    double dampingConstant,
-    double pressureConstant,
-    double timeStep)
+double sph::ToyStarParameters::interactionRadius() const
 {
-  auto gravityConstant = 8 * totalMass * pressureConstant / (M_PI * pow(starRadius, 4));
-  return {ParticleSystem{randomParticles(region, numberOfParticles), totalMass},
-          ToyStarPhysics{gravityConstant, dampingConstant, pressureConstant,
-                         interactionRadius(numberOfParticles), region},
-          Verlet{timeStep}};
+  return ::interactionRadius(region, numberOfParticles);
 }
 
-sph::BreakingDamPhysics::BreakingDamPhysics(double gravityConstant,
-                         double dampingConstant,
-                         double pressureConstant,
-                         double interactionRadius) :
-  gravity_{gravityConstant},
-  damping_{dampingConstant},
-  pressure_{makePressureForce(GasPressure{pressureConstant},
-                              interactionRadius,
-                              Rectangle{-1.0, -1.0, 1.0, 1.0})},
-  leftWall_{Vec2d{1.0, 0.0},  WALL_OFFSET_},
-  bottomWall_{Vec2d{0.0, 1.0},  WALL_OFFSET_},
-  rightWall_{Vec2d{-1.0, 0.0},  0.0} {}
+double sph::BreakingDamParameters::interactionRadius() const
+{
+  return ::interactionRadius(region, numberOfParticles);
+}
+
+double sph::ToyStarParameters::gravityConstant() const
+{
+  return 8.0 * mass * pressureConstant / (M_PI * std::pow(radius, 4));
+}
+
+sph::ToyStarPhysics::ToyStarPhysics(const ToyStarParameters& params) :
+  gravity_{params.gravityConstant()},
+  damping_{params.dampingConstant},
+  pressure_{makePressureForce(GasPressure{params.pressureConstant},
+                              params.interactionRadius(), params.region)}
+{}
+
+Simulation<ToyStarPhysics> sph::createSimulation(const ToyStarParameters& params)
+{
+  return {createParticleSystem(params.numberOfParticles, params.mass, params.region),
+          ToyStarPhysics{params}, params.region, Verlet{params.timeStep},
+          params.simulationSpeed, params.fps};
+}
+
+double sph::BreakingDamParameters::restDensity() const
+{
+  const auto fractionOfArea = (damPosition - region.xmin) / width(region);
+  assert(fractionOfArea > 0);
+  return fluidMass / (fractionOfArea * area(region));
+}
+
+namespace {
+
+constexpr auto LEFT = Vec2d{-1, 0};
+constexpr auto RIGHT = Vec2d{1, 0};
+constexpr auto UP = Vec2d{0, 1};
+
+} // namespace
+
+sph::BreakingDamPhysics::BreakingDamPhysics(const BreakingDamParameters& params) :
+  gravity_{params.gravityAcceleration},
+  damping_{params.dampingConstant},
+  pressure_{makePressureForce(WaterPressure{params.pressureConstant, params.restDensity()},
+                              params.interactionRadius(), params.region)},
+  leftWall_{RIGHT, {params.region.xmin, 0}},
+  bottomWall_{UP, {0, params.region.ymin}},
+  rightWall_{LEFT, {params.damPosition, 0}},
+  rightWallAfter_{LEFT, {params.region.xmax, 0}}
+{}
 
 void sph::BreakingDamPhysics::resolveCollisions(ParticleSystem& ps) const
 {
@@ -62,10 +81,13 @@ void sph::BreakingDamPhysics::resolveCollisions(ParticleSystem& ps) const
 }
 
 sph::BreakingDamSimulation::BreakingDamSimulation(const ParticleSystem& ps,
-                                             const BreakingDamPhysics& physics,
-                                             const Verlet& integrator,
-                                             double simulationSpeed, int fps) :
-    Simulation<BreakingDamPhysics>{ps, physics, integrator, simulationSpeed, fps} {}
+                                                  const BreakingDamPhysics& physics,
+                                                  const Rectangle& region,
+                                                  double timeStep,
+                                                  double simulationSpeed,
+                                                  int fps) :
+  Simulation<BreakingDamPhysics>{ps, physics, region, Verlet{timeStep}, simulationSpeed, fps}
+{}
 
 void sph::BreakingDamSimulation::increaseDamping()
 {
@@ -91,19 +113,15 @@ void sph::BreakingDamSimulation::decreaseGravity()
   gravity.setMagnitude(0.5 * gravity.magnitude());
 }
 
-BreakingDamSimulation sph::createBreakingDamSimulation(
-    size_t numberOfParticles,
-    double totalMass,
-    Rectangle region,
-    double gravityConstant,
-    double dampingConstant,
-    double pressureConstant,
-    double timeStep)
+Rectangle initialRegion(const BreakingDamParameters& params)
 {
-  return {ParticleSystem{randomParticles(region, numberOfParticles), totalMass},
-          BreakingDamPhysics{gravityConstant,
-                             dampingConstant,
-                             pressureConstant, 
-                             interactionRadius(numberOfParticles)},
-          Verlet{timeStep}};
+  return {params.region.xmin, params.region.ymin,
+          params.damPosition, params.region.ymax};
+}
+
+BreakingDamSimulation sph::createSimulation(const BreakingDamParameters& params)
+{
+  return {createParticleSystem(params.numberOfParticles, params.fluidMass, initialRegion(params)),
+          BreakingDamPhysics{params}, params.region, params.timeStep,
+          params.simulationSpeed, params.fps};
 }

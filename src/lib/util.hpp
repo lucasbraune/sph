@@ -47,6 +47,7 @@ struct Rectangle final {
 
 inline double width(const Rectangle& rect) { return rect.xmax - rect.xmin; }
 inline double height(const Rectangle& rect) { return rect.ymax - rect.ymin; }
+inline double area(const Rectangle& rect) { return height(rect) * width(rect); }
 
 Vec2d randomVec2d(const Rectangle& rect = {0.0, 0.0, 1.0, 1.0});
 

@@ -6,21 +6,22 @@
 
 namespace sph {
 
-class View {
+class DrawFunction {
 public:
-  View(const Rectangle& region, size_t numberOfParticles,
-       double density = 0.3, size_t sides = 10);
-  void draw(const SimulationState& state) const;
-  const Rectangle region;
+  DrawFunction(const Rectangle& region, size_t numberOfParticles,
+               double density = 0.3, size_t sides = 10);
+  void operator()(const SimulationState& state) const;
+  
 
 private:
+  const Rectangle region_;
   const std::vector<Vec2d> particlePolygon_;
 };
 
 namespace detail {
 
 template<class Simulation>
-void keyboardHelper(Simulation& simulation, char c)
+void handleBasicKeyboardInput(Simulation& simulation, char c)
 {
   switch (c) {
   case 'p':
@@ -41,7 +42,7 @@ void keyboardHelper(Simulation& simulation, char c)
 template<class Simulation>
 void handleKeyboardInput(Simulation& simulation, char c)
 {
-  detail::keyboardHelper(simulation, c);
+  detail::handleBasicKeyboardInput(simulation, c);
 }
 
 template<>
@@ -59,7 +60,7 @@ inline void handleKeyboardInput(BreakingDamSimulation& simulation, char c)
     simulation.increaseDamping();
     break;
   default:
-    detail::keyboardHelper(simulation, c);
+    detail::handleBasicKeyboardInput(simulation, c);
   }
 }
 

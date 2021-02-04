@@ -42,12 +42,12 @@ std::string textInfo(const SimulationState& state)
 
 } // namespace
 
-View::View(const Rectangle& region, size_t numberOfParticles, double density, size_t sides) :
-  region{region},
+DrawFunction::DrawFunction(const Rectangle& region, size_t numberOfParticles, double density, size_t sides) :
+  region_{region},
   particlePolygon_{regularPolygon(particleRadius(region, numberOfParticles, density), sides)}
 {}
 
-void View::draw(const SimulationState& state) const
+void DrawFunction::operator()(const SimulationState& state) const
 {
   glClearColor(1.0, 1.0, 1.0, 1.0); // White
   glClear(GL_COLOR_BUFFER_BIT);
@@ -63,6 +63,6 @@ void View::draw(const SimulationState& state) const
   }
 
   glColor3f(1.0, 0.0, 0.0); // Red
-  glRasterPos2d(0.95 * region.xmin, 0.95 * region.ymin);
+  glRasterPos2d(0.95 * region_.xmin, 0.95 * region_.ymin);
   drawText(textInfo(state));
 }

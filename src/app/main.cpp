@@ -7,21 +7,17 @@
 
 using namespace sph;
 
-void createGlutWindow(const Rectangle region, int verticalPixels, const std::string title);
+void createGlutWindow(const Rectangle& region, int verticalPixels, const std::string title);
 void display();
 void idle();
 void keyboard(unsigned char key, int x, int y);
 
-template<class Simulation>
-size_t numberOfParticles(const Simulation& sim) { return sim.state().ps.particles.size(); }
-
-// auto simulation = createToyStarSimulation();
-auto simulation = createBreakingDamSimulation();
-const auto view = View{Rectangle{-1, -1, 1, 1}, numberOfParticles(simulation)};
+// auto simulation = createSimulation(ToyStarParameters{});
+auto simulation = createSimulation(BreakingDamParameters{});
 
 int main()
 {
-  createGlutWindow(view.region, 750, "Fluid simulation");
+  createGlutWindow(simulation.region(), 750, "Fluid simulation");
   // Register callback functions
   glutDisplayFunc(display);
   glutIdleFunc(idle);
@@ -31,27 +27,26 @@ int main()
   return 0;
 }
 
-void glutInit()
+int horizontalPixels(int verticalPixels, const Rectangle& region)
 {
-  int argc = 0;
-  char** argv = new char*[0];
-  glutInit(&argc, argv);
-  delete[] argv;
+  auto result = verticalPixels * (width(region) / height(region));
+  return static_cast<int>(result);
 }
 
-void createGlutWindow(const Rectangle region, int verticalPixels, const std::string title)
+void createGlutWindow(const Rectangle& region, int verticalPixels, const std::string title)
 {
-  glutInit();
+  int argc = 0;
+  glutInit(&argc, nullptr);
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-  const auto horizontalPixels = static_cast<int>(verticalPixels * (width(region) / height(region)));
-  glutInitWindowSize(horizontalPixels, verticalPixels);
+  glutInitWindowSize(horizontalPixels(verticalPixels, region), verticalPixels);
   glutCreateWindow(title.c_str());
   gluOrtho2D(region.xmin, region.xmax, region.ymin, region.ymax);
 }
 
 void display()
 {
-  view.draw(simulation.state());
+  static auto draw = DrawFunction{simulation.region(), simulation.numberOfParticles()};
+  draw(simulation.state());
   glutSwapBuffers();
 }
 

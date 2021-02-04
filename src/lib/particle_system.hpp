@@ -11,13 +11,13 @@ struct Particle final {
 };
 
 struct ParticleSystem final {
-  ParticleSystem(const std::vector<Particle>& particles, double totalMass);
   std::vector<Particle> particles;
   double particleMass;
-  double time;
+  double time = 0.0;
 };
 
-std::vector<Particle> randomParticles(const Rectangle& region, size_t numberOfParticles);
+ParticleSystem createParticleSystem(size_t numberOfParticles, double totalMass,
+                                    const Rectangle& region);
 
 struct Physics {
   virtual ~Physics() {}
@@ -80,8 +80,7 @@ private:
 
 class Wall : public Collidable {
 public:
-  Wall(const Vec2d& normal, // must be nonzero
-       double distanceFromTheOrigin);
+  Wall(const Vec2d& normal, const Vec2d& ptOnWall);
   void resolveCollisions(ParticleSystem& ps) const final;
   void move(const Vec2d& displacement) { ptOnWall_ += displacement; }
 
