@@ -7,7 +7,7 @@
 
 namespace sph {
 
-struct ToyStarParameters {
+struct ToyStarParameters final {
   // Simulation
   size_t numberOfParticles = 1000;
   Rectangle region = {-1, -1, 1, 1};
@@ -38,7 +38,7 @@ struct ToyStarPhysics final : public Physics {
 
 Simulation<ToyStarPhysics> createSimulation(const ToyStarParameters& params = {});
 
-struct BreakingDamParameters {
+struct BreakingDamParameters final {
   // Simulation
   size_t numberOfParticles = 1000;
   double timeStep = 0.01;

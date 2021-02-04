@@ -26,7 +26,7 @@ private:
   const double C_, D_;
 };
 
-class WaterPressure {
+class WaterPressure final {
 public:
   WaterPressure(double pressureConstant, double restDensity);
   double operator()(double density) const;
@@ -36,7 +36,7 @@ private:
   const double restDensity_;
 };
 
-class GasPressure {
+class GasPressure final {
 public:
   GasPressure(double pressureConstant);
   double operator()(double density) const;

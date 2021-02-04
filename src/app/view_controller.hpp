@@ -6,7 +6,7 @@
 
 namespace sph {
 
-class DrawFunction {
+class DrawFunction final {
 public:
   DrawFunction(const Rectangle& region, size_t numberOfParticles,
                double density = 0.3, size_t sides = 10);

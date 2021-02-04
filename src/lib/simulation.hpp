@@ -10,7 +10,7 @@ namespace sph {
 
 namespace detail {
 
-class Synchronizer {
+class Synchronizer final {
 public:
   Synchronizer();
   void synchronize(double simulationNow);
@@ -25,7 +25,7 @@ private:
 
 } // namespace detail
 
-struct SimulationState {
+struct SimulationState final {
   const ParticleSystem& ps;
   const double targetSpeed;
   const bool paused;
