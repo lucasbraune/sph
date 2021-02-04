@@ -24,7 +24,7 @@ struct ToyStarParameters final {
   double gravityConstant() const;
 };
 
-struct ToyStarPhysics final : public Physics {
+struct ToyStarPhysics final : Physics {
   ToyStarPhysics(const ToyStarParameters& params);
 
   void applyForces(ParticleSystem& ps) override { gravity_.apply(ps); pressure_.apply(ps); }
@@ -56,7 +56,7 @@ struct BreakingDamParameters final {
   double restDensity() const;
 };
 
-struct BreakingDamPhysics final : public Physics {
+struct BreakingDamPhysics final : Physics {
   BreakingDamPhysics(const BreakingDamParameters& params);
   void applyForces(ParticleSystem& ps) override { gravity_.apply(ps); pressure_.apply(ps); }
   void applyDamping(ParticleSystem& ps) const override { damping_.apply(ps); };
