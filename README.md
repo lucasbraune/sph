@@ -1,8 +1,8 @@
 # sph-fluids
-This program simulates a two-dimensional fluid using the SPH method. SPH stands for <a href="https://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics">smoothed particle hydrodynamics</a>. The simulation runs in real time. Fluid particles are drawn on the screen using OpenGL. 
-
-# Demo
-<img src="toystar.gif" width="600">
+This program simulates a two-dimensional fluid using the SPH method.
+SPH stands for <a href="https://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics">smoothed particle hydrodynamics</a>.
+Fluid particles are drawn to a window using OpenGL.
+An ordinary laptop should be able to run simulations with up to a few thousand particles in real time.
 
 # Building and running the program
 
@@ -15,3 +15,6 @@ To build and run the program, execute the command
 ```
 make run
 ```
+
+# Demo
+<img src="toystar.gif" width="600">
