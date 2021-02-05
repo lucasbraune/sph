@@ -1,4 +1,6 @@
 /**
+ * File: util.hpp
+ * 
  * This header declares types representing two-dimensional vectors, rectangles, disks and matrices.
  */
 

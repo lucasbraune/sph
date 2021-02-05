@@ -1,6 +1,7 @@
 #ifndef PRESSURE_FORCE_H
 #define PRESSURE_FORCE_H
 
+#include <functional>
 #include "particle_system.hpp"
 #include "summation_strategy.hpp"
 
@@ -62,13 +63,13 @@ public:
     summationStrategy_.syncWith(ps);
     updateDensities(ps);
     for (auto& particle : ps.particles) {
-      auto quotient1 = pressure_(particle.density) / (particle.density * particle.density);
-      auto summand = [&](auto& neighbor) {
-        auto quotient2 = pressure_(neighbor.density) / (neighbor.density * neighbor.density);
+      const auto quotient1 = quotient(particle.density);
+      const auto summand = [&](auto& neighbor) {
+        auto quotient2 = quotient(neighbor.density);
         return (quotient1 + quotient2) * kernel_.gradientAt(particle.pos - neighbor.pos);
       };
-      particle.acc -= ps.particleMass *
-                      summationStrategy_.sumOverParticles(summand, neighborhood(particle), ps);
+      const auto sum = summationStrategy_.sumOverParticles(summand, neighborhood(particle), ps);
+      particle.acc -= ps.particleMass * sum;
     }
   }
 
@@ -76,17 +77,22 @@ private:
   void updateDensities(ParticleSystem& ps) const
   {
     for (auto& particle : ps.particles) {
-      auto summand = [&](auto& neighbor) { 
+      const auto summand = [&](auto& neighbor) { 
         return kernel_(particle.pos - neighbor.pos);
       };
-      particle.density = ps.particleMass *
-                         summationStrategy_.sumOverParticles(summand, neighborhood(particle), ps);
+      const auto sum = summationStrategy_.sumOverParticles(summand, neighborhood(particle), ps);
+      particle.density = ps.particleMass * sum;
     }
   }
 
   Disk neighborhood(const Particle& particle) const
   {
     return Disk{particle.pos, kernel_.interactionRadius()};
+  }
+
+  double quotient(double density) const
+  {
+    return pressure_(density) / (density * density);
   }
 
   SummationStrategy summationStrategy_;
