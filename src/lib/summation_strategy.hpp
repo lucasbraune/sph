@@ -24,6 +24,8 @@ public:
   /**
    * Returns the sum of the values of a function evaluated at all particles of a
    * particle system.
+   * 
+   * Precondition: This object must be synchronized with the specified particle system.
    */
   template<class SummandFn>
   std::result_of_t<SummandFn(const Particle&)>
@@ -49,6 +51,7 @@ namespace detail {
  * equal length.
  */
 struct SubdividedInterval final {
+  // Preconditions: left < right, subdivisions > 0
   SubdividedInterval(double left, double right, size_t subdivisions);
 
   /**
@@ -67,7 +70,9 @@ struct SubdividedInterval final {
 
 class GridBasedSummation final {
 public:
+  // Precondition: rows > 0, cols > 0
   GridBasedSummation(const Rectangle& rect, size_t rows, size_t cols);
+  // Precondition: minimumCellLength > 0
   GridBasedSummation(const Rectangle& rect, double minimumCellLength);
 
   /**
