@@ -10,10 +10,11 @@ On MacOS, using <a href="https://brew.sh">Homebrew</a>, freeglut can be installe
 ```
 brew install freeglut
 ```
-To build and run the program, execute the command
+To build and run the program, execute
 ```
 make run
 ```
+from this repository's root folder.
 
 # Demo
 <img src="toystar.gif" width="600">
