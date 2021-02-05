@@ -1,3 +1,7 @@
+/**
+ * This header declares types representing two-dimensional vectors, rectangles, disks and matrices.
+ */
+
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
@@ -8,6 +12,7 @@ namespace sph {
 
 using Vec2d = std::array<double, 2>;
 
+// Assignment operations
 inline Vec2d& operator+=(Vec2d& a, const Vec2d& b)
 {
   a[0] += b[0];
@@ -28,12 +33,14 @@ inline Vec2d& operator*=(Vec2d& a, const double lambda)
 }
 inline Vec2d& operator/=(Vec2d& a, double lambda) { return a *= 1.0 / lambda; }
 
+// Algebraic operations
 inline Vec2d operator+(Vec2d a, const Vec2d& b) { return a += b; }
 inline Vec2d operator-(Vec2d a, const Vec2d& b) { return a -= b; }
 inline Vec2d operator*(double lambda, Vec2d a) { return a *= lambda; }
 inline Vec2d operator*(Vec2d a, double lambda) { return a *= lambda; }
 inline Vec2d operator/(Vec2d a, double lambda) { return a /= lambda; }
 
+// Geometric operations
 inline double dotProduct(const Vec2d& a, const Vec2d& b) { return a[0] * b[0] + a[1] * b[1]; }
 Vec2d project(const Vec2d& x, const Vec2d& normal);
 double norm(const Vec2d& x);
@@ -45,6 +52,7 @@ struct Rectangle final {
   const double xmin, ymin, xmax, ymax;
 };
 
+// Properties of a rectangle
 inline double width(const Rectangle& rect) { return rect.xmax - rect.xmin; }
 inline double height(const Rectangle& rect) { return rect.ymax - rect.ymin; }
 inline double area(const Rectangle& rect) { return height(rect) * width(rect); }

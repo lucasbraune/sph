@@ -76,14 +76,14 @@ public:
   GridBasedSummation(const Rectangle& rect, double minimumCellLength);
 
   /**
-   * Synchronizes this object with the specified particle system. Synchronization lasts
-   * until the positions of the particles in the specified particle system change.
+   * Synchronizes this object with the specified particle system. Synchronization is
+   * broken if the positions of the particles in the specified particle system change.
    */
   void syncWith(const ParticleSystem& ps);
   
   /**
    * Returns the sum of the values of a function evaluated at all particles of a
-   * particle system. The second argument is a disk outside of which the function
+   * particle system. The second argument is a disk outside which the function
    * is identically zero.
    * 
    * Precondition: This object must be synchronized with the specified particle system.
@@ -113,10 +113,7 @@ public:
 private:
   size_t row(double x) const { return width_.subdivision(x); }
   size_t column(double y) const { return height_.subdivision(y); }
-  bool inSync(const ParticleSystem& ps) const
-  {
-    return ps_ == &ps && lastSynchronized_ == ps.time;
-  }
+  bool inSync(const ParticleSystem& ps) const { return ps_ == &ps && lastSynchronized_ == ps.time; }
   
   Matrix<std::vector<const Particle*>> grid_;
   const detail::SubdividedInterval width_, height_;
