@@ -2,7 +2,7 @@
 #define PRESSURE_FORCE_H
 
 #include "particle_system.hpp"
-#include "loop_strategy.hpp"
+#include "summation_strategy.hpp"
 
 namespace sph {
 

@@ -1,4 +1,4 @@
-#include "loop_strategy.hpp"
+#include "summation_strategy.hpp"
 #include <cassert>
 
 using namespace sph;

@@ -5,8 +5,8 @@
  * the particles of a particle system.
  */
 
-#ifndef LOOP_STRATEGY_HPP
-#define LOOP_STRATEGY_HPP
+#ifndef SUMMATION_STRATEGY_HPP
+#define SUMMATION_STRATEGY_HPP
 
 #include <cassert>
 #include <type_traits>
