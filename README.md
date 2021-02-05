@@ -1,4 +1,4 @@
-# sph-fluids
+# sph
 This program simulates a two-dimensional fluid using the SPH method.
 SPH stands for <a href="https://en.wikipedia.org/wiki/Smoothed-particle_hydrodynamics">smoothed particle hydrodynamics</a>.
 An ordinary laptop should be able to run simulations with up to a few thousand particles in real time.
