@@ -1,3 +1,10 @@
+/**
+ * File: summation_strategy.hpp
+ * 
+ * This header declares types that represent strategies for performing sums over
+ * the particles of a particle system.
+ */
+
 #ifndef LOOP_STRATEGY_HPP
 #define LOOP_STRATEGY_HPP
 
@@ -7,35 +14,48 @@
 
 namespace sph {
 
-class TrivialLoopStrategy final {
+class TrivialSummation final {
 public:
+  /**
+   * Synchronizes this object with the specified particle system.
+   */
   void syncWith(const ParticleSystem& ps) { ps_ = &ps; };
   
+  /**
+   * Returns the sum of the values of a function evaluated at all particles of a
+   * particle system.
+   */
   template<class SummandFn>
   std::result_of_t<SummandFn(const Particle&)>
-  accumulate(SummandFn&& summand, const ParticleSystem& ps, const Disk&) const
+  sumOverParticles(SummandFn&& summand, const Disk&, const ParticleSystem& ps) const
   {
     assert(inSync(ps));
     auto sum = std::result_of_t<SummandFn(const Particle&)>{};
-    for (auto& neighbor : ps_->particles) {
-      sum += summand(neighbor);
+    for (auto& particle : ps_->particles) {
+      sum += summand(particle);
     }
     return sum;
   }
 
 private:
-  bool inSync(const ParticleSystem& ps) const
-  {
-    return ps_ == &ps && ps_->time == ps.time;
-  }
-  
+  bool inSync(const ParticleSystem& ps) const { return ps_ == &ps; }
   const ParticleSystem* ps_;
 };
 
 namespace detail {
 
+/**
+ * Represents a half-open interval [left, right) subdivided into half-open subintervals of
+ * equal length.
+ */
 struct SubdividedInterval final {
   SubdividedInterval(double left, double right, size_t subdivisions);
+
+  /**
+   * Returns the index of the subdivision containing a specified real number x.
+   * If there is no such subdivision, returns 0 or the number of subdivisions minus one,
+   * according to whether x < left or x >= right. 
+   */
   size_t subdivision(double x) const;
 
   const double left;
@@ -45,21 +65,34 @@ struct SubdividedInterval final {
 
 } // namespace detail
 
-class GridBasedLoopStrategy final {
+class GridBasedSummation final {
 public:
-  GridBasedLoopStrategy(const Rectangle& rect, size_t rows, size_t cols);
+  GridBasedSummation(const Rectangle& rect, size_t rows, size_t cols);
+  GridBasedSummation(const Rectangle& rect, double minimumCellLength);
+
+  /**
+   * Synchronizes this object with the specified particle system. Synchronization lasts
+   * until the positions of the particles in the specified particle system change.
+   */
   void syncWith(const ParticleSystem& ps);
   
+  /**
+   * Returns the sum of the values of a function evaluated at all particles of a
+   * particle system. The second argument is a disk outside of which the function
+   * is identically zero.
+   * 
+   * Precondition: This object must be synchronized with the specified particle system.
+   */
   template<class SummandFn>
   std::result_of_t<SummandFn(const Particle&)>
-  accumulate(SummandFn&& summand, const ParticleSystem& ps, const Disk& neighborhood) const
+  sumOverParticles(SummandFn&& summand, const Disk& support, const ParticleSystem& ps) const
   {
     assert(inSync(ps));
 
-    const auto minI = row(neighborhood.center[0] - neighborhood.radius);
-    const auto maxI = row(neighborhood.center[0] + neighborhood.radius);
-    const auto minJ = column(neighborhood.center[1] - neighborhood.radius);
-    const auto maxJ = column(neighborhood.center[1] + neighborhood.radius);
+    const auto minI = row(support.center[0] - support.radius);
+    const auto maxI = row(support.center[0] + support.radius);
+    const auto minJ = column(support.center[1] - support.radius);
+    const auto maxJ = column(support.center[1] + support.radius);
     
     auto sum = std::result_of_t<SummandFn(const Particle&)>{};
     for (size_t i=minI; i<=maxI; ++i) {
@@ -77,15 +110,14 @@ private:
   size_t column(double y) const { return height_.subdivision(y); }
   bool inSync(const ParticleSystem& ps) const
   {
-    return ps_ == &ps && ps_->time == ps.time;
+    return ps_ == &ps && lastSynchronized_ == ps.time;
   }
   
   Matrix<std::vector<const Particle*>> grid_;
   const detail::SubdividedInterval width_, height_;
   const ParticleSystem* ps_;
+  double lastSynchronized_;
 };
-
-GridBasedLoopStrategy makeGridBasedLoopStrategy(const Rectangle& rect, double minimumCellLength);
 
 } // namespace sph
 

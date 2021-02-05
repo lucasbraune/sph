@@ -46,19 +46,20 @@ private:
 };
 
 template<class PressureFn,
-         class NeighborLoopStrategy = GridBasedLoopStrategy,
+         class SummationStrategy = GridBasedSummation,
          class KernelFn = CubicKernel>
 class PressureForce final : public Force {
+  static_assert(std::is_convertible_v<PressureFn, std::function<double(double)>>);
   static_assert(std::is_base_of_v<SmoothingKernel, KernelFn>);
 
 public:
   PressureForce(const PressureFn& pressure, const KernelFn& kernel,
-                const NeighborLoopStrategy& loopStrategy) :
-    loopStrategy_{loopStrategy}, kernel_{kernel}, pressure_{pressure} {}
+                const SummationStrategy& summationStrategy) :
+    summationStrategy_{summationStrategy}, kernel_{kernel}, pressure_{pressure} {}
 
   void apply(ParticleSystem& ps) override
   {
-    loopStrategy_.syncWith(ps);
+    summationStrategy_.syncWith(ps);
     updateDensities(ps);
     for (auto& particle : ps.particles) {
       auto quotient1 = pressure_(particle.density) / (particle.density * particle.density);
@@ -67,7 +68,7 @@ public:
         return (quotient1 + quotient2) * kernel_.gradientAt(particle.pos - neighbor.pos);
       };
       particle.acc -= ps.particleMass *
-                      loopStrategy_.accumulate(summand, ps, neighborhood(particle));
+                      summationStrategy_.sumOverParticles(summand, neighborhood(particle), ps);
     }
   }
 
@@ -79,7 +80,7 @@ private:
         return kernel_(particle.pos - neighbor.pos);
       };
       particle.density = ps.particleMass *
-                         loopStrategy_.accumulate(summand, ps, neighborhood(particle));
+                         summationStrategy_.sumOverParticles(summand, neighborhood(particle), ps);
     }
   }
 
@@ -88,7 +89,7 @@ private:
     return Disk{particle.pos, kernel_.interactionRadius()};
   }
 
-  NeighborLoopStrategy loopStrategy_;
+  SummationStrategy summationStrategy_;
   KernelFn kernel_;
   PressureFn pressure_;
 };
@@ -96,8 +97,8 @@ private:
 template<class PressureFn>
 auto makePressureForce(PressureFn&& pressure, double interactionRadius)
 {
-  return PressureForce<PressureFn, TrivialLoopStrategy>{
-    pressure, CubicKernel{interactionRadius}, TrivialLoopStrategy{}
+  return PressureForce<PressureFn, TrivialSummation>{
+    pressure, CubicKernel{interactionRadius}, TrivialSummation{}
   };
 }
 
@@ -106,7 +107,7 @@ auto makePressureForce(PressureFn&& pressure, double interactionRadius, const Re
 {
   return PressureForce<PressureFn>{
     pressure, CubicKernel{interactionRadius},
-    makeGridBasedLoopStrategy(region, interactionRadius)
+    GridBasedSummation{region, interactionRadius}
   };
 }
 
