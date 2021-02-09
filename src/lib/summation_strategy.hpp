@@ -17,7 +17,8 @@ namespace sph {
 class TrivialSummation final {
 public:
   /**
-   * Synchronizes this object with the specified particle system.
+   * Synchronizes this object with the specified particle system. Synchronization lasts
+   * until this object is synchronized with another particle system.
    */
   void syncWith(const ParticleSystem& ps) { ps_ = &ps; };
   
@@ -77,7 +78,8 @@ public:
 
   /**
    * Synchronizes this object with the specified particle system. Synchronization is
-   * broken if the positions of the particles in the specified particle system change.
+   * broken if the positions of the particles in the specified particle system change,
+   * or if this object is synchronized with another particle system.
    */
   void syncWith(const ParticleSystem& ps);
   
