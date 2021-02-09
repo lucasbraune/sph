@@ -14,35 +14,28 @@
 
 namespace sph {
 
-class TrivialSummation final {
-public:
-  /**
-   * Synchronizes this object with the specified particle system. Synchronization lasts
-   * until this object is synchronized with another particle system.
+struct TrivialSummation final {
+  /** 
+   * Method present so that this class exposes the same API as other summation strategy classes.
    */
-  void syncWith(const ParticleSystem& ps) { ps_ = &ps; };
+  void syncWith(const ParticleSystem&) {};
   
   /**
-   * Returns the sum of the values of a function evaluated at all particles of a
-   * particle system.
-   * 
-   * Precondition: This object must be synchronized with the specified particle system.
+   * Returns the sum of the values of a function evaluated at all particles of a particle system.
+   *
+   * The second argument is present so that this class exposes the same API as other summantion
+   * strategy classes.
    */
   template<class SummandFn>
   std::result_of_t<SummandFn(const Particle&)>
   sumOverParticles(SummandFn&& summand, const Disk&, const ParticleSystem& ps) const
   {
-    assert(inSync(ps));
     auto sum = std::result_of_t<SummandFn(const Particle&)>{};
-    for (auto& particle : ps_->particles) {
+    for (auto& particle : ps.particles) {
       sum += summand(particle);
     }
     return sum;
   }
-
-private:
-  bool inSync(const ParticleSystem& ps) const { return ps_ == &ps; }
-  const ParticleSystem* ps_;
 };
 
 namespace detail {
