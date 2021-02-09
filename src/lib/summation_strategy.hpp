@@ -87,7 +87,7 @@ public:
   std::result_of_t<SummandFn(const Particle&)>
   sumOverParticles(SummandFn&& summand, const Disk& support, const ParticleSystem& ps) const
   {
-    assert(inSync(ps));
+    assert(seemsInSync(ps));
 
     const auto minI = row(support.center[0] - support.radius);
     const auto maxI = row(support.center[0] + support.radius);
@@ -108,7 +108,10 @@ public:
 private:
   size_t row(double x) const { return width_.subdivision(x); }
   size_t column(double y) const { return height_.subdivision(y); }
-  bool inSync(const ParticleSystem& ps) const { return ps_ == &ps && lastSynchronized_ == ps.time; }
+  bool seemsInSync(const ParticleSystem& ps) const
+  { 
+    return ps_ == &ps && lastSynchronized_ == ps.time;
+  }
   
   Matrix<std::vector<const Particle*>> grid_;
   const detail::SubdividedInterval width_, height_;
