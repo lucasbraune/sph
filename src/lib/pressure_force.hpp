@@ -65,7 +65,7 @@ public:
     for (auto& particle : ps.particles) {
       const auto quotient1 = quotient(particle.density);
       const auto summand = [&](auto& neighbor) {
-        auto quotient2 = quotient(neighbor.density);
+        const auto quotient2 = quotient(neighbor.density);
         return (quotient1 + quotient2) * kernel_.gradientAt(particle.pos - neighbor.pos);
       };
       const auto sum = summationStrategy_.sumOverParticles(summand, neighborhood(particle), ps);
