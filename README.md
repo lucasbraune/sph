@@ -14,7 +14,7 @@ To build and run the program, execute
 ```
 make run
 ```
-from this repository's root folder.
+from this repository's root directory.
 
 # Demo
 <img src="toystar.gif" width="600">
